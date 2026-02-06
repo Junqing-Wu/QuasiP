@@ -1,0 +1,659 @@
+MATLAB version 9.14.0.2674353 (R2023a) Update 7 on architecture win64
+
+run: { runid='qp' toolbox='empty' tbxctor=@empty_ctor isol_type='' sol_type='' dir='C:\Users\lenovo\Desktop\QuasiP\examples\002_CCP\data\qp' bdfname='C:\Users\lenovo\Desktop\QuasiP\examples\002_CCP\data\qp\bd.mat' logname='C:\Users\lenovo\Desktop\QuasiP\examples\002_CCP\data\qp\coco_log.txt' scrname='C:\Users\lenovo\Desktop\QuasiP\examples\002_CCP\data\qp\coco_scr.txt' }
+
+all: { TOL=1e-06 CleanData=false LogLevel=1 data_dir='C:\Users\lenovo\Desktop\QuasiP\examples\002_CCP\data' }
+  +-cont: { PtMX=1000 }
+  +-corr: { tol=0.0001 }
+  +-QuasiP: { order=1 DOF=7 ode_opts=struct PHI_INITIAL=struct }
+  +-lsol: { det=true }
+
+funcs
+  +-QuasiP: { type='zero' }
+  | +-pars: { type='inactive' pars={ 'cm1' 'cm2' } }
+  +-OM1: { type='inactive' pars={ 'Om1' } }
+  +-cseg
+  | +-prcond: { type='zero' }
+  +-atlas
+    +-test
+      +-BP: { type='singular' pars={ 'atlas.test.BP' } }
+      +-FP: { type='singular' pars={ 'atlas.test.FP' } }
+
+slots
+  +-cseg
+  | +-fix_mfunc: { signal='fix_mfunc@CurveSegmentBase.fix_mfunc' }
+  | +-remesh: { signal='remesh@CurveSegmentBase.remesh' }
+  | +-set_mode: { signal='set_mode@CurveSegmentBase.set_mode' }
+  | +-update: { signal='update@CurveSegmentBase.update' }
+  | +-update_h: { signal='update_h@CurveSegmentBase.update_h' }
+  | +-update_w: { signal='update_w@CurveSegmentBase.update_w' }
+  +-run: { signal='save_bd@save_run' }
+  +-bd: { signal='save_bd@save_bd' }
+  +-bddat: { signal='save_bd@save_bddat' }
+  +-QuasiP: { signal='save_full@coco_save_data' }
+  +-lsol
+    +-det: { signal='set_mode@set_save_det' }
+
+signals
+  +-save_bd: { owner='coco' slots={ 'run@save_run' 'bd@save_bd' 'bddat@save_bddat' } }
+  +-update: { owner='CurveSegmentBase' slots={ 'cseg.update@CurveSegmentBase.update' } }
+  +-set_mode: { owner='CurveSegmentBase' slots={ 'cseg.set_mode@CurveSegmentBase.set_mode' 'lsol.det@set_save_det' } }
+  +-update_h: { owner='CurveSegmentBase' slots={ 'cseg.update_h@CurveSegmentBase.update_h' } }
+  +-fix_mfunc: { owner='CurveSegmentBase' slots={ 'cseg.fix_mfunc@CurveSegmentBase.fix_mfunc' } }
+  +-remesh: { owner='atlas_1d' slots={ 'cseg.remesh@CurveSegmentBase.remesh' } }
+  +-save_full: { owner='AtlasBase' slots={ 'QuasiP@coco_save_data' } }
+
+*********************************************************************
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          6.18e-07  1.20e+08    0.0    0.0    0.0
+init_chart: init_chart: angle(t,t221) =  4.50e+01[DEG]
+
+ STEP   STEP SIZE      TIME        ||U||  LABEL  TYPE           Om1          cm2          cm1
+    0    1.00e-01  00:00:00   1.2049e+08      1  EP      8.5200e+07   1.7500e-10   1.5500e-09
+
+POINT 0: computation finished
+*********************************************************************
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          6.18e-07  1.20e+08    0.0    0.0    0.0
+
+ STEP   STEP SIZE      TIME        ||U||  LABEL  TYPE           Om1          cm2          cm1
+    1    1.90e-01  00:00:00   1.2049e+08                 8.5200e+07   1.7500e-10   1.5500e-09
+
+POINT 1: computation finished
+*********************************************************************
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          6.14e-07  1.20e+08    0.0    0.0    0.0
+
+ STEP   STEP SIZE      TIME        ||U||  LABEL  TYPE           Om1          cm2          cm1
+    2    3.61e-01  00:00:00   1.2049e+08                 8.5200e+07   1.7500e-10   1.5500e-09
+
+POINT 2: computation finished
+*********************************************************************
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          6.18e-07  1.20e+08    0.0    0.0    0.0
+
+ STEP   STEP SIZE      TIME        ||U||  LABEL  TYPE           Om1          cm2          cm1
+    3    5.00e-01  00:00:01   1.2049e+08                 8.5200e+07   1.7500e-10   1.5500e-09
+
+POINT 3: computation finished
+*********************************************************************
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          6.27e-07  1.20e+08    0.0    0.0    0.0
+
+ STEP   STEP SIZE      TIME        ||U||  LABEL  TYPE           Om1          cm2          cm1
+    4    5.00e-01  00:00:01   1.2049e+08                 8.5200e+07   1.7500e-10   1.5500e-09
+
+POINT 4: computation finished
+*********************************************************************
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          6.50e-07  1.20e+08    0.0    0.0    0.0
+
+ STEP   STEP SIZE      TIME        ||U||  LABEL  TYPE           Om1          cm2          cm1
+    5    5.00e-01  00:00:01   1.2049e+08                 8.5200e+07   1.7500e-10   1.5500e-09
+
+POINT 5: computation finished
+*********************************************************************
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          6.71e-07  1.20e+08    0.0    0.0    0.0
+
+ STEP   STEP SIZE      TIME        ||U||  LABEL  TYPE           Om1          cm2          cm1
+    6    5.00e-01  00:00:01   1.2049e+08                 8.5200e+07   1.7500e-10   1.5500e-09
+
+POINT 6: computation finished
+*********************************************************************
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          6.62e-07  1.20e+08    0.0    0.0    0.0
+
+ STEP   STEP SIZE      TIME        ||U||  LABEL  TYPE           Om1          cm2          cm1
+    7    5.00e-01  00:00:02   1.2049e+08                 8.5200e+07   1.7500e-10   1.5500e-09
+
+POINT 7: computation finished
+*********************************************************************
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          6.49e-07  1.20e+08    0.0    0.0    0.0
+
+ STEP   STEP SIZE      TIME        ||U||  LABEL  TYPE           Om1          cm2          cm1
+    8    5.00e-01  00:00:02   1.2049e+08                 8.5200e+07   1.7500e-10   1.5500e-09
+
+POINT 8: computation finished
+*********************************************************************
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          6.92e-07  1.20e+08    0.0    0.0    0.0
+
+ STEP   STEP SIZE      TIME        ||U||  LABEL  TYPE           Om1          cm2          cm1
+    9    5.00e-01  00:00:02   1.2049e+08                 8.5200e+07   1.7500e-10   1.5500e-09
+
+POINT 9: computation finished
+*********************************************************************
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          6.81e-07  1.20e+08    0.0    0.0    0.0
+
+ STEP   STEP SIZE      TIME        ||U||  LABEL  TYPE           Om1          cm2          cm1
+   10    5.00e-01  00:00:02   1.2049e+08      2          8.5200e+07   1.7500e-10   1.5500e-09
+
+POINT 10: computation finished
+*********************************************************************
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          6.91e-07  1.20e+08    0.0    0.0    0.0
+
+ STEP   STEP SIZE      TIME        ||U||  LABEL  TYPE           Om1          cm2          cm1
+   11    5.00e-01  00:00:03   1.2049e+08                 8.5200e+07   1.7500e-10   1.5500e-09
+
+POINT 11: computation finished
+*********************************************************************
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          6.95e-07  1.20e+08    0.0    0.0    0.0
+
+ STEP   STEP SIZE      TIME        ||U||  LABEL  TYPE           Om1          cm2          cm1
+   12    5.00e-01  00:00:03   1.2049e+08                 8.5200e+07   1.7500e-10   1.5500e-09
+
+POINT 12: computation finished
+*********************************************************************
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          6.82e-07  1.20e+08    0.0    0.0    0.0
+
+ STEP   STEP SIZE      TIME        ||U||  LABEL  TYPE           Om1          cm2          cm1
+   13    5.00e-01  00:00:03   1.2049e+08                 8.5200e+07   1.7500e-10   1.5500e-09
+
+POINT 13: computation finished
+*********************************************************************
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          6.93e-07  1.20e+08    0.0    0.0    0.0
+
+ STEP   STEP SIZE      TIME        ||U||  LABEL  TYPE           Om1          cm2          cm1
+   14    5.00e-01  00:00:03   1.2049e+08                 8.5200e+07   1.7500e-10   1.5500e-09
+
+POINT 14: computation finished
+*********************************************************************
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          7.20e-07  1.20e+08    0.0    0.0    0.0
+
+ STEP   STEP SIZE      TIME        ||U||  LABEL  TYPE           Om1          cm2          cm1
+   15    5.00e-01  00:00:03   1.2049e+08                 8.5200e+07   1.7500e-10   1.5500e-09
+
+POINT 15: computation finished
+*********************************************************************
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          7.66e-07  1.20e+08    0.0    0.0    0.0
+
+ STEP   STEP SIZE      TIME        ||U||  LABEL  TYPE           Om1          cm2          cm1
+   16    5.00e-01  00:00:04   1.2049e+08                 8.5200e+07   1.7500e-10   1.5500e-09
+
+POINT 16: computation finished
+*********************************************************************
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          7.60e-07  1.20e+08    0.0    0.0    0.0
+
+ STEP   STEP SIZE      TIME        ||U||  LABEL  TYPE           Om1          cm2          cm1
+   17    5.00e-01  00:00:04   1.2049e+08                 8.5200e+07   1.7500e-10   1.5500e-09
+
+POINT 17: computation finished
+*********************************************************************
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          7.55e-07  1.20e+08    0.0    0.0    0.0
+
+ STEP   STEP SIZE      TIME        ||U||  LABEL  TYPE           Om1          cm2          cm1
+   18    5.00e-01  00:00:04   1.2049e+08                 8.5200e+07   1.7500e-10   1.5500e-09
+
+POINT 18: computation finished
+*********************************************************************
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          7.85e-07  1.20e+08    0.0    0.0    0.0
+
+ STEP   STEP SIZE      TIME        ||U||  LABEL  TYPE           Om1          cm2          cm1
+   19    5.00e-01  00:00:04   1.2049e+08                 8.5200e+07   1.7500e-10   1.5500e-09
+
+POINT 19: computation finished
+*********************************************************************
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          8.27e-07  1.20e+08    0.0    0.0    0.0
+
+ STEP   STEP SIZE      TIME        ||U||  LABEL  TYPE           Om1          cm2          cm1
+   20    5.00e-01  00:00:05   1.2049e+08      3          8.5200e+07   1.7500e-10   1.5500e-09
+
+POINT 20: computation finished
+*********************************************************************
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          8.56e-07  1.20e+08    0.0    0.0    0.0
+
+ STEP   STEP SIZE      TIME        ||U||  LABEL  TYPE           Om1          cm2          cm1
+   21    5.00e-01  00:00:05   1.2049e+08                 8.5200e+07   1.7500e-10   1.5500e-09
+
+POINT 21: computation finished
+*********************************************************************
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          8.63e-07  1.20e+08    0.0    0.0    0.0
+
+ STEP   STEP SIZE      TIME        ||U||  LABEL  TYPE           Om1          cm2          cm1
+   22    5.00e-01  00:00:05   1.2049e+08                 8.5200e+07   1.7500e-10   1.5500e-09
+
+POINT 22: computation finished
+*********************************************************************
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          8.93e-07  1.20e+08    0.0    0.0    0.0
+
+ STEP   STEP SIZE      TIME        ||U||  LABEL  TYPE           Om1          cm2          cm1
+   23    5.00e-01  00:00:05   1.2049e+08                 8.5200e+07   1.7500e-10   1.5500e-09
+
+POINT 23: computation finished
+*********************************************************************
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          9.02e-07  1.20e+08    0.0    0.0    0.0
+
+ STEP   STEP SIZE      TIME        ||U||  LABEL  TYPE           Om1          cm2          cm1
+   24    5.00e-01  00:00:05   1.2049e+08                 8.5200e+07   1.7500e-10   1.5500e-09
+
+POINT 24: computation finished
+*********************************************************************
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          8.83e-07  1.20e+08    0.0    0.0    0.0
+
+ STEP   STEP SIZE      TIME        ||U||  LABEL  TYPE           Om1          cm2          cm1
+   25    5.00e-01  00:00:06   1.2049e+08                 8.5200e+07   1.7500e-10   1.5500e-09
+
+POINT 25: computation finished
+*********************************************************************
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          8.42e-07  1.20e+08    0.0    0.0    0.0
+
+ STEP   STEP SIZE      TIME        ||U||  LABEL  TYPE           Om1          cm2          cm1
+   26    5.00e-01  00:00:06   1.2049e+08                 8.5200e+07   1.7500e-10   1.5500e-09
+
+POINT 26: computation finished
+*********************************************************************
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          8.47e-07  1.20e+08    0.0    0.0    0.0
+
+ STEP   STEP SIZE      TIME        ||U||  LABEL  TYPE           Om1          cm2          cm1
+   27    5.00e-01  00:00:06   1.2049e+08                 8.5200e+07   1.7500e-10   1.5500e-09
+
+POINT 27: computation finished
+*********************************************************************
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          8.78e-07  1.20e+08    0.0    0.0    0.0
+
+ STEP   STEP SIZE      TIME        ||U||  LABEL  TYPE           Om1          cm2          cm1
+   28    5.00e-01  00:00:06   1.2049e+08                 8.5200e+07   1.7500e-10   1.5500e-09
+
+POINT 28: computation finished
+*********************************************************************
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          8.87e-07  1.20e+08    0.0    0.0    0.0
+
+ STEP   STEP SIZE      TIME        ||U||  LABEL  TYPE           Om1          cm2          cm1
+   29    5.00e-01  00:00:07   1.2049e+08                 8.5200e+07   1.7500e-10   1.5500e-09
+
+POINT 29: computation finished
+*********************************************************************
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          8.86e-07  1.20e+08    0.0    0.0    0.0
+
+ STEP   STEP SIZE      TIME        ||U||  LABEL  TYPE           Om1          cm2          cm1
+   30    5.00e-01  00:00:07   1.2049e+08      4          8.5200e+07   1.7500e-10   1.5500e-09
+
+POINT 30: computation finished
+*********************************************************************
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          1.10e-06  1.20e+08    0.0    0.0    0.0
+   1   4  1.25e-01  1.57e-01  2.63e+00  1.20e+08    0.0    0.2    0.0
+   2   4  8.49e-06  3.67e+03  1.07e+01  1.20e+08    0.0    0.5    0.0
+   3   4  4.63e-05  6.67e+02  1.39e+01  1.20e+08    0.0    0.7    0.0
+   4   4  5.69e-05  5.56e+02  1.65e+01  1.20e+08    0.0    0.9    0.0
+   5   4  1.99e-04  1.58e+02  1.82e+01  1.20e+08    0.0    1.1    0.0
+   6   4  8.50e-05  3.75e+02  1.96e+01  1.20e+08    0.0    1.3    0.0
+   7   4  9.88e-05  3.16e+02  2.13e+01  1.20e+08    0.0    1.5    0.0
+   8   4  1.03e-04  3.06e+02  2.21e+01  1.20e+08    0.0    1.7    0.0
+   9   4  3.09e-04  1.01e+02  2.30e+01  1.20e+08    0.0    1.9    0.0
+  10   4  5.98e-05  5.21e+02  2.34e+01  1.20e+08    0.0    2.2    0.0
+
+warning: state_co_correct: correction failed
+no convergence of Newton's method within 10 iterations
+
+warning: no convergence, retry with step size h =  2.50e-01
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          9.55e-07  1.20e+08    0.0    0.0    0.0
+
+ STEP   STEP SIZE      TIME        ||U||  LABEL  TYPE           Om1          cm2          cm1
+   31    4.75e-01  00:00:09   1.2049e+08                 8.5200e+07   1.7500e-10   1.5500e-09
+
+POINT 31: computation finished
+*********************************************************************
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          9.99e-07  1.20e+08    0.0    0.0    0.0
+
+ STEP   STEP SIZE      TIME        ||U||  LABEL  TYPE           Om1          cm2          cm1
+   32    5.00e-01  00:00:09   1.2049e+08                 8.5200e+07   1.7500e-10   1.5500e-09
+
+POINT 32: computation finished
+*********************************************************************
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          1.00e-06  1.20e+08    0.0    0.0    0.0
+
+ STEP   STEP SIZE      TIME        ||U||  LABEL  TYPE           Om1          cm2          cm1
+   33    5.00e-01  00:00:10   1.2049e+08                 8.5200e+07   1.7500e-10   1.5500e-09
+
+POINT 33: computation finished
+*********************************************************************
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          1.00e-06  1.20e+08    0.0    0.0    0.0
+   1   4  1.25e-01  1.49e-01  2.37e+00  1.20e+08    0.0    0.2    0.0
+   2   4  8.71e-06  3.58e+03  1.03e+01  1.20e+08    0.0    0.4    0.0
+   3   4  2.48e-05  1.24e+03  1.36e+01  1.20e+08    0.0    0.6    0.0
+   4   4  5.17e-05  6.13e+02  1.62e+01  1.20e+08    0.0    0.9    0.0
+   5   4  1.45e-04  2.17e+02  1.80e+01  1.20e+08    0.0    1.1    0.0
+   6   4  1.05e-04  3.04e+02  1.94e+01  1.20e+08    0.0    1.3    0.0
+   7   4  9.79e-05  3.20e+02  2.10e+01  1.20e+08    0.0    1.5    0.0
+   8   4  2.17e-04  1.46e+02  2.18e+01  1.20e+08    0.0    1.7    0.0
+   9   4  3.01e-04  1.04e+02  2.27e+01  1.20e+08    0.0    1.9    0.0
+  10   4  1.07e-04  2.94e+02  2.31e+01  1.20e+08    0.0    2.2    0.0
+
+warning: state_co_correct: correction failed
+no convergence of Newton's method within 10 iterations
+
+warning: no convergence, retry with step size h =  2.50e-01
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          9.93e-07  1.20e+08    0.0    0.0    0.0
+
+ STEP   STEP SIZE      TIME        ||U||  LABEL  TYPE           Om1          cm2          cm1
+   34    4.75e-01  00:00:12   1.2049e+08                 8.5200e+07   1.7500e-10   1.5500e-09
+
+POINT 34: computation finished
+*********************************************************************
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          1.04e-06  1.20e+08    0.0    0.0    0.0
+   1   4  1.25e-01  1.52e-01  2.47e+00  1.20e+08    0.0    0.2    0.0
+   2   4  8.62e-06  3.61e+03  1.05e+01  1.20e+08    0.0    0.4    0.0
+   3   4  3.38e-05  9.14e+02  1.37e+01  1.20e+08    0.0    0.6    0.0
+   4   4  5.38e-05  5.88e+02  1.63e+01  1.20e+08    0.0    0.9    0.0
+   5   4  1.68e-04  1.87e+02  1.81e+01  1.20e+08    0.0    1.1    0.0
+   6   4  9.88e-05  3.23e+02  1.95e+01  1.20e+08    0.0    1.3    0.0
+   7   4  9.85e-05  3.17e+02  2.11e+01  1.20e+08    0.0    1.5    0.0
+   8   4  1.70e-04  1.86e+02  2.19e+01  1.20e+08    0.0    1.7    0.0
+   9   4  3.05e-04  1.03e+02  2.28e+01  1.20e+08    0.0    1.9    0.0
+  10   4  3.70e-05  8.45e+02  2.32e+01  1.20e+08    0.0    2.1    0.0
+
+warning: state_co_correct: correction failed
+no convergence of Newton's method within 10 iterations
+
+warning: no convergence, retry with step size h =  2.37e-01
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          1.01e-06  1.20e+08    0.0    0.0    0.0
+   1   4  1.25e-01  1.50e-01  2.39e+00  1.20e+08    0.0    0.2    0.0
+   2   4  8.69e-06  3.59e+03  1.04e+01  1.20e+08    0.0    0.4    0.0
+   3   4  2.70e-05  1.14e+03  1.36e+01  1.20e+08    0.0    0.7    0.0
+   4   4  5.22e-05  6.07e+02  1.62e+01  1.20e+08    0.0    0.9    0.0
+   5   4  1.50e-04  2.09e+02  1.80e+01  1.20e+08    0.0    1.1    0.0
+   6   4  1.04e-04  3.07e+02  1.94e+01  1.20e+08    0.0    1.3    0.0
+   7   4  9.81e-05  3.19e+02  2.11e+01  1.20e+08    0.0    1.5    0.0
+   8   4  2.06e-04  1.54e+02  2.19e+01  1.20e+08    0.0    1.7    0.0
+   9   4  3.02e-04  1.04e+02  2.27e+01  1.20e+08    0.0    1.9    0.0
+  10   4  8.97e-05  3.49e+02  2.32e+01  1.20e+08    0.0    2.2    0.0
+
+warning: state_co_correct: correction failed
+no convergence of Newton's method within 10 iterations
+
+warning: no convergence, retry with step size h =  1.19e-01
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          1.00e-06  1.20e+08    0.0    0.0    0.0
+   1   4  1.25e-01  1.48e-01  2.35e+00  1.20e+08    0.0    0.2    0.0
+   2   4  8.72e-06  3.57e+03  1.03e+01  1.20e+08    0.0    0.5    0.0
+   3   4  2.36e-05  1.31e+03  1.36e+01  1.20e+08    0.0    0.7    0.0
+   4   4  5.14e-05  6.17e+02  1.62e+01  1.20e+08    0.0    0.9    0.0
+   5   4  1.42e-04  2.21e+02  1.80e+01  1.20e+08    0.0    1.1    0.0
+   6   4  1.06e-04  3.02e+02  1.94e+01  1.20e+08    0.0    1.3    0.0
+   7   4  9.78e-05  3.20e+02  2.10e+01  1.20e+08    0.0    1.5    0.0
+   8   4  2.23e-04  1.42e+02  2.18e+01  1.20e+08    0.0    1.7    0.0
+   9   4  3.00e-04  1.04e+02  2.27e+01  1.20e+08    0.0    2.0    0.0
+  10   4  1.16e-04  2.70e+02  2.31e+01  1.20e+08    0.0    2.2    0.0
+
+warning: state_co_correct: correction failed
+no convergence of Newton's method within 10 iterations
+
+warning: no convergence, retry with step size h =  5.94e-02
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          9.97e-07  1.20e+08    0.0    0.0    0.0
+
+ STEP   STEP SIZE      TIME        ||U||  LABEL  TYPE           Om1          cm2          cm1
+   35    1.13e-01  00:00:19   1.2049e+08                 8.5200e+07   1.7500e-10   1.5500e-09
+
+POINT 35: computation finished
+*********************************************************************
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          9.99e-07  1.20e+08    0.0    0.0    0.0
+
+ STEP   STEP SIZE      TIME        ||U||  LABEL  TYPE           Om1          cm2          cm1
+   36    2.14e-01  00:00:19   1.2049e+08                 8.5200e+07   1.7500e-10   1.5500e-09
+
+POINT 36: computation finished
+*********************************************************************
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          1.00e-06  1.20e+08    0.0    0.0    0.0
+   1   4  1.25e-01  1.50e-01  2.41e+00  1.20e+08    0.0    0.2    0.0
+   2   4  8.67e-06  3.59e+03  1.04e+01  1.20e+08    0.0    0.4    0.0
+   3   4  2.86e-05  1.08e+03  1.36e+01  1.20e+08    0.0    0.6    0.0
+   4   4  5.26e-05  6.03e+02  1.62e+01  1.20e+08    0.0    0.8    0.0
+   5   4  1.55e-04  2.03e+02  1.80e+01  1.20e+08    0.0    1.1    0.0
+   6   4  1.03e-04  3.10e+02  1.94e+01  1.20e+08    0.0    1.3    0.0
+   7   4  9.82e-05  3.19e+02  2.11e+01  1.20e+08    0.0    1.5    0.0
+   8   4  1.97e-04  1.61e+02  2.19e+01  1.20e+08    0.0    1.7    0.0
+   9   4  3.03e-04  1.03e+02  2.27e+01  1.20e+08    0.0    1.9    0.0
+  10   4  7.72e-05  4.06e+02  2.32e+01  1.20e+08    0.0    2.1    0.0
+
+warning: state_co_correct: correction failed
+no convergence of Newton's method within 10 iterations
+
+warning: no convergence, retry with step size h =  1.07e-01
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          1.00e-06  1.20e+08    0.0    0.0    0.0
+
+ STEP   STEP SIZE      TIME        ||U||  LABEL  TYPE           Om1          cm2          cm1
+   37    2.04e-01  00:00:22   1.2049e+08                 8.5200e+07   1.7500e-10   1.5500e-09
+
+POINT 37: computation finished
+*********************************************************************
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          1.01e-06  1.20e+08    0.0    0.0    0.0
+   1   4  1.25e-01  1.52e-01  2.45e+00  1.20e+08    0.0    0.2    0.0
+   2   4  8.64e-06  3.61e+03  1.04e+01  1.20e+08    0.0    0.4    0.0
+   3   4  3.21e-05  9.62e+02  1.37e+01  1.20e+08    0.0    0.6    0.0
+   4   4  5.34e-05  5.93e+02  1.63e+01  1.20e+08    0.0    0.9    0.0
+   5   4  1.63e-04  1.92e+02  1.81e+01  1.20e+08    0.0    1.1    0.0
+   6   4  1.00e-04  3.18e+02  1.95e+01  1.20e+08    0.0    1.3    0.0
+   7   4  9.84e-05  3.18e+02  2.11e+01  1.20e+08    0.0    1.5    0.0
+   8   4  1.79e-04  1.77e+02  2.19e+01  1.20e+08    0.0    1.7    0.0
+   9   4  3.04e-04  1.03e+02  2.28e+01  1.20e+08    0.0    2.0    0.0
+  10   4  5.02e-05  6.24e+02  2.32e+01  1.20e+08    0.0    2.2    0.0
+
+warning: state_co_correct: correction failed
+no convergence of Newton's method within 10 iterations
+
+warning: no convergence, retry with step size h =  1.02e-01
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          1.00e-06  1.20e+08    0.0    0.0    0.0
+   1   4  1.25e-01  1.51e-01  2.42e+00  1.20e+08    0.0    0.2    0.0
+   2   4  8.67e-06  3.60e+03  1.04e+01  1.20e+08    0.0    0.5    0.0
+   3   4  2.94e-05  1.05e+03  1.36e+01  1.20e+08    0.0    0.7    0.0
+   4   4  5.28e-05  6.00e+02  1.63e+01  1.20e+08    0.0    0.9    0.0
+   5   4  1.57e-04  2.00e+02  1.80e+01  1.20e+08    0.0    1.1    0.0
+   6   4  1.02e-04  3.12e+02  1.94e+01  1.20e+08    0.0    1.3    0.0
+   7   4  9.83e-05  3.18e+02  2.11e+01  1.20e+08    0.0    1.5    0.0
+   8   4  1.93e-04  1.64e+02  2.19e+01  1.20e+08    0.0    1.8    0.0
+   9   4  3.03e-04  1.03e+02  2.27e+01  1.20e+08    0.0    2.0    0.0
+  10   4  7.06e-05  4.43e+02  2.32e+01  1.20e+08    0.0    2.2    0.0
+
+warning: state_co_correct: correction failed
+no convergence of Newton's method within 10 iterations
+
+warning: no convergence, retry with step size h =  5.09e-02
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          1.00e-06  1.20e+08    0.0    0.0    0.0
+   1   4  1.25e-01  1.50e-01  2.40e+00  1.20e+08    0.0    0.2    0.0
+   2   4  8.68e-06  3.59e+03  1.04e+01  1.20e+08    0.0    0.4    0.0
+   3   4  2.81e-05  1.10e+03  1.36e+01  1.20e+08    0.0    0.7    0.0
+   4   4  5.25e-05  6.04e+02  1.62e+01  1.20e+08    0.0    0.9    0.0
+   5   4  1.53e-04  2.05e+02  1.80e+01  1.20e+08    0.0    1.1    0.0
+   6   4  1.03e-04  3.10e+02  1.94e+01  1.20e+08    0.0    1.3    0.0
+   7   4  9.82e-05  3.19e+02  2.11e+01  1.20e+08    0.0    1.5    0.0
+   8   4  2.00e-04  1.59e+02  2.19e+01  1.20e+08    0.0    1.8    0.0
+   9   4  3.02e-04  1.03e+02  2.27e+01  1.20e+08    0.0    2.0    0.0
+  10   4  8.09e-05  3.87e+02  2.32e+01  1.20e+08    0.0    2.2    0.0
+
+warning: state_co_correct: correction failed
+no convergence of Newton's method within 10 iterations
+
+warning: no convergence, retry with step size h =  2.55e-02
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          1.00e-06  1.20e+08    0.0    0.0    0.0
+   1   4  1.25e-01  1.50e-01  2.40e+00  1.20e+08    0.0    0.2    0.0
+   2   4  8.68e-06  3.59e+03  1.04e+01  1.20e+08    0.0    0.4    0.0
+   3   4  2.74e-05  1.12e+03  1.36e+01  1.20e+08    0.0    0.6    0.0
+   4   4  5.23e-05  6.06e+02  1.62e+01  1.20e+08    0.0    0.9    0.0
+   5   4  1.52e-04  2.07e+02  1.80e+01  1.20e+08    0.0    1.1    0.0
+   6   4  1.03e-04  3.08e+02  1.94e+01  1.20e+08    0.0    1.3    0.0
+   7   4  9.81e-05  3.19e+02  2.11e+01  1.20e+08    0.0    1.5    0.0
+   8   4  2.03e-04  1.56e+02  2.19e+01  1.20e+08    0.0    1.7    0.0
+   9   4  3.02e-04  1.04e+02  2.27e+01  1.20e+08    0.0    1.9    0.0
+  10   4  8.60e-05  3.64e+02  2.32e+01  1.20e+08    0.0    2.1    0.0
+
+warning: state_co_correct: correction failed
+no convergence of Newton's method within 10 iterations
+
+warning: no convergence, retry with step size h =  1.27e-02
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          1.00e-06  1.20e+08    0.0    0.0    0.0
+   1   4  1.25e-01  1.50e-01  2.39e+00  1.20e+08    0.0    0.2    0.0
+   2   4  8.69e-06  3.59e+03  1.04e+01  1.20e+08    0.0    0.5    0.0
+   3   4  2.71e-05  1.14e+03  1.36e+01  1.20e+08    0.0    0.7    0.0
+   4   4  5.22e-05  6.07e+02  1.62e+01  1.20e+08    0.0    0.9    0.0
+   5   4  1.51e-04  2.08e+02  1.80e+01  1.20e+08    0.0    1.1    0.0
+   6   4  1.04e-04  3.08e+02  1.94e+01  1.20e+08    0.0    1.3    0.0
+   7   4  9.81e-05  3.19e+02  2.11e+01  1.20e+08    0.0    1.6    0.0
+   8   4  2.05e-04  1.55e+02  2.19e+01  1.20e+08    0.0    1.8    0.0
+   9   4  3.02e-04  1.04e+02  2.27e+01  1.20e+08    0.0    2.0    0.0
+  10   4  8.86e-05  3.54e+02  2.32e+01  1.20e+08    0.0    2.2    0.0
+
+warning: state_co_correct: correction failed
+no convergence of Newton's method within 10 iterations
+
+warning: no convergence, retry with step size h =  1.00e-02
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          1.00e-06  1.20e+08    0.0    0.0    0.0
+   1   4  1.25e-01  1.50e-01  2.39e+00  1.20e+08    0.0    0.2    0.0
+   2   4  8.69e-06  3.59e+03  1.04e+01  1.20e+08    0.0    0.4    0.0
+   3   4  2.70e-05  1.14e+03  1.36e+01  1.20e+08    0.0    0.7    0.0
+   4   4  5.22e-05  6.07e+02  1.62e+01  1.20e+08    0.0    0.9    0.0
+   5   4  1.51e-04  2.08e+02  1.80e+01  1.20e+08    0.0    1.1    0.0
+   6   4  1.04e-04  3.08e+02  1.94e+01  1.20e+08    0.0    1.3    0.0
+   7   4  9.81e-05  3.19e+02  2.11e+01  1.20e+08    0.0    1.5    0.0
+   8   4  2.05e-04  1.54e+02  2.19e+01  1.20e+08    0.0    1.7    0.0
+   9   4  3.02e-04  1.04e+02  2.27e+01  1.20e+08    0.0    2.0    0.0
+  10   4  8.91e-05  3.52e+02  2.32e+01  1.20e+08    0.0    2.2    0.0
+
+warning: state_co_correct: correction failed
+no convergence of Newton's method within 10 iterations
+
+ STEP   STEP SIZE      TIME        ||U||  LABEL  TYPE           Om1          cm2          cm1
+   37    1.00e-02  00:00:35   1.2049e+08      5  MX      8.5200e+07   1.7500e-10   1.5500e-09
+
+POINT 37: computation finished
+*********************************************************************

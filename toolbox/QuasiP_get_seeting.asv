@@ -17,9 +17,8 @@ par_opts.ncores   = 1;        % number of cores in parallel computation
 defaults.par_opts = par_opts;
 
 amp_opts.amp = true;
-amp_opts.outdof = 'all';
-amp_opts.Nperiod = 10;
-amp_opts.Nstep = 2^6;
+amp_opts.Dofs = 'all';
+amp_opts.Np = 
 defaults.amp_opts = amp_opts;
 
 stable_opts.sta = false;
@@ -39,8 +38,8 @@ assert(isfield(copts, 'DOF'), ...
     '%s: The number of DOF is not defined');
 data.DOF     = copts.DOF;
 
-if strcmp(copts.amp_opts.outdof, 'all') || copts.stable_opts.sta
-    copts.amp_opts.outdof = 1:data.DOF;
+if strcmp(copts.amp_opts.Dofs, 'all') || copts.stable_opts.sta
+    copts.amp_opts.Dofs = 1:data.DOF;
 end
 if copts.stable_opts.sta
     S = stable_opts.S;
@@ -80,7 +79,7 @@ if ~isfield(copts, 'PHI_INITIAL') % defaults.method: VCHB
         'S_wave',  { S_w  });
 end
 PHI = COM_PHI(copts.PHI_INITIAL);
-data.PHI = PHI;
+data.PHI     = PHI;
 
 if copts.par_opts.parallel
     % activate parallel computing
