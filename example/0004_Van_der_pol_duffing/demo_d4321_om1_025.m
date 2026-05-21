@@ -76,7 +76,7 @@ hold on
 plot(MF_f(:,1),log(abs(2*MF_x)),'ro')
 xlabel('normalized f')
 ylabel('log(abs(X))')
-title('Full 4-torus solution');
+title('$x(\tau_1,\tau_2,\tau_3,\tau_4)$','Interpreter','latex');
 xlim([0,6])
 
 HT_x_4 = reshape(HT_x,2^6,2^6,2^6,2^6);
@@ -90,7 +90,7 @@ hold on
 plot(reshape(HT_x_4(1,:,:,:),[],1),reshape(HT_u_4(1,:,:,:),[],1),'b-')
 xlabel('$x$','Interpreter','latex'); 
 ylabel('$\dot{x}$','Interpreter','latex');
-title('Full 4-torus solution');
+title('$x(\tau_1,\tau_2,\tau_3,\tau_4)$','Interpreter','latex');
 grid on;
 
 %% 222: Poincare section 3D → 2D
@@ -100,7 +100,7 @@ hold on
 plot(reshape(HT_x_4(1,1,:,:),[],1),reshape(HT_u_4(1,1,:,:),[],1),'b-')
 xlabel('$x$','Interpreter','latex'); 
 ylabel('$\dot{x}$','Interpreter','latex');
-title('Poincare section 3D → 2D');
+title('$x(0,\tau_2,\tau_3,\tau_4)$','Interpreter','latex');
 grid on;
 
 %% 223: Poincare section 2D → 1D
@@ -110,7 +110,7 @@ hold on
 plot(reshape(HT_x_4(1,1,1,:),[],1),reshape(HT_u_4(1,1,1,:),[],1),'b-')
 xlabel('$x$','Interpreter','latex'); 
 ylabel('$\dot{x}$','Interpreter','latex');
-title('Poincare section 2D → 1D');
+title('$x(0,0,\tau_3,\tau_4)$','Interpreter','latex');
 grid on;
 
 %% 224: Poincare section 1D → periodic
@@ -120,7 +120,7 @@ hold on
 plot(reshape(HT_x_4(1,1,1,1),[],1),reshape(HT_u_4(1,1,1,1),[],1),'bo')
 xlabel('$x$','Interpreter','latex'); 
 ylabel('$\dot{x}$','Interpreter','latex');
-title('Poincare section 1D → periodic');
+title('$x(0,0,0,\tau_4)$','Interpreter','latex');
 grid on;
 
 %%
@@ -202,7 +202,7 @@ hold on
 plot(MF_f(:,1),log(abs(2*MF_x)),'ro')
 xlabel('normalized f')
 ylabel('log(abs(X))')
-title('Full 3-torus solution');
+title('$x(\tau_1,\tau_2,\tau_3)$','Interpreter','latex');
 xlim([0,6])
 
 HT_x_3 = reshape(HT_x,2^6,2^6,2^6);
@@ -216,7 +216,7 @@ hold on
 plot(reshape(HT_x_3(1,:,:),[],1),reshape(HT_u_3(1,:,:),[],1),'b-')
 xlabel('$x$','Interpreter','latex'); 
 ylabel('$\dot{x}$','Interpreter','latex');
-title('Full 3-torus solution');
+title('$x(\tau_1,\tau_2,\tau_3)$','Interpreter','latex');
 grid on;
 
 %% 222: Poincare section 3D → 2D
@@ -226,7 +226,7 @@ hold on
 plot(reshape(HT_x_3(1,1,:),[],1),reshape(HT_u_3(1,1,:),[],1),'b-')
 xlabel('$x$','Interpreter','latex'); 
 ylabel('$\dot{x}$','Interpreter','latex');
-title('Poincare section 3D → 2D');
+title('$x(0,\tau_2,\tau_3)$','Interpreter','latex');
 grid on;
 
 %% 223: Poincare section 2D → 1D
@@ -236,7 +236,7 @@ hold on
 plot(reshape(HT_x_3(1,1,1),[],1),reshape(HT_u_3(1,1,1),[],1),'bo')
 xlabel('$x$','Interpreter','latex'); 
 ylabel('$\dot{x}$','Interpreter','latex');
-title('Poincare section 2D → 1D');
+title('$x(0,0,\tau_3)$','Interpreter','latex');
 grid on;
 
 subplot(224)
@@ -315,7 +315,7 @@ hold on
 plot(MF_f(:,1),log(abs(2*MF_x)),'ro')
 xlabel('normalized f')
 ylabel('log(abs(X))')
-title('Full 2-torus solution');
+title('$x(\tau_1,\tau_2)$','Interpreter','latex');
 xlim([0,6])
 
 HT_x_2 = reshape(HT_x,2^6,2^6);
@@ -328,7 +328,7 @@ hold on
 plot(reshape(HT_x_2(1,:),[],1),reshape(HT_u_2(1,:),[],1),'b-')
 xlabel('$x$','Interpreter','latex'); 
 ylabel('$\dot{x}$','Interpreter','latex');
-title('Full 2-torus solution');
+title('$x(\tau_1,\tau_2)$','Interpreter','latex');
 grid on;
 
 subplot(222)
@@ -337,7 +337,7 @@ hold on
 plot(reshape(HT_x_2(1,1),[],1),reshape(HT_u_2(1,1),[],1),'bo')
 xlabel('$x$','Interpreter','latex'); 
 ylabel('$\dot{x}$','Interpreter','latex');
-title('Poincare section 2D → 1D');
+title('$x(0,\tau_2)$','Interpreter','latex');
 grid on;
 
 subplot(223)
@@ -417,7 +417,7 @@ hold on
 plot(MF_f(:,1),log(abs(2*MF_x)),'ro')
 xlabel('normalized f')
 ylabel('log(abs(X))')
-title('Full 1-torus solution');
+title('$x(\tau_1)$','Interpreter','latex');
 xlim([0,6])
 
 figure(2222)
@@ -427,7 +427,7 @@ hold on
 plot(HT_x(1),HT_u(1),'bo')
 xlabel('$x$','Interpreter','latex'); 
 ylabel('$\dot{x}$','Interpreter','latex');
-title('Periodic orbit');
+title('$x(\tau_1)$','Interpreter','latex');
 grid on;
 
 subplot(222)
