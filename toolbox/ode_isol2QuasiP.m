@@ -24,11 +24,9 @@ function prob = ode_isol2QuasiP(prob, oid, varargin)
 % PNAMES - Optional string label or cell array of string labels for
 %          continuation parameters tracking p.
 % P0     - Optional initial p.
-%----------------------------------------------------------
-tbid = coco_get_id(oid, 'QuasiP'); % Create toolbox instance identifier
-%----------------------------------------------------------
+tbid = coco_get_id(oid, 'QuasiP');
 data = struct();
-data = QuasiP_get_seeting(prob, tbid, data);       % Get toolbox settings
+data = QuasiP_get_seeting(prob, tbid, data);
 %----------------------------------------------------------
 grammar   = 'F DFDX [DFDP [L]] X_MF OM [PNAMES [P0]]';
 args_spec = {
@@ -51,6 +49,17 @@ X_MF     = args.X_MF;
 OM       = args.OM;
 p0       = args.p0;
 %----------------------------------------------------------
+data = quasip_post_process(tbid, data, args, p0);
+sol = QuasiP_init_sol(data,X_MF,OM,p0);
+QuasiP_arg_check(tbid, data, X_MF, OM, p0);
+data = QuasiP_init_data(data, OM, p0);
+prob = ode_construct_QuasiP(prob, tbid, data, sol);
+end
+
+%==========================================================================
+%==========================================================================
+
+function data = quasip_post_process(tbid, data, args, p0)
 if strcmp(tbid, 'QuasiP')
     prefix = '';
 else
@@ -59,6 +68,7 @@ else
 end
 data.my_tbid = tbid;
 data.prefix  = prefix;
+%----------------------------------------------------------
 if ~isempty(args.pnames) && iscell(args.pnames)
     for i = 1:length(args.pnames)
         data.pnames{i} = [prefix, args.pnames{i}];
@@ -66,10 +76,12 @@ if ~isempty(args.pnames) && iscell(args.pnames)
 else
     data.pnames = args.pnames;
 end
+%----------------------------------------------------------
 data.kOMnames = cell(1, data.ode_opts.e);
 for ii = 1 : data.ode_opts.e
     data.kOMnames{ii} = sprintf([prefix 'k_OM%d'], ii);
 end
+%----------------------------------------------------------
 nUOM = data.ode_opts.d - data.ode_opts.e;
 data.uOMnames = cell(1, nUOM);
 for ii = 1 : nUOM
@@ -90,16 +102,9 @@ else
     data.isABC      = isABC;
     data.isABCwithp = isABCwithp;
 end
-if isempty(p0)
-    data.isp = false;
-else
-    data.isp = true;
-end
-if isempty(data.fp)
-    data.isfwithp = false;
-else
-    data.isfwithp = true;
-end
+%----------------------------------------------------------
+data.isp      = ~isempty(p0);
+data.isfwithp = ~isempty(data.fp);
 data.isfwithu = data.ode_opts.isfwithu;
 %----------------------------------------------------------
 if data.stable_opts.issta
@@ -127,16 +132,17 @@ if data.isL
 else
     terms = 'dx = f(x';
 end
+%----------------------------------------------------------
 if data.isfwithu
-   terms = [terms ',dx']; 
+   terms = [terms ',dx'];
 end
 if data.isfwithp
-   terms = [terms ',p']; 
+   terms = [terms ',p'];
 end
 for ii = 1:data.ode_opts.e
     terms = [terms, sprintf(',theta%d', ii)];
 end
-terms = [terms, ')']; 
+terms = [terms, ')'];
 %----------------------------------------------------------
 headers = {'n','d','e','pnames','kOMs','uoms','para_tori','type_method','period','L','pS'};
 values  = {
@@ -152,14 +158,16 @@ values  = {
     num2str(data.PHI.L), ...
     strjoin(string(data.PHI.pS), '+')
 };
+%----------------------------------------------------------
 col_widths = cellfun(@(h,v) max(length(h), length(v))+2, headers, values);
 total_width = sum(col_widths);
-line = repmat('=', 1, total_width);
+line = repmat('=', 1, total_width+(data.ode_opts.d-1)*3);
 term_str = [' ' terms ' '];
-fill_len = total_width - length(term_str);
+fill_len = total_width + (data.ode_opts.d-1)*3 - length(term_str);
 left_fill = repmat('>', 1, ceil(fill_len/2));
 right_fill = repmat('<', 1, floor(fill_len/2));
 title_line = [left_fill term_str right_fill];
+
 disp(line);
 disp(title_line);
 disp(line);
@@ -167,10 +175,4 @@ fmt = strjoin(compose('%%-%ds', col_widths), '');
 fprintf([fmt '\n'], headers{:});
 fprintf([fmt '\n'], values{:});
 disp(line);
-%----------------------------------------------------------
-QuasiP_arg_check(tbid, data, X_MF, OM, p0);          % Validate input
-data = QuasiP_init_data(data, OM, p0);               % Build toolbox data
-sol  = QuasiP_init_sol(data,X_MF,OM,p0);             % Build initial solution guess
-prob = ode_construct_QuasiP(prob, tbid, data, sol);  % Append continuation problem
-%----------------------------------------------------------
 end

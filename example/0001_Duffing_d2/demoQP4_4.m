@@ -97,12 +97,16 @@ T_x = coco_bd_col(bd1,'T_x');
 T_u = coco_bd_col(bd1,'T_u');
 
 figure(1)
-plot(x(:,1),x(:,2),'k-')
+plot(x(:,1),x(:,2), 'color', [0.5 0.5 0.5])
 hold on
-plot(HT_x,HT_u,'r--')
+% plot(HT_x,HT_u,'r--')
 plot(T_x(1:2^2:end),T_u(1:2^2:end),'bo')
 legend('TI','HT','kT_1')
 
+xlim([-10,10])
+ylim([-25,25])
+xlabel('$x$','Interpreter','latex'); 
+ylabel('$\dot{x}$','Interpreter','latex');
 
 MF_x = coco_bd_col(bd1,'MF_x');
 MF_f = coco_bd_col(bd1,'MF_f');
