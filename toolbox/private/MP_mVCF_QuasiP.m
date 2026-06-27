@@ -15,12 +15,7 @@ pS_prod = prod(pS);         % 基本周期区间内的采样数的乘积
 y0   = zeros(nL,1);         % 非线性代数方程组Rd的残差
 Jx0  = zeros(nL,nL);        % Rd关于Xd的导数
 Jom0 = zeros(nL,d);         % Rd关于Om的导数
-Jp0  = zeros(nL,a);         % Rd关于p 的单数
-%----------------------------------------------------------
-y1   = zeros(d-e,1);        % 未知基频的相位条件PC的残差
-Jx1  = zeros(d-e,nL);       % PC关于Xd的导数  
-Jom1 = zeros(d-e,d);        % PC关于Om的导数 
-Jp1  = zeros(d-e,a);        % PC关于p 的导数  
+Jp0  = zeros(nL,a);         % Rd关于p 的单数 
 %==========================================================
 Xd   = u(1:nL);             % nL*1
 Om   = u(nL+1:nL+d);        % d*1
@@ -237,21 +232,7 @@ if data.isfwithp
     end
 end
 %==========================================================
-if d>e
-    kk = e+1;
-    for ii = 1:d-e
-        if data.ODE == 1
-            Jx1(ii,:) = transpose(Xd)*transpose(PHI.Lam1{kk});
-        else
-            Jx1(ii,:) = transpose(Xd)*...
-                        ( transpose(PHI.Lam1{kk}) + ...
-                          transpose(PHI.Lam2{kk})*PHI.Lam1{kk} );
-        end
-        kk = kk+1;
-    end
-end
-%==========================================================
-y = [y0; y1];
-J = [Jx0, Jom0, Jp0; Jx1, Jom1, Jp1];
+y = y0;
+J = [Jx0, Jom0, Jp0];
 end
 

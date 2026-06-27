@@ -9,11 +9,11 @@ switch PHI.parametrization_tori
                C = MP_sCCF_INITIAL_C_byPHI(data,X_MF,OM);     
       end
   case{'MT'} 
-      switch PHI_INITIAL.type
+      switch PHI.type
           case{'DM'}
                C = MT_DM_INITIAL_C_byPHI(data,X_MF,OM);
-          case{'SHOOT'}
-               C = MT_SHOOT_INITIAL_C_byPHI(data,X_MF,OM);     
+          case{'SHT'}
+               C = MT_SHT_INITIAL_C_byPHI(data,X_MF,OM);
       end
 end
 end

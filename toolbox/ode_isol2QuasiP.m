@@ -28,16 +28,17 @@ tbid = coco_get_id(oid, 'QuasiP');
 data = struct();
 data = QuasiP_get_seeting(prob, tbid, data);
 %----------------------------------------------------------
-grammar   = 'F DFDX [DFDP [L]] X_MF OM [PNAMES [P0]]';
+grammar   = 'F DFDX [DFDP [L [DFDTH]]] X_MF OM [PNAMES [P0]]';
 args_spec = {
-    'F',          '',        '@',     'fhan',  [],  'read',  {}
-    'DFDX',       '',        '@',  'dfdxhan',  [],  'read',  {}
-    'DFDP',       '',     '@|[]',  'dfdphan',  [],  'read',  {}
-    'L',          '',     '@|[]',     'lhan',  [],  'read',  {}
-    'X_MF',       '',    '[num]',     'X_MF',  [],  'read',  {}
-    'OM',         '',    '[num]',       'OM',  [],  'read',  {}
-    'PNAMES', 'cell',    '{str}',   'pnames',  {},  'read',  {}
-    'P0',         '',    '[num]',       'p0',  [],  'read',  {}
+    'F',          '',        '@',      'fhan',   [],  'read',  {}
+    'DFDX',       '',        '@',   'dfdxhan',   [],  'read',  {}
+    'DFDP',       '',     '@|[]',   'dfdphan',   [],  'read',  {}
+    'L',          '',     '@|[]',      'lhan',   [],  'read',  {}
+    'DFDTH',      '',     '@|[]',  'dfdthhan',   [],  'read',  {}    
+    'X_MF',       '',    '[num]',      'X_MF',   [],  'read',  {}
+    'OM',         '',    '[num]',        'OM',   [],  'read',  {}
+    'PNAMES', 'cell',    '{str}',    'pnames',   {},  'read',  {}
+    'P0',         '',    '[num]',        'p0',   [],  'read',  {}
     };
 [args, ~] = coco_parse(grammar, args_spec, [], varargin{:});
 %----------------------------------------------------------
@@ -45,20 +46,22 @@ data.f   = args.fhan;
 data.fx  = args.dfdxhan;
 data.fp  = args.dfdphan;
 data.l   = args.lhan;
+data.fth = args.dfdthhan;
 X_MF     = args.X_MF;
 OM       = args.OM;
 p0       = args.p0;
 %----------------------------------------------------------
 data = quasip_post_process(tbid, data, args, p0);
+quasip_print_equation_table(data);
+%----------------------------------------------------------
 sol = QuasiP_init_sol(data,X_MF,OM,p0);
 QuasiP_arg_check(tbid, data, X_MF, OM, p0);
 data = QuasiP_init_data(data, OM, p0);
 prob = ode_construct_QuasiP(prob, tbid, data, sol);
 end
-
 %==========================================================================
 %==========================================================================
-
+%==========================================================================
 function data = quasip_post_process(tbid, data, args, p0)
 if strcmp(tbid, 'QuasiP')
     prefix = '';
@@ -109,15 +112,26 @@ data.isfwithu = data.ode_opts.isfwithu;
 %----------------------------------------------------------
 if data.stable_opts.issta
     assert(~(data.ODE == 1 && data.isfwithu), ...
-       'Cannot determine the stability of dx = f(x,dx)');
+        'Cannot determine the stability of dx = f(x,dx)');
 end
-%----------------------------------------------------------
+switch data.PHI.parametrization_tori
+    case 'MT'
+        switch data.PHI.type
+            case 'SHT'
+                data.PHI = MT_SHT_COM_PHI_Supplement(data);
+        end
+end
+end
+%==========================================================================
+%==========================================================================
+%==========================================================================
+function quasip_print_equation_table(data)
 if data.isL
     terms = [];names = {'A', 'B', 'C'};exps = {'*ddx', '*dx', '*x'};
     for i = 1:3
-        if isABC(i)
+        if data.isABC(i)
             term = names{i};
-            if isABCwithp(i)
+            if data.isABCwithp(i)
                 term = [term '(p)'];
             end
             term = [term exps{i}];
@@ -134,30 +148,64 @@ else
 end
 %----------------------------------------------------------
 if data.isfwithu
-   terms = [terms ',dx'];
+    terms = [terms ',dx'];
 end
 if data.isfwithp
-   terms = [terms ',p'];
+    terms = [terms ',p'];
 end
 for ii = 1:data.ode_opts.e
     terms = [terms, sprintf(',theta%d', ii)];
 end
 terms = [terms, ')'];
 %----------------------------------------------------------
-headers = {'n','d','e','pnames','kOMs','uoms','para_tori','type_method','period','L','pS'};
-values  = {
-    num2str(data.ode_opts.n), ...
-    num2str(data.ode_opts.d), ...
-    num2str(data.ode_opts.e), ...
-    strjoin(data.pnames, '+'), ...
-    strjoin(data.kOMnames, '+'), ...
-    strjoin(data.uOMnames, '+'), ...
-    data.PHI.parametrization_tori, ...
-    [data.PHI.type '_' strjoin(data.PHI.method, '+')], ...
-    strjoin(string(data.PHI.P), '+'), ...
-    num2str(data.PHI.L), ...
-    strjoin(string(data.PHI.pS), '+')
-};
+headers = {'N','d','e','pnames','kOMs','uoms','para_tori','type_method','period','L','pS'};
+switch data.PHI.parametrization_tori
+    case{'MP'}
+        values  = {
+            num2str(data.ode_opts.n), ...
+            num2str(data.ode_opts.d), ...
+            num2str(data.ode_opts.e), ...
+            strjoin(data.pnames, '+'), ...
+            strjoin(data.kOMnames, '+'), ...
+            strjoin(data.uOMnames, '+'), ...
+            data.PHI.parametrization_tori, ...
+            [data.PHI.type '_' strjoin(data.PHI.method, '+')], ...
+            strjoin(string(data.PHI.P), '+'), ...
+            num2str(data.PHI.L), ...
+            strjoin(string(data.PHI.pS), '+')
+            };
+    case{'MT'}
+        switch data.PHI.type
+            case{'DM'}
+
+            case{'SHT'}
+                pS = cell(1,data.ode_opts.d);
+                if data.PHI.IsFixedStep
+                    pS{data.PHI.Omt}   = data.PHI.P{data.PHI.Omt}*data.PHI.Nsteps;
+                    for ii = 1:data.ode_opts.d-1
+                        pS{data.PHI.Omnot(ii)} = data.PHI.pSnot{ii};
+                    end
+                else
+                    pS{data.PHI.Omt}   = 'UN';
+                    for ii = 1:data.ode_opts.d-1
+                        pS{data.PHI.Omnot(ii)} = data.PHI.pSnot{ii};
+                    end
+                end
+                values  = {
+                    num2str(data.PHI.N), ...
+                    num2str(data.ode_opts.d), ...
+                    num2str(data.ode_opts.e), ...
+                    strjoin(data.pnames, '+'), ...
+                    strjoin(data.kOMnames, '+'), ...
+                    strjoin(data.uOMnames, '+'), ...
+                    data.PHI.parametrization_tori, ...
+                    [data.PHI.type '_' data.PHI.method ' |' func2str(data.PHI.ODEsolver) ' |Omt=' num2str(data.PHI.Omt) ' |M=' num2str(data.PHI.M_SHT)], ...
+                    strjoin(string(data.PHI.P), '+'), ...
+                    num2str(data.PHI.L), ...
+                    strjoin(string(pS), '+')
+                    };
+        end
+end
 %----------------------------------------------------------
 col_widths = cellfun(@(h,v) max(length(h), length(v))+2, headers, values);
 total_width = sum(col_widths);
@@ -167,7 +215,7 @@ fill_len = total_width + (data.ode_opts.d-1)*3 - length(term_str);
 left_fill = repmat('>', 1, ceil(fill_len/2));
 right_fill = repmat('<', 1, floor(fill_len/2));
 title_line = [left_fill term_str right_fill];
-
+%----------------------------------------------------------
 disp(line);
 disp(title_line);
 disp(line);

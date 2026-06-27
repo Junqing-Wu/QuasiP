@@ -2,9 +2,9 @@ clc
 clear
 
 % Verification Program for Cubic Spline Interpolation
-S = 2^5;    % Coarse grid intervals per 2π
+S = 2^7;    % Coarse grid intervals per 2π
 wS = 2^8;   % Fine grid intervals for interpolation
-p  = 2;     % Period scaling parameter (integer)
+p  = 3;     % Period scaling parameter (integer)
 
 pS = p*S;       % Total number of coarse intervals
 pwS = p*wS;     % Total number of fine intervals
@@ -20,7 +20,7 @@ wdtau = 2*pi/wS;
 wtaui = (0 : wdtau : 2*p*pi)';
 
 % Test function (non-periodic)
-y = cos(0.5*taui) + sin(3*taui) + cos(sin(taui)) + 0.1*taui;
+y = cos(0.5*taui) + sin(3*taui) + cos(sin(taui)) + 0.5*taui;
 
 figure(1)
 plot(taui, y, 'g-', 'LineWidth', 1.5);

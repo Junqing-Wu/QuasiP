@@ -10,7 +10,7 @@ function prob = ode_construct_QuasiP(prob, tbid, data, sol)
 % PROB - Continuation problem structure.
 % TBID - Toolbox instance identifier.
 % DATA - Toolbox data structure.
-% SOL  - Initial solution guess.
+% SOL  - Initial solution guess.   
 %----------------------------------------------------------
 switch data.PHI.parametrization_tori
     case{'MP'}
@@ -22,8 +22,19 @@ switch data.PHI.parametrization_tori
     case{'MT'}
         switch data.PHI.type
             case{'DM'}
-            case{'SHOOT'}
+
+            case{'SHT'}
+                if data.PHI.isvar
+                   prob = coco_add_func(prob, tbid, @MT_SHT_QuasiP, data, 'zero', 'u0', sol.u, 'F+dF');  
+                else
+                   prob = coco_add_func(prob, tbid, @MT_SHT_QuasiP, data, 'zero', 'u0', sol.u);  
+                end
         end
+end
+if data.ode_opts.d > data.ode_opts.e
+    pcfid = coco_get_id(tbid, 'OPC');
+    uidx   = coco_get_func_data(prob, tbid, 'uidx');
+    prob  = coco_add_func(prob, pcfid, @QuasiP_PC, data, 'zero', 'uidx', uidx, 'F+dF');
 end
 %----------------------------------------------------------
 if ~isempty(data.pnames)

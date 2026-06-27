@@ -11,8 +11,8 @@ switch PHI_INITIAL.parametrization_tori
       switch PHI_INITIAL.type
           case{'DM'}
                PHI = MT_DM_COM_PHI(PHI_INITIAL);
-          case{'SHOOT'}
-               PHI = MT_SHOOT_COM_PHI(PHI_INITIAL);     
+          case{'SHT'}
+               PHI = MT_SHT_COM_PHI(PHI_INITIAL);     
       end
 end
 end

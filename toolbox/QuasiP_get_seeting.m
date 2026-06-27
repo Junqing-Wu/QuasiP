@@ -70,53 +70,88 @@ end
 data.amp_opts       =  copts.amp_opts;
 %--------------------------------------------------------------------------------------------------------------------
 if copts.stable_opts.issta
-    S        = copts.stable_opts.S;
-    L        = copts.stable_opts.L;
-    period   = cell2mat(data.PHI.P);
-    Omi      = copts.stable_opts.Omi;
-    assert(length(unique(Omi)) == length(Omi) && all(Omi <= data.ode_opts.d), ...
-       '%s: The OmiforStab is not defined');
-    Num_Omi = numel(Omi);
-    TAU      = cell(1,Num_Omi);
-    pL1      = cell(1,Num_Omi);
-    Harm     = cell(1,Num_Omi);
-    pS       = cell(1,Num_Omi);
-    for ii = 1:Num_Omi
-        Om_t    = Omi(ii);
-        Om_not  = [Om_t+1:data.ode_opts.d,1:Om_t-1];
-        per_t   = period(Om_t);
-        per_not = period(Om_not);
-        tau_1im1 = 0;
-        pS_1im1  = 1;
-        for jj = 1:data.ode_opts.d-1
-            tau_i = (0:2*pi/S:per_not(jj)*2*pi-2*pi/S)';
-            tau_1im1 = [ kron( ones(per_not(jj)*S,1),tau_1im1 ) , kron( tau_i,ones(pS_1im1,1) ) ];
-            pS_1im1 = pS_1im1*per_not(jj)*S;
-        end
-        tau_t = (0:2*pi/L:per_t*2*pi)';
-        TAUii = zeros(pS_1im1*(per_t*L+1),data.ode_opts.d);
-        TAUii(:,Om_t) = kron(ones(pS_1im1,1),tau_t);
-        TAUii(:,Om_not) = kron(tau_1im1(:,2:end),ones(per_t*L+1,1));
-        TAU{ii} = TAUii;
-        pL1{ii} = per_t*L+1;
-        if data.ode_opts.d > 1
-            Harm{ii} = fun_k(per_not,repmat(S,1,data.ode_opts.d-1) );
-            pS{ii}   = per_not.*repmat(S,1,data.ode_opts.d-1);
-        else
-            Harm{ii} = [];
-            pS{ii}   = [];
-        end
-    end
-    copts.stable_opts.TAU  = TAU;
-    copts.stable_opts.pL1  = pL1;
-    copts.stable_opts.Harm = Harm;
-    copts.stable_opts.pS   = pS; 
+    copts.stable_opts = fill_stable_TAU_data(copts.stable_opts, data.PHI, data.ode_opts);
 end
 data.stable_opts   = copts.stable_opts;
 %--------------------------------------------------------------------------------------------------------------------
 if copts.par_opts.parallel
     % activate parallel computing
     activate_parallel(copts.par_opts.ncores)
+end
+end
+%====================================================================================================================
+%====================================================================================================================
+%====================================================================================================================
+%====================================================================================================================
+function stable_opts = fill_stable_TAU_data(stable_opts, PHI, ode_opts)
+S        = stable_opts.S;
+L        = stable_opts.L;
+period   = cell2mat(PHI.P);
+Omi      = stable_opts.Omi;
+d        = ode_opts.d;
+assert(length(unique(Omi)) == length(Omi) && all(Omi <= d), ...
+   '%s: The OmiforStab is not defined');
+Num_Omi = numel(Omi);
+TAU      = cell(1,Num_Omi);
+pL1      = cell(1,Num_Omi);
+Harm     = cell(1,Num_Omi);
+pS       = cell(1,Num_Omi);
+for ii = 1:Num_Omi
+    Om_t    = Omi(ii);
+    Om_not  = [Om_t+1:d,1:Om_t-1];
+    per_t   = period(Om_t);
+    per_not = period(Om_not);
+    tau_1im1 = 0;
+    pS_1im1  = 1;
+    for jj = 1:d-1
+        tau_i = (0:2*pi/S:per_not(jj)*2*pi-2*pi/S)';
+        tau_1im1 = [ kron( ones(per_not(jj)*S,1),tau_1im1 ) , kron( tau_i,ones(pS_1im1,1) ) ];
+        pS_1im1 = pS_1im1*per_not(jj)*S;
+    end
+    tau_t = (0:2*pi/L:per_t*2*pi)';
+    TAUii = zeros(pS_1im1*(per_t*L+1),d);
+    TAUii(:,Om_t) = kron(ones(pS_1im1,1),tau_t);
+    TAUii(:,Om_not) = kron(tau_1im1(:,2:end),ones(per_t*L+1,1));
+    TAU{ii} = TAUii;
+    pL1{ii} = per_t*L+1;
+    if d > 1
+        Harm{ii} = fun_k(per_not,repmat(S,1,d-1) );
+        pS{ii}   = per_not.*repmat(S,1,d-1);
+    else
+        Harm{ii} = [];
+        pS{ii}   = [];
+    end
+end
+stable_opts.TAU  = TAU;
+stable_opts.pL1  = pL1;
+stable_opts.Harm = Harm;
+stable_opts.pS   = pS;
+end
+%====================================================================================================================
+%====================================================================================================================
+%====================================================================================================================
+%====================================================================================================================
+function k = fun_k(p,wS)
+pwS = p.*wS;
+d = length(p);
+k = zeros(d,prod(pwS));
+for jj = 1:d
+
+    k1 = 0:1/p(jj):wS(jj)-1/p(jj);
+    k2 = (0:1/p(jj):wS(jj)-1/p(jj))-wS(jj);
+    kk = zeros(1,pwS(jj));
+    for ii = 1:pwS(jj)
+        if abs(k1(ii))<abs(k2(ii))
+            kk(ii) = k1(ii);
+        elseif abs(k1(ii))>abs(k2(ii))
+            kk(ii) = k2(ii);
+        else
+            kk(ii) = -abs(k1(ii));
+        end
+    end
+    N1 = prod(pwS(1:jj-1));
+    N2 = prod(pwS(jj+1:end));
+    k(jj,:) = kron(ones(1,N2),kron(kk,ones(1,N1)));
 end
 end
 %====================================================================================================================
@@ -153,32 +188,3 @@ catch ME
     rethrow(ME)
 end
 end
-%====================================================================================================================
-%====================================================================================================================
-%====================================================================================================================
-%====================================================================================================================
-
-function k = fun_k(p,wS)
-pwS = p.*wS;
-d = length(p);
-k = zeros(d,prod(pwS));
-for jj = 1:d
-
-    k1 = 0:1/p(jj):wS(jj)-1/p(jj);
-    k2 = (0:1/p(jj):wS(jj)-1/p(jj))-wS(jj);
-    kk = zeros(1,pwS(jj));
-    for ii = 1:pwS(jj)
-        if abs(k1(ii))<abs(k2(ii))
-            kk(ii) = k1(ii);
-        elseif abs(k1(ii))>abs(k2(ii))
-            kk(ii) = k2(ii);
-        else
-            kk(ii) = -abs(k1(ii));
-        end
-    end
-    N1 = prod(pwS(1:jj-1));
-    N2 = prod(pwS(jj+1:end));
-    k(jj,:) = kron(ones(1,N2),kron(kk,ones(1,N1)));
-end
-end
-

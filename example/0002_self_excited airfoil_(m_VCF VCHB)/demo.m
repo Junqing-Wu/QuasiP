@@ -1,6 +1,6 @@
+clearvars;
+close all;
 clc;
-clear;
-clf;
 % system parameters
 OM0 = 1;
 pname = {'Q'};

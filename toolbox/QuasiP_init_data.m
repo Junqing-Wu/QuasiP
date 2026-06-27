@@ -13,8 +13,8 @@ d = data.ode_opts.d;
 e = data.ode_opts.e;
 
 data.cdim   = data.PHI.nL;   % Number of undetermined coefficients of qp 
-data.omdim  = numel(OM); % Number of base frequencies 
-data.pdim   = numel(p0);  % Number of problem parameters
+data.omdim  = numel(OM);     % Number of base frequencies 
+data.pdim   = numel(p0);     % Number of problem parameters
 
 data.C_idx   = 1:data.cdim;
 data.OM_idx  = data.C_idx(end) + (1:data.omdim);
