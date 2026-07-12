@@ -3,7 +3,7 @@ close all;
 clc;
 
 
-num_cont = 100;
+num_cont = 1000;
 
 e1      = 2;
 e2      = 1;

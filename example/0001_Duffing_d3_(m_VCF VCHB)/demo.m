@@ -39,28 +39,29 @@ na = length(x(:,1)); ff = (0:na-1)'/na*2*pi/dt;
 keep_idx = pks_sorted >= (pks_sorted(1) - 8);  
 pks_final = pks_sorted(keep_idx);
 loc_final = locs(idx_sorted(keep_idx));
+loc_final = [1;loc_final];
 ff_final = ff(loc_final,:)/(OM0(1));
 X_final  = X(loc_final,:);
 X_MF1 = solve_HOrder(X_final,ff_final,rho,[5,5,5],[1,1,1]);
 X_MF2 = X_MF1(:,1:end-1);
 %----------------------------------------------------------
-% figure(1)
-% plot(ff/(OM0(1)),log(abs(X(:,1))))
-% xlabel('normalized f')
-% ylabel('log(abs(X))')
-% xlim([0,4])
-% k_h = X_MF1(:,1:2)';
-% Q   = X_MF1(:,1+2:end);
-% theta = (OM0*t)';
-% H_IDF = exp(1i*theta*k_h);
-% xx = real(H_IDF*Q);
-% figure(2)
-% plot(x(:,1),x(:,2))
-% hold on
-% plot(xx(:,1),xx(:,2),'--')
-% xlabel('x')
-% ylabel('dx')
-% legend('TI','TI-FFT')
+figure(1)
+plot(ff/(OM0(1)),log(abs(X(:,1))))
+xlabel('normalized f')
+ylabel('log(abs(X))')
+xlim([0,4])
+k_h = X_MF1(:,1:3)';
+Q   = X_MF1(:,1+3:end);
+theta = (OM0*t)';
+H_IDF = exp(1i*theta*k_h);
+xx = real(H_IDF*Q);
+figure(2)
+plot(x(:,1),x(:,2))
+hold on
+plot(xx(:,1),xx(:,2),'--')
+xlabel('x')
+ylabel('dx')
+legend('TI','TI-FFT')
 %----------------------------------------------------------
 %%
 prob1 = coco_prob();
@@ -68,7 +69,7 @@ ode_opts    = struct('n',1, 'd',3, 'e',3, 'isfwithu',false);
 amp_opts    = struct('isamp',true,'isuamp',true,'isht',false,'outdof',1,'Nperiod',1,'Nsampling',2^8);
 stable_opts = struct('issta',true,'S',2^5,'L',2^8,'N_Ly',1000,'Omi',[1,2,3]);
 prob1 = coco_set(prob1,'cont','PtMX',100);
-prob1 = coco_set(prob1,'cont','NSV',1);
+prob1 = coco_set(prob1,'cont','NSV',10);
 prob1 = coco_set(prob1,'QuasiP','ode_opts',ode_opts,'amp_opts',amp_opts,'stable_opts',stable_opts); 
 PHI_INITIAL = struct( 'parametrization_tori', 'MP', ...
     'type',    'mVCF'           , ...     

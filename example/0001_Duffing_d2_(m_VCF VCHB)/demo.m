@@ -49,6 +49,8 @@ na = length(x(:,1)); ff = (0:na-1)'/na*2*pi/dt;
 keep_idx = pks_sorted >= (pks_sorted(1) - 8);  
 pks_final = pks_sorted(keep_idx);
 loc_final = locs(idx_sorted(keep_idx));
+loc_final = [1;loc_final];
+
 ff_final = ff(loc_final,:)/(OM0(1));
 X_final  = X(loc_final,:);
 X_MF1 = solve_HOrder(X_final,ff_final,rho,[5,5],[1,1]);
@@ -96,7 +98,7 @@ fc_funcs = {@fc_2};
 prob1 = coco_add_func(prob1, 'KOM_zero', fc_funcs{:}, [], 'zero','uidx', uidx(data.kOM_idx) , 'F+dF');
 bd1 = coco(prob1, 'qp1', [], 1, {'k_OM1' 'k_OM2' 'zeta' 'gamma' 'f1' 'f2'}, [1.8 6]);
 
-% bd1 = coco_bd_read('qp1');
+bd1 = coco_bd_read('qp1');
 max_x1    = coco_bd_col(bd1, 'Max_x');
 Om_mode1  = coco_bd_col(bd1, 'Om');
 Stab1     = coco_bd_col(bd1, 'Stab');

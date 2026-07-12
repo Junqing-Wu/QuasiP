@@ -24,13 +24,14 @@ for jj = 1:PHI.M_SHT
 end
 PHI.Local_HT = Local_HT;
 PHI.Local_MF = Local_MF;
-PHI.EiG      = sparse( kron(eye(PHI.N),PHI.iGam) );
-PHI.EG       = sparse( kron(eye(PHI.N),PHI.Gam ) );
-
+if data.ode_opts.d > 1
+    PHI.EiG      = sparse( kron(eye(PHI.N),PHI.iGam) );
+    PHI.EG       = sparse( kron(eye(PHI.N),PHI.Gam ) );
+end
 if data.ODE == 1 && ~PHI.MATLABsolver
     PHI.ODEsolver = @ode45;
     PHI.MATLABsolver = true;
     PHI.IsFixedStep  = false;
-    disp(['First-order systems can only use MATLABsolver! >>>ODE45 is used by default<<<']);
+    disp('First-order systems can only use MATLABsolver! >>>ODE45 is used by default<<<');
 end
 end

@@ -5,7 +5,7 @@ u = y(n+1:end);
 v = u*Om1;
 theta = phi;
 theta(Omt) = phi1;
-theta(Omnot) = theta(Omnot) + phi(Omnot) + Rho*phi1;
+theta(Omnot) = phi(Omnot) + Rho*phi1;
 %-------------------------------------------------------------
 if data.isfwithu
     f           = data.f(q,v,p,theta);
@@ -38,25 +38,24 @@ else
         dfdp  = zeros(n,a);
     end
 end
-dfdu = Om1*dfdv;
 %-------------------------------------------------------------
-M = Cons.Aw;
-D = Cons.Bw-dfdu;
-K = Cons.C -dfdq;
+M = (Cons.Aw);
+D = (Cons.Bw-Om1*dfdv);
+K = (Cons.C-dfdq);
 %-------------------------------------------------------------
 F_qqs = zeros(n,n);
 F_qus = zeros(n,n);
 F_qOm = zeros(n,d);
-fCqBu = f - Cons.C*q - Cons.Bw*u;
-F_qOm(:,Omt) = F_qOm(:,Omt) + Cons.Aw*Cons.invAw_Om1*fCqBu - Cons.Bw_Om1*u; 
+
+F_qOm(:,Omt) =  - 2/Om1 *(f - Cons.C*q - Cons.Bw*u) - Cons.B*u ; 
 for ii = 1:d-1
     F_qOm(:,Omt)       = F_qOm(:,Omt) - phi1*Om2d(ii)/Om1^2*dfdth(:,Omnot(ii));
     F_qOm(:,Omnot(ii)) = phi1/Om1*dfdth(:,Omnot(ii));
 end
 F_qp  = zeros(n,a);
 for aa = 1:a
-    F_qp(:,aa) = F_qp(:,aa) + Cons.Aw*Cons.invAw_p(:,:,aa)*fCqBu + dfdp(:,aa) -...
-                              Cons.C_p(:,:,aa)*q - Cons.Bw_p(:,:,aa)*u; 
+    F_qp(:,aa) = F_qp(:,aa) - Cons.A_p(:,:,aa)*Cons.invA* (f - Cons.C*q + Cons.Bw*u) +  ...
+                              ( dfdp(:,aa) - Cons.C_p(:,:,aa)*q - Om1*Cons.B_p(:,:,aa)*u ); 
 end
 F = [F_qqs,F_qus,F_qOm,F_qp];
 %-------------------------------------------------------------

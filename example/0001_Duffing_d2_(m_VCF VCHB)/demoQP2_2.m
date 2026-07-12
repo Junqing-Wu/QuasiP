@@ -36,6 +36,8 @@ na = length(x(:,1)); ff = (0:na-1)'/na*2*pi/dt;
 keep_idx = pks_sorted >= (pks_sorted(1) - 8);  
 pks_final = pks_sorted(keep_idx);
 loc_final = locs(idx_sorted(keep_idx));
+loc_final = [1;loc_final];
+
 ff_final = ff(loc_final,:)/(OM0(1));
 X_final  = X(loc_final,:);
 X_MF1 = solve_HOrder(X_final,ff_final,rho,[5,5],[2,2]);
