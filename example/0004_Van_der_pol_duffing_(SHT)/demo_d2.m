@@ -33,7 +33,7 @@ end
 prob = coco_prob();
 ode_opts = struct('n',1, 'd',2, 'e',2, 'isfwithu',true);
 amp_opts    = struct('isamp',false,'isuamp',true,'isht',true,'outdof',1,'Nperiod',1,'Nsampling',2^8);
-par_opts    = struct('parallel',true,'ncores',6);
+par_opts    = struct('parallel',true,'ncores',10);
 prob = coco_set(prob,'QuasiP','ode_opts',ode_opts,'amp_opts',amp_opts,'par_opts',par_opts); 
 prob = coco_set(prob,'cont','PtMX',num_cont);
 PHI_INITIAL = struct( 'parametrization_tori', 'MT', ...

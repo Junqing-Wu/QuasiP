@@ -39,9 +39,9 @@ if data.par_opts.parallel
     if MATLABsolver
         % y' = 1/Om1*g(y,p,phi1,phi2+rho2*phi1,...,phie+rhoe*phi1)
         parfor ii = 1 : PHI.L_HT
-            ys_ii    = ys(ii,:);
-            phis_ii  = phis(ii,:);
-            phi1s_ii = phis_ii(Omt);
+            ys_ii     = ys(ii,:);
+            phis_ii   = phis(ii,:);
+            phi1s_ii  = phis_ii(Omt);
             idx_match = (phi1s == phi1s_ii);
             phi1e_ii  = phi1e(idx_match);
             [~,Psi]   = MT_SHT_MATLABsolver1(data,ys_ii,phis_ii,phi1s_ii,phi1e_ii,Om,p);
@@ -50,9 +50,9 @@ if data.par_opts.parallel
     else
         % M*a + D*u + K*q = f(q,Om1*u,p,phi1,phi2+rho2*phi1,...,phie+rhoe*phi1)
         parfor ii = 1 : PHI.L_HT
-            ys_ii    = ys(ii,:);
-            phis_ii  = phis(ii,:);
-            phi1s_ii = phis_ii(Omt);
+            ys_ii     = ys(ii,:);
+            phis_ii   = phis(ii,:);
+            phi1s_ii  = phis_ii(Omt);
             idx_match = (phi1s == phi1s_ii);
             phi1e_ii  = phi1e(idx_match);
             [~,Psi]   = PHI.ODEsolver(data,ys_ii(:),phis_ii(:),phi1s_ii,phi1e_ii,dphi1,Om,p);
@@ -63,9 +63,9 @@ else
     if MATLABsolver
         % y' = 1/Om1*g(y,p,phi1,phi2+rho2*phi1,...,phie+rhoe*phi1)
         for ii = 1 : PHI.L_HT
-            ys_ii    = ys(ii,:);
-            phis_ii  = phis(ii,:);
-            phi1s_ii = phis_ii(Omt);
+            ys_ii     = ys(ii,:);
+            phis_ii   = phis(ii,:);
+            phi1s_ii  = phis_ii(Omt);
             idx_match = (phi1s == phi1s_ii);
             phi1e_ii  = phi1e(idx_match);
             [~,Psi]   = MT_SHT_MATLABsolver1(data,ys_ii,phis_ii,phi1s_ii,phi1e_ii,Om,p);
@@ -74,9 +74,9 @@ else
     else
         % M*a + D*u + K*q = f(q,Om1*u,p,phi1,phi2+rho2*phi1,...,phie+rhoe*phi1)
         for ii = 1 : PHI.L_HT
-            ys_ii    = ys(ii,:);
-            phis_ii  = phis(ii,:);
-            phi1s_ii = phis_ii(Omt);
+            ys_ii     = ys(ii,:);
+            phis_ii   = phis(ii,:);
+            phi1s_ii  = phis_ii(Omt);
             idx_match = (phi1s == phi1s_ii);
             phi1e_ii  = phi1e(idx_match);
             [~,Psi]   = PHI.ODEsolver(data,ys_ii(:),phis_ii(:),phi1s_ii,phi1e_ii,dphi1,Om,p);
