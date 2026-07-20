@@ -15,9 +15,10 @@
 clearvars;
 close all;
 clc;
+num_p = 3000;
 % system parameters
 rho = [1;1/2^0.5];
-Om1 = 6;
+Om1 = 5.5;
 OM0 = rho*Om1;
 pname = {'zeta' 'gamma' 'f1' 'f2'};
 p0 = [0.1;0.2;5;5];
@@ -75,19 +76,18 @@ X_MF2 = X_MF1(:,1:end-1);
 %% ====================== 任务 1 ======================
 prob1 = coco_prob();
 ode_opts    = struct('n',1, 'd',2, 'e',2, 'isfwithu',false);
-amp_opts    = struct('isamp',false,'isuamp',true,'isht',true,'outdof',1,'Nperiod',1,'Nsampling',2^8);
-stable_opts = struct('issta',false,'S',2^6,'L',2^8,'N_Ly',500,'Omi',[1,2]);
-par_opts    = struct('parallel',false,'ncores',6);
-prob1 = coco_set(prob1,'cont','PtMX',3000);
-prob1 = coco_set(prob1,'cont','NSV',5);
-prob1 = coco_set(prob1, 'corr','ItMX',50);
-% prob1 = coco_set(prob1,'cont','h_min',0.2,'h_max',0.5);
+amp_opts    = struct('isamp',true,'isuamp',true,'isht',true,'outdof',1,'Nperiod',1,'Nsampling',2^8);
+stable_opts = struct('issta',true,'S',2^6,'L',2^8,'N_Ly',500,'Omi',[1,2]);
+par_opts    = struct('parallel',true,'ncores',12);
+prob1 = coco_set(prob1,'cont','PtMX',num_p);
+prob1 = coco_set(prob1,'cont','NSV',10);
+prob1 = coco_set(prob1,'cont','h_min',0.25,'h_max',0.5);
 prob1 = coco_set(prob1,'QuasiP','ode_opts',ode_opts,'amp_opts',amp_opts,'stable_opts',stable_opts,'par_opts',par_opts); 
 PHI_INITIAL = struct( 'parametrization_tori', 'MT', ...
     'type',       'SHT'           , ...     
-    'method',     'HT' , ... % HT or MF
+    'method',     'MF' , ... % HT or MF
     'ODEsolver',  @Newmark, ...
-    'isvar',      true, ...
+    'isvar'    ,  true, ...
     'Omt',        1, ...
     'M_SHT',      1, ...
     'Nsteps',     2^8,...
@@ -102,22 +102,24 @@ prob1 = ode_isol2QuasiP(prob1, '', funcs{:}, X_MF2, OM0, pname, p0);
 [data, uidx] = coco_get_func_data(prob1, 'QuasiP', 'data', 'uidx');
 fc_funcs = {@fc_2};
 prob1 = coco_add_func(prob1, 'KOM_zero', fc_funcs{:}, [], 'zero','uidx', uidx(data.kOM_idx) , 'F+dF');
-bd1 = coco(prob1, 'qp1', [], 1, {'k_OM1' 'k_OM2' 'zeta' 'gamma' 'f1' 'f2'}, [1.8 6]);
+bd1 = coco(prob1, 'qp1', [], 1, {'k_OM1' 'k_OM2' 'zeta' 'gamma' 'f1' 'f2'}, [1.8 5.5]);
+close(11111)
 
-% % bd1 = coco_bd_read('qp1');
-% max_x1    = coco_bd_col(bd1, 'Max_x');
-% Om_mode1  = coco_bd_col(bd1, 'Om');
-% Stab1     = coco_bd_col(bd1, 'Stab');
-% Ly1       = coco_bd_col(bd1, 'Ly');
-% A11 = find(~Stab1(:,1));
-% 
-% figure(1)
-% plot(Om_mode1(:,1), max_x1,'k--');
-% hold on
-% plot(Om_mode1(A11,1), max_x1(A11), 'ko');
-% xlabel('\omega_1');
-% ylabel('max(x)');
-% grid on;
+
+% bd1 = coco_bd_read('qp1');
+max_x1    = coco_bd_col(bd1, 'Max_x');
+Om_mode1  = coco_bd_col(bd1, 'Om');
+Stab1     = coco_bd_col(bd1, 'Stab');
+Ly1       = coco_bd_col(bd1, 'Ly');
+A11 = find(~Stab1(:,1));
+
+figure(1)
+plot(Om_mode1(:,1), max_x1,'k--');
+hold on
+plot(Om_mode1(A11,1), max_x1(A11), 'ko');
+xlabel('\omega_1');
+ylabel('max(x)');
+grid on;
 % 
 % 
 

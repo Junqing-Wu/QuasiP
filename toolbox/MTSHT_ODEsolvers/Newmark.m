@@ -1,4 +1,4 @@
-function [Phi1,Psi]  = Newmark(data,ys,phi,phi1s,phi1e,dphi1,Om,p)
+function [Phi1,Psi,A]  = Newmark(data,ys,phi,phi1s,phi1e,dphi1,Om,p)
 % 0: M*a + D*u + K*q = f(q,Om1*u,p,phi1,phi2+rho2*phi1,...,phie+rhoe*phi1)
 %    M = Om1^2*A; D = Om1*B 
 PHI     = data.PHI;
@@ -15,6 +15,7 @@ if PHI.isvar
 else
     Psi = zeros(n_steps,N);
 end
+A = zeros(n_steps,N/2);
 %-------------------------------------------------------------------------------------
 ItMX    = PHI.ODE2slover_opt.ItMX;
 RelTol  = PHI.ODE2slover_opt.RelTol;
@@ -42,6 +43,7 @@ else
     fs  = data.f(qs,p,thetas);
 end
 as = Cons.Aw\(fs-Cons.Bw*us-Cons.C*qs);
+A(1,:) = as';
 if PHI.isvar
     Jqs = [eye(n),zeros(n,n),zeros(n,d),zeros(n,a)];
     Jus = [zeros(n,n),eye(n),zeros(n,d),zeros(n,a)];
@@ -59,10 +61,12 @@ else
 end
 K_hat = 1/(beta*dphi1^2)*Cons.Aw + gamma/(beta*dphi1)*Cons.Bw +  Cons.C;
 for i = 1:n_steps-1
-    
+
     qe    = qs + us*dphi1 + dphi1^2*(0.5-beta)*as;
-    ue    = gamma/(beta*dphi1)*(qe-qs) + (1-gamma/beta)*us + dphi1*(1-gamma/2/beta)*as;
-    ae    = 1/(beta*dphi1^2)  *(qe-qs) - 1/(beta*dphi1)*us - (0.5-beta)/beta       *as;
+    qstar = qs + dphi1*us +(0.5-beta)*dphi1^2*as;
+    ustar = us + (1-gamma)*dphi1*as;
+    ue    = ustar + gamma/(beta*dphi1)*(qe-qstar);
+    ae    = (qe-qstar)/(beta*dphi1^2);
     ve    = Om1*ue;
 
     phi1  = Phi1(i+1);
@@ -91,8 +95,8 @@ for i = 1:n_steps-1
         dqe = -KT\R;
 
         qe  = qe+dqe;
-        ue    = gamma/(beta*dphi1)*(qe-qs) + (1-gamma/beta)*us + dphi1*(1-gamma/2/beta)*as;
-        ae    = 1/(beta*dphi1^2)  *(qe-qs) - 1/(beta*dphi1)*us - (0.5-beta)/beta       *as;
+        ue    = ustar+gamma/(beta*dphi1)*(qe-qstar);
+        ae    = (qe-qstar)/(beta*dphi1^2);
         ve    = ue*Om1;
         
         if norm(R)<=RelTol
@@ -105,8 +109,8 @@ for i = 1:n_steps-1
        
        [Me,De,Ke,Fe] = MT_SHT_MDKF_var(data,[qe;ue],phi1,phi,Om1,Om2d,Omt,Omnot,Rho,p,Cons,n,d,e,a); 
 
-       Jqstar = Jqs+dphi1*Jus+(0.5-beta)*dphi1^2*Jas;
-       Justar = Jus+(1-gamma)*dphi1*Jas;
+       Jqstar = Jqs + dphi1*Jus + (0.5-beta)*dphi1^2*Jas;
+       Justar = Jus + (1-gamma)*dphi1*Jas;
        S   = Me/(beta*dphi1^2) + gamma*De/(beta*dphi1) + Ke;
        Jqe = S\(Fe + Me*Jqstar/(beta*dphi1^2) + De*(gamma/(beta*dphi1)*Jqstar-Justar));
        Jue = Justar+gamma/(beta*dphi1)*(Jqe-Jqstar);
@@ -130,11 +134,15 @@ for i = 1:n_steps-1
         ys = [qs;us];
         Psi(i+1,:) = ys';
     end
+    A(i+1,:) = as';
 end
+
 % plot(Psi(:,1),Psi(:,2))
 % hold on
 % plot(Psi(1,1),Psi(1,2),'rx')
 % plot(Psi(end,1),Psi(end,2),'bo')
+% xlabel('x')
+
 end
 
 

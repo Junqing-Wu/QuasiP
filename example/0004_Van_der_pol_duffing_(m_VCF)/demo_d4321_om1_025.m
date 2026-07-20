@@ -2,7 +2,6 @@ clearvars;
 close all;
 clc;
 
-
 num_cont = 2;
 om1 = 2.65;
 rho = [1;1/5^0.5;1/11^0.5;1/33^0.5];
@@ -51,7 +50,8 @@ PHI_INITIAL = struct( 'parametrization_tori', 'MP', ...
     'k',       { {5,3,3,3} }, ...        
     'P',       { {1,1,1,1} }, ...    
     'S',       { {2^5,2^5,2^5,2^5} }, ...
-    'S_wave',  { {2^6,2^6,2^6,2^6} });
+    'S_wave',  { {2^6,2^6,2^6,2^6} }, ...
+    'OmOd',    [1,2,3,4]);
 prob = coco_set(prob, 'QuasiP', 'PHI_INITIAL', PHI_INITIAL); 
 funcs = {@VDPDwithe4_F, @VDPD_DFDX, [], @VDPD_L}; 
 prob = ode_isol2QuasiP(prob, '', funcs{:}, X_MF2, OM0);
@@ -60,6 +60,7 @@ fc_funcs = {@fc_4e};
 prob = coco_add_func(prob, 'KOM_zero', fc_funcs{:}, [], 'zero','uidx', uidx(data.kOM_idx) , 'F+dF');
 
 bd4_hbhbhbhb = coco(prob, 'qp4', [], 0, {'k_OM1' 'k_OM2' 'k_OM3' 'k_OM4'}, [0.2 om1]);
+close(11111)
 
 max_x1_hbhbhbhb    = coco_bd_col(bd4_hbhbhbhb, 'Max_x');
 Om_mode_hbhbhbhb  = coco_bd_col(bd4_hbhbhbhb, 'Om');
@@ -186,6 +187,7 @@ fc_funcs = {@fc_3e};
 prob = coco_add_func(prob, 'KOM_zero', fc_funcs{:}, [], 'zero','uidx', uidx(data.kOM_idx) , 'F+dF');
 
 bd3_hbhbhb = coco(prob, 'qp3', [], 0, {'k_OM1' 'k_OM2' 'k_OM3'}, [0.2 om1]);
+close(11111)
 
 max_x1_hbhbhb    = coco_bd_col(bd3_hbhbhb, 'Max_x');
 Om_mode_hbhbhb  = coco_bd_col(bd3_hbhbhb, 'Om');
@@ -299,6 +301,7 @@ fc_funcs = {@fc_2e};
 prob = coco_add_func(prob, 'KOM_zero', fc_funcs{:}, [], 'zero','uidx', uidx(data.kOM_idx) , 'F+dF');
 
 bd2_hbhb = coco(prob, 'qp2', [], 0, {'k_OM1' 'k_OM2'}, [0.2 om1]);
+close(11111)
 
 max_x1_hbhb    = coco_bd_col(bd2_hbhb, 'Max_x');
 Om_mode_hbhb  = coco_bd_col(bd2_hbhb, 'Om');
@@ -401,6 +404,7 @@ prob = ode_isol2QuasiP(prob, '', funcs{:}, X_MF2, OM0);
 [data, uidx] = coco_get_func_data(prob, 'QuasiP', 'data', 'uidx');
 
 bd1_hb = coco(prob, 'qp1', [], 0, {'k_OM1'}, [0.2 om1]);
+close(11111)
 
 max_x1_hb    = coco_bd_col(bd1_hb, 'Max_x');
 Om_mode_hb  = coco_bd_col(bd1_hb, 'Om');

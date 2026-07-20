@@ -6,7 +6,8 @@ switch data.PHI.parametrization_tori
     case{'MT'}
         switch data.PHI.type
             case{'DM'}
-            case{'SHOOT'}
+            case{'SHT'}
+                Psi = MT_SHT_PostP_sta_Psi(data,Omii,pii,Amp);
         end
 end
 

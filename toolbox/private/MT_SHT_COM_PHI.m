@@ -49,7 +49,7 @@ else
     PHI.iGTiG                  = transpose(PHI.iGam)*PHI.iGam;
 
     [Varphi_wave2d,PHI.pwSnot] = Com_phi(S_wavenot,Pnot);
-    [PHI.wGam,~]               = Com_Gam(PHI.kQ,PHI.U,Varphi_wave2d,cell2mat(PHI.pwSnot));
+    [PHI.wGam,PHI.iwGam]       = Com_Gam(PHI.kQ,PHI.U,Varphi_wave2d,cell2mat(PHI.pwSnot));
     PHI.wGamiGam               = PHI.wGam*PHI.iGam;
     %---------------------------------------------------------------------
     v1  = zeros(1,PHI.U-1);
@@ -99,7 +99,7 @@ PHI.Varphi1_end   = Varphi1_se(2:end);
 Varphi              = zeros(PHI.M_SHT*PHI.pS2d,d);
 Varphi(:,PHI.Omt)   = kron(transpose(PHI.Varphi1_sta),ones(PHI.pS2d,1));
 Varphi(:,PHI.Omnot) = kron(ones(PHI.M_SHT,1),PHI.Varphi2d);
-PHI.Varphi          = Varphi;
+PHI.Varphi          = Varphi;             % 单轨迹初始值
 PHI.L_HT            = PHI.M_SHT*PHI.pS2d; % 单个x需要的未知数个数 （超时域）
 PHI.L_MF            = PHI.M_SHT*PHI.U;    % 单个x需要的未知数个数 （多频域）
 switch PHI.method
@@ -109,6 +109,41 @@ switch PHI.method
         PHI.L = PHI.L_MF;
 end
 PHI.dphi1  = 2*pi/PHI.Nsteps;
+PHI.num_phi1_taj = PHI.P{PHI.Omt}*PHI.Nsteps/PHI.M_SHT + 1;
+%---------------------------------------------------------------------
+OmOd     = [PHI.Omt,PHI.Omnot];
+[~, pos] = sort(OmOd);
+P_omod   = cell(1,d);
+wS_omod  = cell(1,d);
+pwS_omod = cell(1,d);
+for ii = 1:d
+    P_omod{ii}   = PHI.P{OmOd(ii)};
+    wS_omod{ii}  = PHI.S_wave{OmOd(ii)};
+    pwS_omod{ii} = PHI.P{OmOd(ii)}*PHI.S_wave{OmOd(ii)};
+end
+PHI.OmOd     = OmOd;
+PHI.pos      = pos;
+PHI.P_omod   = P_omod;
+PHI.wS_omod  = wS_omod;
+PHI.pwS_omod = pwS_omod;
+%---------------------------------------------------------------------
+wS  = cell2mat(PHI.wS_omod) ;
+pwS = cell2mat(PHI.pwS_omod);
+p   = cell2mat(PHI.P_omod)  ;
+wdtau1   = 2*pi/wS(1);
+wTau1    = 2*p(1)*pi;
+wtau_1im1 = (0:wdtau1:wTau1-wdtau1)';
+pwS_1im1 = pwS(1);
+for ii = 2:d
+    wdtaui = 2*pi/wS(ii);
+    wTaui  = 2*p(ii)*pi;
+    wtau_i = (0:wdtaui:wTaui-wdtaui)';  
+    wtau_1im1 = [ kron( ones(pwS(ii),1),wtau_1im1 ) , kron( wtau_i,ones(pwS_1im1,1) ) ];
+    pwS_1im1  = pwS_1im1*pwS(ii);  
+end
+wtau     = wtau_1im1';
+wtau     = wtau(pos,:);
+PHI.wtau = wtau;
 end
 %====================================================================================================================
 %====================================================================================================================

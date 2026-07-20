@@ -73,7 +73,7 @@ amp_opts    = struct('isamp',true,'isuamp',true,'isht',false,'outdof',1,'Nperiod
 stable_opts = struct('issta',true,'S',2^5,'L',2^8,'N_Ly',1000,'Omi',1);
 prob1 = coco_set(prob1,'cont','PtMX',1000);
 prob1 = coco_set(prob1,'cont','NSV',10);
-prob1 = coco_set(prob1,'cont','h_min',0.001,'h_max',0.1);
+prob1 = coco_set(prob1,'cont','h_min',0.001,'h_max',0.01);
 prob1 = coco_set(prob1,'QuasiP','ode_opts',ode_opts,'amp_opts',amp_opts,'stable_opts',stable_opts); 
 PHI_INITIAL = struct( 'parametrization_tori', 'MP', ...
     'type',    'mVCF'           , ...     
@@ -86,6 +86,7 @@ prob1 = coco_set(prob1, 'QuasiP', 'PHI_INITIAL', PHI_INITIAL);
 funcs = {@Duffing1_F, @Duffing1_DFDX, @Duffing1_DFDP, @Duffing1_L};
 prob1 = ode_isol2QuasiP(prob1, '', funcs{:}, X_MF2, OM0, pname, p0);
 bd1 = coco(prob1, 'p4p', [], 1, {'k_OM1' 'r' 'b' 'f'}, [2 5]);
+close(11111)
 
 % bd1 = coco_bd_read('qp1');
 max_x1    = coco_bd_col(bd1, 'max.x');
@@ -100,7 +101,7 @@ figure(1)
 hold on
 for ii = 0:3
 plot(Om_mode1, x_ht(2^8*ii+1,:),'b-');
-% plot(Om_mode1(A), x_ht(2^8*ii+1,A), 'bo');
+plot(Om_mode1(A), x_ht(2^8*ii+1,A), 'bo');
 end
 xlabel('\omega_1');
 ylabel('x');
@@ -108,10 +109,16 @@ grid on;
 
 
 
-% figure(2)
-% plot(x(:,1),x(:,2));
-% hold on
-% plot(x_ht(:,end),u_ht(:,end),'--');
+
+figure(2)
+plot(x(:,1),x(:,2),'r-');
+hold on
+plot(x_ht(:,end),u_ht(:,end),'b-.');
+xlabel('x');
+ylabel('dx');
+legend('TI','HB')
+grid on;
+
 
 
 

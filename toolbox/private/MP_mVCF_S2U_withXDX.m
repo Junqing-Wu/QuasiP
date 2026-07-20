@@ -6,8 +6,8 @@ function Nd_Xd = MP_mVCF_S2U_withXDX(PHI, N0_X0, N0_dX0, Om, pS_prod)
 %   - S_prod: Total S-domain spectral combinations
 % Output:
 %   - Nd_Xd: U-domain gradient matrix (dimension: U_prod × U_prod)
-U            = cell2mat(PHI.U);
-pS           = cell2mat(PHI.pS);
+U            = cell2mat(PHI.U_omod);
+pS           = cell2mat(PHI.pS_omod);
 pS_iiTd      = pS_prod;
 U_1Tiiminus1 = 1;
 N_Xiiminus1   = reshape(N0_X0,1,[]);
@@ -21,7 +21,7 @@ for kk = 1:PHI.d
     N_dXiiminus1_bar = pagetranspose( reshape(N_dXiiminus1,U_1Tiiminus1^2,pS(kk),pS_iiTd) );
     N_dXiiminus1_bar = reshape( N_dXiiminus1_bar, pS(kk),1,U_1Tiiminus1^2*pS_iiTd );
     % Gradient transformation (HB/CO/FD)
-    switch PHI.method{kk}
+    switch PHI.me_omod{kk}
         case{'HB'} % Harmonic Balance gradient
             N_Xiiminus1_bar_SU = repmat(N_Xiiminus1_bar,1,U(kk));
             N_dXiiminus1_bar_SU = repmat(N_dXiiminus1_bar,1,U(kk));

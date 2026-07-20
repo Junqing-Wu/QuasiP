@@ -2,11 +2,32 @@ function PHI = MP_mVCF_COM_PHI(PHI_INITIAL)
 PHI = PHI_INITIAL;
 d   = PHI.d;
 n   = PHI.n;
+if ~isfield(PHI_INITIAL,'isvar')
+    PHI.isvar = true;
+end
+if ~isfield(PHI_INITIAL,'OmOd')
+    PHI.OmOd = 1:d;
+end
+OmOd = PHI.OmOd;
+assert( numel(unique(OmOd)) == d &&  all(OmOd <= d) ...
+              &&  all(OmOd >= 1) && numel(OmOd) == d, ...
+              '%s: The Omod is not well defined');
 isCO = false;
 %----------------------------------------------------------
-U      = cell(1,d);
-pS     = cell(1,d);
-pwS    = cell(1,d);
+pS       = cell(1,d);
+for ii = 1:d
+    pS{ii} = PHI.P{ii}*PHI.S{ii};
+end
+PHI.pS   = pS;
+me_omod  = cell(1,d);
+k_omod   = cell(1,d);
+P_omod   = cell(1,d);
+S_omod   = cell(1,d);
+wS_omod  = cell(1,d);
+U_omod   = cell(1,d);
+pS_omod  = cell(1,d);
+pwS_omod = cell(1,d);
+pwS      = cell(1,d);
 %----------------------------------------------------------
 xi0    = cell(1,d);
 xi1    = cell(1,d);
@@ -30,44 +51,59 @@ wGam0  = cell(1,d);
 wGam1  = cell(1,d);
 %----------------------------------------------------------
 for ii = 1:d
-    ki   = PHI.k{ii};
-    pii  = PHI.P{ii};
-    Si   = PHI.S{ii};
-    wSi  = PHI.S_wave{ii};
-    switch PHI.method{ii}
+
+    ki   = PHI.k{OmOd(ii)};
+    pii  = PHI.P{OmOd(ii)};
+    Si   = PHI.S{OmOd(ii)};
+    wSi  = PHI.S_wave{OmOd(ii)};
+
+    switch PHI.method{OmOd(ii)}
         case{'HB'}
             [xi1{ii},xi2{ii},Gam0{ii},iGam0{ii},...
-                wGam0{ii},U{ii},pS{ii},pwS{ii}] = MP_mVCF_ShapeF_HB(ki,pii,Si,wSi);
-            xi0{ii}   = eye(U{ii});
+                wGam0{ii},U_omod{ii},pS_omod{ii},pwS_omod{ii}] = MP_mVCF_ShapeF_HB(ki,pii,Si,wSi);
+            xi0{ii}   = eye(U_omod{ii});
             Gam1{ii}  = Gam0{ii}*xi1{ii};
             wGam1{ii} = wGam0{ii}*xi1{ii};
             wxi1{ii}  = xi1{ii};
             wxi2{ii}  = xi2{ii};
         case{'FD'}
             [xi1{ii},xi2{ii},wGam0{ii},...
-                wGam1{ii},U{ii},pS{ii},pwS{ii}] = MP_ShapeF_FD(ki,pii,Si,wSi);
-            xi0{ii}   = eye(U{ii});
-            Gam0{ii}  = eye(U{ii});
+                wGam1{ii},U_omod{ii},pS_omod{ii},pwS_omod{ii}] = MP_ShapeF_FD(ki,pii,Si,wSi);
+            xi0{ii}   = eye(U_omod{ii});
+            Gam0{ii}  = eye(U_omod{ii});
             Gam1{ii}  = xi1{ii};
-            iGam0{ii} = eye(U{ii});
+            iGam0{ii} = eye(U_omod{ii});
             wxi1{ii}  = xi1{ii};
             wxi2{ii}  = xi2{ii};
         case{'CO'}
             isCO = true;
             [xi0{ii},xi1{ii},xi2{ii},wxi1{ii},wxi2{ii},wGam0{ii},...
-                wGam1{ii},U{ii},pS{ii},pwS{ii}] = MP_ShapeF_CO(ki,pii,Si,wSi);
-            Gam0{ii}  = eye(U{ii});
+                wGam1{ii},U_omod{ii},pS_omod{ii},pwS_omod{ii}] = MP_ShapeF_CO(ki,pii,Si,wSi);
+            Gam0{ii}  = eye(U_omod{ii});
             Gam1{ii}  = wxi1{ii};
-            iGam0{ii} = eye(U{ii});
+            iGam0{ii} = eye(U_omod{ii});
     end
     XI0 = sparse( kron(XI0,xi0{ii}) );
+
+    me_omod{ii} = PHI.method{OmOd(ii)};
+    k_omod{ii}  = ki;
+    S_omod{ii}  = Si;
+    P_omod{ii}  = pii;
+    wS_omod{ii} = wSi;
+    pwS{ii}     = PHI.P{ii}*PHI.S_wave{ii};
 end
 %----------------------------------------------------------
-PHI.U   = U;
-PHI.pS  = pS;
-PHI.pwS = pwS;
+PHI.me_omod  = me_omod;
+PHI.k_omod   = k_omod;
+PHI.P_omod   = P_omod;
+PHI.S_omod   = S_omod;
+PHI.wS_omod  = wS_omod;
+PHI.U_omod   = U_omod;
+PHI.pS_omod  = pS_omod;
+PHI.pwS_omod = pwS_omod;
+PHI.pwS      = pwS;
 %----------------------------------------------------------
-U = cell2mat(U);
+U = cell2mat(U_omod);
 for ii = 1:d
     U1_im1 = prod(U(1:ii-1));  
     Uip1_d = prod(U(ii+1:d));
@@ -104,9 +140,10 @@ for ii = 1:d
     end
 end
 %----------------------------------------------------------
-S  = cell2mat(PHI.S);
-pS = cell2mat(PHI.pS);
-p  = cell2mat(PHI.P);
+S  = cell2mat(PHI.S_omod);
+pS = cell2mat(PHI.pS_omod);
+p  = cell2mat(PHI.P_omod);
+
 dtau1   = 2*pi/S(1);
 Tau1    = 2*p(1)*pi;
 tau_1im1 = (0:dtau1:Tau1-dtau1)';
@@ -119,10 +156,12 @@ for ii = 2:d
     pS_1im1 = pS_1im1*pS(ii);  
 end
 tau = tau_1im1'; 
+[~, pos] = sort(OmOd);
+tau      = tau(pos,:);
 %----------------------------------------------------------
-wS  = cell2mat(PHI.S_wave);
-pwS = cell2mat(PHI.pwS);
-p   = cell2mat(PHI.P);
+wS  = cell2mat(PHI.wS_omod);
+pwS = cell2mat(PHI.pwS_omod);
+p   = cell2mat(PHI.P_omod);
 wdtau1   = 2*pi/wS(1);
 wTau1    = 2*p(1)*pi;
 wtau_1im1 = (0:wdtau1:wTau1-wdtau1)';
@@ -134,10 +173,12 @@ for ii = 2:d
     wtau_1im1 = [ kron( ones(pwS(ii),1),wtau_1im1 ) , kron( wtau_i,ones(pwS_1im1,1) ) ];
     pwS_1im1 = pwS_1im1*pwS(ii);  
 end
-wtau = wtau_1im1';
+wtau   = wtau_1im1';
+wtau = wtau(pos,:);
 %----------------------------------------------------------
 PHI.isCO = isCO;
 PHI.tau    = tau;
+PHI.pos    = pos;
 PHI.wtau   = wtau;
 %----------------------------------------------------------
 PHI.xi0   = xi0;

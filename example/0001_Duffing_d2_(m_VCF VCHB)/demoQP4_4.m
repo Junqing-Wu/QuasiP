@@ -81,7 +81,8 @@ PHI_INITIAL = struct( 'parametrization_tori', 'MP', ...
     'k',       { {7,7} }, ...        
     'P',       { {4,4} }, ...    
     'S',       { {2^5,2^5} }, ...
-    'S_wave',  { {2^7,2^7} });
+    'S_wave',  { {2^7,2^7} }, ...
+    'OmOd',    [1,2]);
 prob1 = coco_set(prob1, 'QuasiP', 'PHI_INITIAL', PHI_INITIAL); 
 
 funcs = {@Duffing1_F, @Duffing1_DFDX, @Duffing1_DFDP, @Duffing1_L};
@@ -90,6 +91,7 @@ prob1 = ode_isol2QuasiP(prob1, '', funcs{:}, X_MF2, OM0, pname, p0);
 fc_funcs = {@fc_2};
 prob1 = coco_add_func(prob1, 'KOM_zero', fc_funcs{:}, [], 'zero','uidx', uidx(data.kOM_idx) , 'F+dF');
 bd1 = coco(prob1, 'qp44', [], 0, {'k_OM1' 'k_OM2' 'zeta' 'gamma' 'f1' 'f2'}, [1.927 2.83]);
+close(11111)
 
 % bd1 = coco_bd_read('qp44');
 
@@ -101,7 +103,7 @@ T_u = coco_bd_col(bd1,'T_u');
 figure(1)
 plot(x(:,1),x(:,2), 'color', [0.5 0.5 0.5])
 hold on
-% plot(HT_x,HT_u,'r--')
+plot(HT_x,HT_u,'r--')
 plot(T_x(1:2^2:end),T_u(1:2^2:end),'bo')
 legend('TI','HT','kT_1')
 

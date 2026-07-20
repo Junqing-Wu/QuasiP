@@ -32,7 +32,7 @@ end
 %% ===================== 任务1：SHT  =====================
 prob = coco_prob();
 ode_opts = struct('n',1, 'd',2, 'e',2, 'isfwithu',true);
-amp_opts    = struct('isamp',false,'isuamp',true,'isht',true,'outdof',1,'Nperiod',1,'Nsampling',2^8);
+amp_opts    = struct('isamp',true,'isuamp',true,'isht',true,'outdof',1,'Nperiod',1,'Nsampling',2^8);
 par_opts    = struct('parallel',true,'ncores',10);
 prob = coco_set(prob,'QuasiP','ode_opts',ode_opts,'amp_opts',amp_opts,'par_opts',par_opts); 
 prob = coco_set(prob,'cont','PtMX',num_cont);
@@ -55,15 +55,16 @@ prob = ode_isol2QuasiP(prob, '', funcs{:}, X_MF, OM0);
 fc_funcs = {@fc_2e};
 prob = coco_add_func(prob, 'KOM_zero', fc_funcs{:}, [], 'zero','uidx', uidx(data.kOM_idx) , 'F+dF');
 bd2 = coco(prob, 'sht2', [], 1, {'k_OM1' 'k_OM2'}, [0.2 om1]);
+close(11111)
 
-% max_x1    = coco_bd_col(bd2, 'Max_x');
-% Om_mode  = coco_bd_col(bd2, 'Om');
-% figure(1)
-% hold on
-% plot(Om_mode(:,1), max_x1,'-','DisplayName','HB+HB');
-% xlabel('\omega_1');
-% ylabel('max(x)');
-% grid on;
+max_x1    = coco_bd_col(bd2, 'Max_x');
+Om_mode  = coco_bd_col(bd2, 'Om');
+figure(1)
+hold on
+plot(Om_mode(:,1), max_x1,'-','DisplayName','HB+HB');
+xlabel('\omega_1');
+ylabel('max(x)');
+grid on;
 
 function [data, y, J] = fc_2e(prob, data, u)
 rho = [1;1/5^0.5];

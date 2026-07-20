@@ -78,6 +78,7 @@ funcs = {@Airfoil1_F, @Airfoil1_DFDX, [], @Airfoil1_L};
 prob = ode_isol2QuasiP(prob, '', funcs{:}, X_MF2, OM0, pname, p0);
 
 bd = coco(prob, 'qp', [], 1, { 'Q' 'u_om1' 'u_om2'}, [p0 9]);
+close(11111)
 
 max_x    = coco_bd_col(bd, 'Max_x');
 Om_mode  = coco_bd_col(bd, 'Om');

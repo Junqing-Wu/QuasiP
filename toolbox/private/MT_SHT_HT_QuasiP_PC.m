@@ -36,7 +36,7 @@ if d > e
             end
             Jx1(ii,Loca0) = kron(eye(N),PHI.iGTiG)*reshape(dys1,[],1);
         else 
-            Jx1(ii,Loca0) = kron(eye(N),PHI.iGTXI1iG{ii})*reshape(ys1,[],1);
+            Jx1(ii,Loca0) = kron(eye(N),PHI.iGTXI1iG{kk})*reshape(ys1,[],1);
         end
         kk = kk+1;
     end

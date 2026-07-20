@@ -24,6 +24,7 @@ switch command
         end
     case 'data'
         res = {};
+        num_QuasiP = numel(prob.slots.save_full);
         chart = varargin{1};
         [data_ii, uidx_ii] = coco_get_func_data(prob, my_tbid, 'data', 'uidx');
         Cii   = chart.x(uidx_ii(data_ii.C_idx));
@@ -31,8 +32,25 @@ switch command
         pii   = chart.x(uidx_ii(data_ii.p_idx));
         PHI   = data_ii.PHI;
         n     = PHI.n;
+        if isequal(prob.cont.atlas, @atlas_1d.create)
+            iscont =  true;
+            if data.isp
+                cont_para  = chart.x(num_QuasiP*data_ii.p_idx(end)+1);
+            else
+                cont_para  = chart.x(num_QuasiP*data_ii.OM_idx(end)+1);
+            end
+        else
+            iscont = false;
+        end
+        figure(11111)
         if ~data.amp_opts.isamp && ~data.stable_opts.issta
             res = {reshape(Cii,[],n), Omii', pii'};
+            if iscont
+                plot(cont_para,norm(Cii),'ko');
+                xlabel('cont para');
+                ylabel('C');
+                hold on
+            end
         elseif data.amp_opts.isamp && ~data.stable_opts.issta
             outdof = data.amp_opts.outdof;
             Amp    = PostP_amp(data_ii,Cii,Omii,outdof,data_ii.amp_opts.isuamp);
@@ -46,6 +64,12 @@ switch command
             else
                 res = {reshape(Cii,[],n),Omii',pii',Amp.Maxht_x,Amp.maxx,Amp.minx,...
                     Amp.HT_x,Amp.T_x,Amp.MF_x, Amp.MF_f, Amp.t};
+            end
+            if iscont
+                plot(cont_para,Amp.Maxht_x(1),'ko');
+                xlabel('cont para');
+                ylabel('||x_1||')
+                hold on
             end
         elseif data.stable_opts.issta
             outdof = 1:n;
@@ -66,6 +90,16 @@ switch command
             else
                 res = {reshape(Cii,[],n),Omii',pii',Amp.Maxht_x,Amp.maxx,Amp.minx,...
                     Amp.HT_x,Amp.T_x,Amp.MF_x, Amp.MF_f, Amp.t,Sta.Psi, Sta.Ly, Sta.Stab};
+            end
+            if iscont
+                if Sta.Stab(1)
+                    plot(cont_para,Amp.Maxht_x(1),'ko');
+                else
+                    plot(cont_para,Amp.Maxht_x(1),'r^');
+                end
+                xlabel('cont para');
+                ylabel('||x_1||')
+                hold on
             end
         end
 end

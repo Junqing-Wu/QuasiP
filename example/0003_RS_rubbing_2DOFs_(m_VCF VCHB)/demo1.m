@@ -48,7 +48,10 @@ prob2 = coco_add_func(prob2,'Dom',@Dom,[],'inactive','Dom','uidx',OM2_idx,'F+dF'
 
 % bd2 = coco(prob2, 'qp2', [], 1, {'SX.k_OM1' 'Dom' 'SX.u_om2' 'USX.u_om2'  'USX.k_OM1' 'SX.OM' 'USX.OM' 'SX.mu' 'USX.mu'}, [0.3 0.45]);Dom2
 
-coco(prob2, 'qp2', [], 1, {'Dom' 'SX.u_om2' 'USX.u_om2' 'SX.k_OM1' 'USX.k_OM1' 'SX.OM' 'USX.OM' 'SX.mu' 'USX.mu' }, [0.002 Dom2]);
+coco(prob2, 'qp2', [], 1, {'Dom' 'SX.u_om2' 'USX.u_om2' 'SX.k_OM1' 'USX.k_OM1' 'SX.OM' 'USX.OM' 'SX.mu' 'USX.mu' }, [0.001 Dom2]);
+close(11111)
+
+
 
 bd2 = coco_bd_read('qp2');
 

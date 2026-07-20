@@ -86,6 +86,7 @@ prob1 = coco_set(prob1, 'QuasiP', 'PHI_INITIAL', PHI_INITIAL);
 funcs = {@Duffing1_F, @Duffing1_DFDX, @Duffing1_DFDP, @Duffing1_L};
 prob1 = ode_isol2QuasiP(prob1, '', funcs{:}, X_MF2, OM0, pname, p0);
 bd1 = coco(prob1, 'p64n', [], 1, {'k_OM1' 'r' 'b' 'f'}, [2 5]);
+close(11111)
 
 % bd1 = coco_bd_read('qp1');
 max_x1    = coco_bd_col(bd1, 'max.x');
@@ -109,10 +110,15 @@ grid on;
 
 
 
-% figure(2)
-% plot(x(:,1),x(:,2));
-% hold on
-% plot(x_ht(:,end),u_ht(:,end),'--');
+
+figure(2)
+% plot(x(:,1),x(:,2),'r-');
+hold on
+plot(x_ht(:,end),u_ht(:,end),'k-');
+xlabel('x');
+ylabel('dx');
+% legend('p2')
+grid on;
 
 
 

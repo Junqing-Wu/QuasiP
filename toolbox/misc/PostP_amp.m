@@ -9,7 +9,8 @@ switch data.PHI.parametrization_tori
     case{'MT'}
         switch data.PHI.type
             case{'DM'}
-            case{'SHOOT'}
+            case{'SHT'}
+                Amp =  MT_SHT_PostP_amp(data,Omii,outdof,isuamp);
         end
 end
 end

@@ -8,8 +8,8 @@ function [X0,dX0] = MP_mVCF_U2S_01(PHI,Xd,Om,U_prod)
 %   - X0: S-domain spectral vector (dimension: S_prod)
 pSiip1Td = 1;
 U1Tii = U_prod;
-U = cell2mat(PHI.U);
-pS = cell2mat(PHI.pS);
+U = cell2mat(PHI.U_omod);
+pS = cell2mat(PHI.pS_omod);
 Xii  = Xd;
 dXii = zeros(size(Xd));
 % Iterative spectral projection (backward over extended frequencies)
@@ -21,7 +21,7 @@ for kk = PHI.d:-1:1
     dXii_wave = pagetranspose( reshape(dXii,pSiip1Td,U(kk),U1Tii) );
     dXii_wave = reshape(dXii_wave,U(kk),pSiip1Td*U1Tii);
     % Spectral method (HB/CO/FD)
-    switch PHI.method{kk}
+    switch PHI.me_omod{kk}
         case{'HB'} % Harmonic Balance (HB)
             Xiiminus1_bar  = PHI.Gam0{kk}*Xii_wave;
             dXiiminus1_bar = Om(kk)*PHI.Gam1{kk}*Xii_wave+...

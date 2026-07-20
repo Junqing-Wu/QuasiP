@@ -16,7 +16,11 @@ switch data.PHI.parametrization_tori
     case{'MP'}
         switch data.PHI.type
             case{'mVCF'}
-                prob = coco_add_func(prob, tbid, @MP_mVCF_QuasiP, data, 'zero', 'u0', sol.u, 'F+dF');
+                if data.PHI.isvar
+                    prob = coco_add_func(prob, tbid, @MP_mVCF_QuasiP, data, 'zero', 'u0', sol.u, 'F+dF');
+                else
+                    prob = coco_add_func(prob, tbid, @MP_mVCF_QuasiP, data, 'zero', 'u0', sol.u);                    
+                end
             case{'sCCF'}
         end
     case{'MT'}

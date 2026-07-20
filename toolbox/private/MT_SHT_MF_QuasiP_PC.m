@@ -42,7 +42,7 @@ if d > e
             Jx1(ii,Loca0) = reshape(dYs1,[],1);
         else
             Ys1     = Ys(loca00,:);
-            Jx1(ii,Loca0) = kron(eye(N),PHI.XI1_i{ii})*reshape(Ys1,[],1);
+            Jx1(ii,Loca0) = kron(eye(N),PHI.XI1_i{kk})*reshape(Ys1,[],1);
         end
         kk = kk+1;
     end

@@ -35,6 +35,13 @@ if PHI.isvar
 else
     PSI = zeros(PHI.L_HT,N);
 end
+if data.amp_opts.isamp
+    if MATLABsolver
+        phi_y_dy = cell(PHI.L_HT,1);
+    else
+        phi_y_dy = zeros(PHI.num_phi1_taj,1+N,PHI.L_HT);
+    end
+end
 if data.par_opts.parallel
     if MATLABsolver
         % y' = 1/Om1*g(y,p,phi1,phi2+rho2*phi1,...,phie+rhoe*phi1)
@@ -44,8 +51,11 @@ if data.par_opts.parallel
             phi1s_ii  = phis_ii(Omt);
             idx_match = (phi1s == phi1s_ii);
             phi1e_ii  = phi1e(idx_match);
-            [~,Psi]   = MT_SHT_MATLABsolver1(data,ys_ii,phis_ii,phi1s_ii,phi1e_ii,Om,p);
+            [varphi1,Psi,dy]   = MT_SHT_MATLABsolver1(data,ys_ii,phis_ii,phi1s_ii,phi1e_ii,Om,p);
             PSI(ii,:) = Psi(end,:);
+            if data.amp_opts.isamp
+                phi_y_dy{ii,1} = [varphi1,Psi(:,1:N),dy];
+            end
         end
     else
         % M*a + D*u + K*q = f(q,Om1*u,p,phi1,phi2+rho2*phi1,...,phie+rhoe*phi1)
@@ -55,8 +65,11 @@ if data.par_opts.parallel
             phi1s_ii  = phis_ii(Omt);
             idx_match = (phi1s == phi1s_ii);
             phi1e_ii  = phi1e(idx_match);
-            [~,Psi]   = PHI.ODEsolver(data,ys_ii(:),phis_ii(:),phi1s_ii,phi1e_ii,dphi1,Om,p);
+            [varphi1,Psi]   = PHI.ODEsolver(data,ys_ii(:),phis_ii(:),phi1s_ii,phi1e_ii,dphi1,Om,p);
             PSI(ii,:) = Psi(end,:);
+            if data.amp_opts.isamp
+                phi_y_dy(:,:,ii) = [varphi1,Psi(:,1:N)];
+            end
         end
     end
 else
@@ -68,8 +81,11 @@ else
             phi1s_ii  = phis_ii(Omt);
             idx_match = (phi1s == phi1s_ii);
             phi1e_ii  = phi1e(idx_match);
-            [~,Psi]   = MT_SHT_MATLABsolver1(data,ys_ii,phis_ii,phi1s_ii,phi1e_ii,Om,p);
+            [varphi1,Psi,dy]   = MT_SHT_MATLABsolver1(data,ys_ii,phis_ii,phi1s_ii,phi1e_ii,Om,p);
             PSI(ii,:) = Psi(end,:);
+            if data.amp_opts.isamp
+                phi_y_dy{ii,1} = [varphi1,Psi(:,1:N),dy];
+            end
         end
     else
         % M*a + D*u + K*q = f(q,Om1*u,p,phi1,phi2+rho2*phi1,...,phie+rhoe*phi1)
@@ -79,12 +95,14 @@ else
             phi1s_ii  = phis_ii(Omt);
             idx_match = (phi1s == phi1s_ii);
             phi1e_ii  = phi1e(idx_match);
-            [~,Psi]   = PHI.ODEsolver(data,ys_ii(:),phis_ii(:),phi1s_ii,phi1e_ii,dphi1,Om,p);
+            [varphi1,Psi]   = PHI.ODEsolver(data,ys_ii(:),phis_ii(:),phi1s_ii,phi1e_ii,dphi1,Om,p);
             PSI(ii,:) = Psi(end,:);
+            if data.amp_opts.isamp
+                phi_y_dy(:,:,ii) = [varphi1,Psi(:,1:N)];
+            end
         end
     end
 end
-
 %==========================================================
 %>>>>>>>>>>>>>>>>>>>>>>>>> BC <<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 %==========================================================
@@ -93,5 +111,12 @@ switch PHI.method
         [y,J] = MT_SHT_HT_QuasiP(data,PSI,ys,Om);
     case 'MF'
         [y,J] = MT_SHT_MF_QuasiP(data,PSI,Ys,Om);
+end
+
+if data.amp_opts.isamp && max(abs(y))<1e-5 
+        data.phi_y_dy  = phi_y_dy;
+end
+if data.stable_opts.issta && PHI.isvar && max(abs(y))<1e-5
+    data.ye_ys = PSI(:,N+1:N+N^2);
 end
 end

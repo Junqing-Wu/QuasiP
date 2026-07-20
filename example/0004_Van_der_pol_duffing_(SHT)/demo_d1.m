@@ -28,14 +28,14 @@ end
 %% ===================== 任务1：HB =====================
 prob = coco_prob();
 ode_opts = struct('n',1, 'd',1, 'e',1, 'isfwithu',true);
-amp_opts    = struct('isamp',false,'isuamp',true,'isht',true,'outdof',1,'Nperiod',1,'Nsampling',2^8);
+amp_opts    = struct('isamp',true,'isuamp',true,'isht',true,'outdof',1,'Nperiod',1,'Nsampling',2^8);
 
 prob = coco_set(prob,'QuasiP','ode_opts',ode_opts,'amp_opts',amp_opts); 
 prob = coco_set(prob,'cont','PtMX',1000);
 PHI_INITIAL = struct( 'parametrization_tori', 'MT', ...
     'type',       'SHT'           , ...     
     'method',     'HT' , ... % HT or MF
-    'ODEsolver',  @Newmark, ...
+    'ODEsolver',  @ode45, ...
     'isvar',      true, ...
     'Omt',        1, ...
     'M_SHT',      1, ...
@@ -49,14 +49,15 @@ prob = coco_set(prob, 'QuasiP', 'PHI_INITIAL', PHI_INITIAL);
 funcs = {@VDPDwithe1_F, @VDPD_DFDX, [], @VDPD_L, @VDPDwithe1_DFDTH}; 
 prob = ode_isol2QuasiP(prob, '', funcs{:}, X_MF, OM0);
 [data, uidx] = coco_get_func_data(prob, 'QuasiP', 'data', 'uidx');
-bd1_hb = coco(prob, 'qp1_hb', [], 1, {'k_OM1'}, [0.2 om1]);
+bd1 = coco(prob, 'qp1', [], 1, {'k_OM1'}, [0.2 om1]);
+close(11111)
 
-% max_x1_hb    = coco_bd_col(bd1_hb, 'Max_x');
-% Om_mode_hb  = coco_bd_col(bd1_hb, 'Om');
-% 
-% figure(1)
-% plot(Om_mode_hb, max_x1_hb,'k-','DisplayName','HB');
-% xlabel('\omega_1');
-% ylabel('max(x)');
-% grid on;
-% hold on;
+max_x1    = coco_bd_col(bd1, 'Max_x');
+Om_mode  = coco_bd_col(bd1, 'Om');
+
+figure(1)
+plot(Om_mode, max_x1,'r-.','DisplayName','SHT');
+xlabel('\omega_1');
+ylabel('max(x)');
+grid on;
+hold on;

@@ -5,7 +5,7 @@ bd2 = coco_bd_read('qp2');
 
 SMF_x = coco_bd_col(bd2,'SX.MF_x');
 SMF_f = coco_bd_col(bd2,'SX.MF_f');
-SX_MF  = [SMF_f(:,3:4,1),SMF_x(:,:,1)];
+SX_MF  = [SMF_f{1}(:,3:4),SMF_x{1}];
 
 USMF_x = coco_bd_col(bd2,'USX.MF_x');
 USMF_f = coco_bd_col(bd2,'USX.MF_f');
@@ -22,9 +22,9 @@ p0 = [0.2;SOM0(1)];
 
 prob3 = coco_prob();
 ode_opts = struct('n',2, 'd',2, 'e',1, 'isfwithu',true);
-amp_opts = struct('isamp',false,'isuamp',true,'outdof',[1 2],'Nperiod',50,'Nsampling',2^8);
+amp_opts = struct('isamp',true,'isuamp',true,'outdof',[1 2],'Nperiod',50,'Nsampling',2^8);
 prob3 = coco_set(prob3,'cont','PtMX',3000);
-prob3 = coco_set(prob3,'cont','h_min',1e-3,'h_max',0.5);
+prob3 = coco_set(prob3,'cont','h_min',1e-3,'h_max',0.05);
 prob3 = coco_set(prob3,'cont','NSV',1);
 prob3 = coco_set(prob3,'QuasiP','ode_opts',ode_opts,'amp_opts',amp_opts); 
 % prob3 = coco_set(prob3, 'cont','PtMX',25);
@@ -54,6 +54,7 @@ OM2_idx = [SXuidx(SXdata.uOM_idx),USXuidx(USXdata.uOM_idx)];
 prob3 = coco_add_func(prob3,'Dom',@Dom,[],'inactive','Dom','uidx',OM2_idx,'F+dF');
 
 coco(prob3, 'qp3', [], 1, {'SX.mu' 'USX.mu' 'SX.u_om2' 'USX.u_om2' 'SX.k_OM1' 'USX.k_OM1' 'SX.OM' 'USX.OM' 'Dom'}, [0.1 0.4]);
+close(11111)
 
 bd3 = coco_bd_read('qp3');
 SOM1 = coco_bd_col(bd3,'SX.k_OM1');

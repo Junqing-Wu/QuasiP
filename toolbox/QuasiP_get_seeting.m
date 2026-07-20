@@ -47,13 +47,15 @@ if ~isfield(copts, 'PHI_INITIAL') % defaults.method: VCHB
     P = repmat({1}    , 1, data.ode_opts.d);
     S = repmat({2^5}  , 1, data.ode_opts.d);
     S_w = repmat({2^8}, 1, data.ode_opts.d);
+    OmOd = 1:data.ode_opts.d;
     copts.PHI_INITIAL = struct( 'parametrization_tori', 'MP', ...
         'type',    'mVCF'           , ...
         'method',  { methods   }, ...
         'k',       { k    }, ...
         'P',       { P    }, ...
         'S',       { S    }, ...
-        'S_wave',  { S_w  },...      
+        'S_wave',  { S_w  },... 
+        'OmOd',    OmOd, ...
         'd',       data.ode_opts.d, ...
         'n',       data.ode_opts.n);
 else
@@ -63,16 +65,20 @@ end
 PHI = COM_PHI(copts.PHI_INITIAL);
 data.PHI = PHI;
 %--------------------------------------------------------------------------------------------------------------------
-copts.amp_opts.Harm =  fun_k(cell2mat(PHI.P),cell2mat(PHI.S_wave));
-if data.ode_opts.d <= 2
-    copts.amp_opts.isht = true;
+if copts.amp_opts.isamp
+    copts.amp_opts.Harm =  fun_k(cell2mat(PHI.P_omod),cell2mat(PHI.wS_omod));
+    if data.ode_opts.d <= 2
+        copts.amp_opts.isht = true;
+    end
+else
+    copts.stable_opts.issta = false;
 end
-data.amp_opts       =  copts.amp_opts;
+data.amp_opts   =  copts.amp_opts;
 %--------------------------------------------------------------------------------------------------------------------
 if copts.stable_opts.issta
-    copts.stable_opts = fill_stable_TAU_data(copts.stable_opts, data.PHI, data.ode_opts);
+    copts.stable_opts = fill_stable_TAU_data(copts.stable_opts, data.PHI, data.ode_opts);  
 end
-data.stable_opts   = copts.stable_opts;
+data.stable_opts  = copts.stable_opts;
 %--------------------------------------------------------------------------------------------------------------------
 if copts.par_opts.parallel
     % activate parallel computing
@@ -116,7 +122,16 @@ for ii = 1:Num_Omi
     TAU{ii} = TAUii;
     pL1{ii} = per_t*L+1;
     if d > 1
-        Harm{ii} = fun_k(per_not,repmat(S,1,d-1) );
+        if ~isfield(PHI,'Omt')
+            Harm{ii} = fun_k(per_not,repmat(S,1,d-1) );
+        else
+            if Om_t == PHI.Omt
+                my_S = cell2mat(PHI.S);
+                Harm{ii} = fun_k(per_not, my_S(Om_not));
+            else
+                Harm{ii} = fun_k(per_not,repmat(S,1,d-1) );
+            end
+        end
         pS{ii}   = per_not.*repmat(S,1,d-1);
     else
         Harm{ii} = [];

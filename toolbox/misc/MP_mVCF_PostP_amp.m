@@ -4,12 +4,16 @@ Noutdof  = length(outdof);
 PHI      = data.PHI;
 n        = PHI.n;
 d        = PHI.d;
-pwS      = cell2mat(PHI.pwS);
-pwS_prod = prod(pwS);
-U        = cell2mat(PHI.U);
+pwS_omod = cell2mat(PHI.pwS_omod);
+pwS_prod = prod(pwS_omod);
+U        = cell2mat(PHI.U_omod);
 U_prod   = prod(U);
 Xd_n     = reshape(Xd,U_prod,n)';
 HARM     = transpose(data.amp_opts.Harm);
+%-------------------------------------------------------------------------
+OmOd     = PHI.OmOd;
+pos      = PHI.pos;
+HARM     = HARM(:,pos);
 %-------------------------------------------------------------------------
 Maxht_x  = zeros(1,Noutdof);
 maxx  = zeros(1,Noutdof);
@@ -23,21 +27,21 @@ MF_x     = zeros(pwS_prod,Noutdof);
 %-------------------------------------------------------------------------
 k_address = [];
 if d==1
-    pwS = [pwS,1];
+    pwS_omod = [pwS_omod,1];
 end
 %-------------------------------------------------------------------------
 for kk = 1:Noutdof
     ii = outdof(kk);
     if isuamp
-        [HT_x(:,ii),HT_u(:,ii)] = MP_mVCF_U2S_xv(Xd_n(ii,:),Om,PHI,U_prod);
+        [HT_x(:,kk),HT_u(:,kk)] = MP_mVCF_U2S_xv(Xd_n(ii,:),Om(OmOd),PHI,U_prod);    
     else
-        HT_x(:,ii)              = MP_mVCF_U2S_x(Xd_n(ii,:),PHI,U_prod);
+        HT_x(:,kk)              = MP_mVCF_U2S_x(Xd_n(ii,:),PHI,U_prod);      
     end
-    Maxht_x(ii) = max(abs(HT_x(:,ii)));
-    maxx(ii) = max(HT_x(:,ii));
-    minx(ii) = min(HT_x(:,ii));
+    Maxht_x(kk) = max(abs(HT_x(:,kk)));
+    maxx(kk) = max(HT_x(:,kk));
+    minx(kk) = min(HT_x(:,kk));
     
-    [MF_x(:,ii),A] = HT2MF(HT_x(:,ii),pwS,pwS_prod);
+    [MF_x(:,kk),A] = HT2MF(HT_x(:,kk),pwS_omod,pwS_prod);
     k_address = union(A, k_address);
 end
 %-------------------------------------------------------------------------
@@ -49,7 +53,7 @@ MF_f = [kom/Om(1),kom,k];
 [T_x, T_u, tspan] = deal([]);
 %-------------------------------------------------------------------------
 if d~=1 && data.amp_opts.Nperiod~=0
-    T1 = 2*pi/Om(1);
+    T1 = 2*pi/Om(PHI.OmOd(1));
     dt = T1/data.amp_opts.Nsampling;
     t  = 0:dt:data.amp_opts.Nperiod*T1;
     theta = (Om*t)';

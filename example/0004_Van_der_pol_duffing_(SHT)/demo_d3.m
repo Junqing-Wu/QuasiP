@@ -33,18 +33,18 @@ for ii = 2:numel(IP.location)
 X_MF = [X_MF;IP.location{ii}',transpose(IP.amplitude{ii})];
 end
 
-%% ===================== 任务：HB + HB + HB =====================
+%% ===================== 任务：SHT =====================
 
 prob = coco_prob();
 ode_opts    = struct('n',1, 'd',3, 'e',3, 'isfwithu',true);
-amp_opts    = struct('isamp',false,'isuamp',true,'isht',true,'outdof',1,'Nperiod',1,'Nsampling',2^8);
-par_opts    = struct('parallel',true,'ncores',6);
+amp_opts    = struct('isamp',true,'isuamp',true,'isht',true,'outdof',1,'Nperiod',1,'Nsampling',2^8);
+par_opts    = struct('parallel',true,'ncores',12);
 prob = coco_set(prob,'QuasiP','ode_opts',ode_opts,'amp_opts',amp_opts,'par_opts',par_opts); 
 prob = coco_set(prob,'cont','PtMX',num_cont);
 PHI_INITIAL = struct( 'parametrization_tori', 'MT', ...
     'type',       'SHT'           , ...     
     'method',     'MF' , ... % HT or MF
-    'ODEsolver',  @Newmark, ...
+    'ODEsolver',  @ode45, ...
     'isvar',      true ,...
     'Omt',        1, ...
     'M_SHT',      1, ...
@@ -60,17 +60,18 @@ prob = ode_isol2QuasiP(prob, '', funcs{:}, X_MF, OM0);
 fc_funcs = {@fc_3e};
 prob = coco_add_func(prob, 'KOM_zero', fc_funcs{:}, [], 'zero','uidx', uidx(data.kOM_idx) , 'F+dF');
 
-bd3_hbhbhb = coco(prob, 'sht3', [], 1, {'k_OM1' 'k_OM2' 'k_OM3'}, [0.2 om1]);
-% 
-% max_x1_hbhbhb    = coco_bd_col(bd3_hbhbhb, 'Max_x');
-% Om_mode_hbhbhb  = coco_bd_col(bd3_hbhbhb, 'Om');
-% 
-% figure(1)
-% hold on
-% plot(Om_mode_hbhbhb(:,1), max_x1_hbhbhb,'-','DisplayName','HB+HB+HB');
-% xlabel('\omega_1');
-% ylabel('max(x)');
-% grid on;
+bd3 = coco(prob, 'sht3', [], 1, {'k_OM1' 'k_OM2' 'k_OM3'}, [0.2 om1]);
+close(11111)
+
+max_x1    = coco_bd_col(bd3, 'Max_x');
+Om_mode  = coco_bd_col(bd3, 'Om');
+
+figure(1)
+hold on
+plot(Om_mode(:,1), max_x1,'-','DisplayName','HB+HB+HB');
+xlabel('\omega_1');
+ylabel('max(x)');
+grid on;
 
 
 function [data, y, J] = fc_3e(prob, data, u)

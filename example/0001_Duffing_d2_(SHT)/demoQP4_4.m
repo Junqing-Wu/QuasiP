@@ -66,27 +66,34 @@ X_MF2 = X_MF1(:,1:end-1);
 prob1 = coco_prob();
 ode_opts = struct('n',1, 'd',2, 'e',2, 'isfwithu',false);
 amp_opts = struct('isamp',true,'isuamp',true,'outdof',1,'Nperiod',5000,'Nsampling',2^2);
+par_opts    = struct('parallel',true,'ncores',12);
 prob1 = coco_set(prob1,'cont','PtMX',1000);
 % prob1 = coco_set(prob1,'cont','NSV',1);
 prob1 = coco_set(prob1,'corr','ItMX',50);
 prob1 = coco_set(prob1,'cont','h_min',0.001,'h_max',0.5);
 stable_opts = struct('issta',true,'S',2^6,'L',2^8,'N_Ly',2000,'Omi',[1,2]);
-prob1 = coco_set(prob1,'QuasiP','ode_opts',ode_opts,'amp_opts',amp_opts,'stable_opts',stable_opts); 
-PHI_INITIAL = struct( 'parametrization_tori', 'MP', ...
-    'type',    'mVCF'           , ...     
-    'method',  { {'HB','HB'} }, ...   
+prob1 = coco_set(prob1,'QuasiP','ode_opts',ode_opts,'amp_opts',amp_opts,'stable_opts',stable_opts,'par_opts',par_opts); 
+PHI_INITIAL = struct( 'parametrization_tori', 'MT', ...
+    'type',       'SHT'           , ...     
+    'method',     'MF' , ... % HT or MF
+    'ODEsolver',  @Newmark, ...
+    'isvar'    ,  true, ...
+    'Omt',        1, ...
+    'M_SHT',      16, ...
+    'Nsteps',     2^9,...  
     'k',       { {7,7} }, ...        
     'P',       { {4,4} }, ...    
     'S',       { {2^5,2^5} }, ...
     'S_wave',  { {2^7,2^7} });
 prob1 = coco_set(prob1, 'QuasiP', 'PHI_INITIAL', PHI_INITIAL); 
 
-funcs = {@Duffing1_F, @Duffing1_DFDX, @Duffing1_DFDP, @Duffing1_L};
+funcs = {@Duffing1_F, @Duffing1_DFDX, @Duffing1_DFDP, @Duffing1_L, @Duffing1_DFDTH};
 prob1 = ode_isol2QuasiP(prob1, '', funcs{:}, X_MF2, OM0, pname, p0);
 [data, uidx] = coco_get_func_data(prob1, 'QuasiP', 'data', 'uidx');
 fc_funcs = {@fc_2};
 prob1 = coco_add_func(prob1, 'KOM_zero', fc_funcs{:}, [], 'zero','uidx', uidx(data.kOM_idx) , 'F+dF');
 bd1 = coco(prob1, 'qp44', [], 0, {'k_OM1' 'k_OM2' 'zeta' 'gamma' 'f1' 'f2'}, [1.927 2.83]);
+close(11111)
 
 % bd1 = coco_bd_read('qp44');
 
@@ -98,7 +105,7 @@ T_u = coco_bd_col(bd1,'T_u');
 figure(1)
 plot(x(:,1),x(:,2), 'color', [0.5 0.5 0.5])
 hold on
-% plot(HT_x,HT_u,'r--')
+plot(HT_x,HT_u,'r.')
 plot(T_x(1:2^2:end),T_u(1:2^2:end),'bo')
 legend('TI','HT','kT_1')
 
@@ -114,9 +121,9 @@ tt = coco_bd_col(bd1,'t');
 
 
 figure(2)
-plot(ff/(OM0(1)),log(abs(X(:,1))),'k-')
+plot(ff/(OM0(1)),log10(abs(X(:,1))),'k-')
 hold on
-plot(MF_f(:,1),log(abs(2*MF_x)),'ro')
+plot(MF_f(:,1),log10(abs(2*MF_x)),'ro')
 xlabel('normalized f')
 ylabel('log(abs(X))')
 xlim([0,6])

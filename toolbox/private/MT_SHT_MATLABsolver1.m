@@ -1,4 +1,4 @@
-function [Phi1,Psi]  = MT_SHT_MATLABsolver1(data,ys,phis,phi1s,phi1e,Om,p)
+function [Phi1,Psi,dy]  = MT_SHT_MATLABsolver1(data,ys,phis,phi1s,phi1e,Om,p)
 PHI   = data.PHI;
 N     = PHI.N;
 a     = data.pdim;
@@ -11,17 +11,30 @@ Rho   = Om2d./Om1;
 if PHI.isvar
     Psi0  = [ys(:),eye(N),zeros(N,d+a)];
     G          = @(phi1,Psi) MT_SHT_dPSI_function1(data,phi1,Psi,phis,Om1,Om2d,PHI.Omt,PHI.Omnot,Rho,p,N,a,d,e);
-    [Phi1,Psi] = data.PHI.ODEsolver(G, [phi1s phi1e], Psi0(:), data.PHI.ODEsolver_opt);
 else
     Psi0  = ys(:);
     G          = @(phi1,Psi) MT_SHT_dPSI_function2(data,phi1,Psi,phis,Om1,PHI.Omt,PHI.Omnot,Rho,p,N);
-    [Phi1,Psi] = data.PHI.ODEsolver(G, [phi1s phi1e], Psi0(:), data.PHI.ODEsolver_opt);
+end
+[Phi1,Psi] = data.PHI.ODEsolver(G, [phi1s phi1e], Psi0(:), data.PHI.ODEsolver_opt);
+
+if data.amp_opts.isamp
+    G_fun = @(phi1,Psi) MT_SHT_dPSI_function2(data,phi1,Psi,phis,Om1,PHI.Omt,PHI.Omnot,Rho,p,N);
+    nPt   = length(Phi1);
+    dy = zeros(nPt, N);
+    for k = 1:nPt
+        dPsi    = G_fun(Phi1(k), Psi(k,1:N)');
+        dy(k,:) = dPsi(:)'*Om1;
+    end
+else
+    dy = [];
 end
 
 % plot(Psi(:,1),Psi(:,2))
 % hold on
 % plot(Psi(1,1),Psi(1,2),'rx')
 % plot(Psi(end,1),Psi(end,2),'bo')
+% xlabel('x')
+
 
 end
 

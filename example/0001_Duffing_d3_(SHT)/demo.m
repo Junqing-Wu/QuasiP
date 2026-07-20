@@ -65,17 +65,17 @@ X_MF2 = X_MF1(:,1:end-1);
 %%
 prob1 = coco_prob();
 ode_opts    = struct('n',1, 'd',3, 'e',3, 'isfwithu',false);
-amp_opts    = struct('isamp',false,'isuamp',true,'isht',false,'outdof',1,'Nperiod',1,'Nsampling',2^8);
-stable_opts = struct('issta',false,'S',2^5,'L',2^8,'N_Ly',1000,'Omi',[1,2,3]);
-par_opts    = struct('parallel',true,'ncores',4);
-prob1 = coco_set(prob1,'cont','PtMX',100);
-prob1 = coco_set(prob1,'cont','NSV',10);
+amp_opts    = struct('isamp',true,'isuamp',true,'isht',false,'outdof',1,'Nperiod',1,'Nsampling',2^8);
+stable_opts = struct('issta',true,'S',2^5,'L',2^8,'N_Ly',1000,'Omi',[1,2,3]);
+par_opts    = struct('parallel',true,'ncores',12);
+prob1 = coco_set(prob1,'cont','PtMX',10);
+prob1 = coco_set(prob1,'cont','NSV',1);
 prob1 = coco_set(prob1,'QuasiP','ode_opts',ode_opts,'amp_opts',amp_opts,'stable_opts',stable_opts,'par_opts',par_opts); 
 PHI_INITIAL = struct( 'parametrization_tori', 'MT', ...
     'type',        'SHT'           , ...     
-    'method',      'HT' , ... % HT or MF
-    'ODEsolver',   @Newmark, ...
-    'Omt',         3, ...
+    'method',      'MF' , ... % HT or MF
+    'ODEsolver',   @ode45, ...
+    'Omt',         1, ...
     'M_SHT',       1, ...
     'Nsteps',      2^7, ...
     'k',           { {5,5,5} }, ...        
@@ -89,38 +89,38 @@ prob1 = ode_isol2QuasiP(prob1, '', funcs{:}, X_MF2, OM0, pname, p0);
 fc_funcs = {@fc_2};
 prob1 = coco_add_func(prob1, 'KOM_zero', fc_funcs{:}, [], 'zero','uidx', uidx(data.kOM_idx) , 'F+dF');
 bd1 = coco(prob1, 'qp1', [], 1, {'k_OM1' 'k_OM2' 'k_OM3' 'zeta' 'gamma' 'f1' 'f2'}, [1.8 9]);
+close(11111)
 
 
 % bd1 = coco_bd_read('qp1');
-% max_x1    = coco_bd_col(bd1, 'Max_x');
-% Om_mode1  = coco_bd_col(bd1, 'Om');
-% Stab1     = coco_bd_col(bd1, 'Stab');
-% Ly1       = coco_bd_col(bd1, 'Ly');
+max_x1    = coco_bd_col(bd1, 'Max_x');
+Om_mode1  = coco_bd_col(bd1, 'Om');
+Stab1     = coco_bd_col(bd1, 'Stab');
+Ly1       = coco_bd_col(bd1, 'Ly');
 % 
-% A11 = find(~Stab1(:,1));
-% A12 = find(~Stab1(:,2));
-% A13 = find(~Stab1(:,3));
+A11 = find(~Stab1(:,1));
+A12 = find(~Stab1(:,2));
+A13 = find(~Stab1(:,3));
 % 
-% figure(1)
-% plot(Om_mode1(:,1), max_x1,'k--');
-% hold on
-% plot(Om_mode1(A11,1), max_x1(A11), 'ko');
-% plot(Om_mode1(A12,1), max_x1(A12), 'k*');
-% plot(Om_mode1(A13,1), max_x1(A13), 'k^');
+figure(1)
+plot(Om_mode1(:,1), max_x1,'k--');
+hold on
+plot(Om_mode1(A11,1), max_x1(A11), 'ko');
+plot(Om_mode1(A12,1), max_x1(A12), 'k*');
+plot(Om_mode1(A13,1), max_x1(A13), 'k^');
+xlabel('\omega_1');
+ylabel('max(x)');
+grid on;
 % 
-% xlabel('\omega_1');
-% ylabel('max(x)');
-% grid on;
 % 
-% 
-% figure(2)
-% plot(Ly1(:,1),'k-')
-% hold on
-% plot(Ly1(:,2),'k-')
-% plot(Ly1(:,3),'b--')
-% plot(Ly1(:,4),'b--')
-% plot(Ly1(:,5),'r.')
-% plot(Ly1(:,6),'r.')
+figure(2)
+plot(Ly1(:,1),'k-')
+hold on
+plot(Ly1(:,2),'k-')
+plot(Ly1(:,3),'b--')
+plot(Ly1(:,4),'b--')
+plot(Ly1(:,5),'r.')
+plot(Ly1(:,6),'r.')
 
 
 

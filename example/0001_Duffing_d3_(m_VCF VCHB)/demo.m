@@ -45,28 +45,28 @@ X_final  = X(loc_final,:);
 X_MF1 = solve_HOrder(X_final,ff_final,rho,[5,5,5],[1,1,1]);
 X_MF2 = X_MF1(:,1:end-1);
 %----------------------------------------------------------
-figure(1)
-plot(ff/(OM0(1)),log(abs(X(:,1))))
-xlabel('normalized f')
-ylabel('log(abs(X))')
-xlim([0,4])
-k_h = X_MF1(:,1:3)';
-Q   = X_MF1(:,1+3:end);
-theta = (OM0*t)';
-H_IDF = exp(1i*theta*k_h);
-xx = real(H_IDF*Q);
-figure(2)
-plot(x(:,1),x(:,2))
-hold on
-plot(xx(:,1),xx(:,2),'--')
-xlabel('x')
-ylabel('dx')
-legend('TI','TI-FFT')
+% figure(1)
+% plot(ff/(OM0(1)),log(abs(X(:,1))))
+% xlabel('normalized f')
+% ylabel('log(abs(X))')
+% xlim([0,4])
+% k_h = X_MF1(:,1:3)';
+% Q   = X_MF1(:,1+3:end);
+% theta = (OM0*t)';
+% H_IDF = exp(1i*theta*k_h);
+% xx = real(H_IDF*Q);
+% figure(2)
+% plot(x(:,1),x(:,2))
+% hold on
+% plot(xx(:,1),xx(:,2),'--')
+% xlabel('x')
+% ylabel('dx')
+% legend('TI','TI-FFT')
 %----------------------------------------------------------
 %%
 prob1 = coco_prob();
 ode_opts    = struct('n',1, 'd',3, 'e',3, 'isfwithu',false);
-amp_opts    = struct('isamp',true,'isuamp',true,'isht',false,'outdof',1,'Nperiod',1,'Nsampling',2^8);
+amp_opts    = struct('isamp',true,'isuamp',true,'isht',false,'outdof',1,'Nperiod',3,'Nsampling',2^8);
 stable_opts = struct('issta',true,'S',2^5,'L',2^8,'N_Ly',1000,'Omi',[1,2,3]);
 prob1 = coco_set(prob1,'cont','PtMX',100);
 prob1 = coco_set(prob1,'cont','NSV',10);
@@ -77,7 +77,8 @@ PHI_INITIAL = struct( 'parametrization_tori', 'MP', ...
     'k',       { {5,5,5} }, ...        
     'P',       { {1,1,1} }, ...    
     'S',       { {2^5,2^5,2^5} }, ...
-    'S_wave',  { {2^6,2^6,2^6} });
+    'S_wave',  { {2^6,2^6,2^6} }, ...
+    'OmOd',    [2,3,1]);
 prob1 = coco_set(prob1, 'QuasiP', 'PHI_INITIAL', PHI_INITIAL); 
 
 funcs = {@Duffing1_F, @Duffing1_DFDX, @Duffing1_DFDP, @Duffing1_L};
@@ -86,8 +87,9 @@ prob1 = ode_isol2QuasiP(prob1, '', funcs{:}, X_MF2, OM0, pname, p0);
 fc_funcs = {@fc_2};
 prob1 = coco_add_func(prob1, 'KOM_zero', fc_funcs{:}, [], 'zero','uidx', uidx(data.kOM_idx) , 'F+dF');
 bd1 = coco(prob1, 'qp1', [], 1, {'k_OM1' 'k_OM2' 'k_OM3' 'zeta' 'gamma' 'f1' 'f2'}, [1.8 9]);
+close(11111)
 
-bd1 = coco_bd_read('qp1');
+% bd1 = coco_bd_read('qp1');
 max_x1    = coco_bd_col(bd1, 'Max_x');
 Om_mode1  = coco_bd_col(bd1, 'Om');
 Stab1     = coco_bd_col(bd1, 'Stab');

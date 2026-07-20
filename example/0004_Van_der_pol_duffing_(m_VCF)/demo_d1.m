@@ -45,12 +45,13 @@ funcs = {@VDPDwithe1_F, @VDPD_DFDX, [], @VDPD_L};
 prob = ode_isol2QuasiP(prob, '', funcs{:}, X_MF, OM0);
 [data, uidx] = coco_get_func_data(prob, 'QuasiP', 'data', 'uidx');
 bd1_hb = coco(prob, 'qp1_hb', [], 1, {'k_OM1'}, [0.2 om1]);
+close(11111)
 
 max_x1_hb    = coco_bd_col(bd1_hb, 'Max_x');
 Om_mode_hb  = coco_bd_col(bd1_hb, 'Om');
 
 figure(1)
-plot(Om_mode_hb, max_x1_hb,'k-','DisplayName','HB');
+plot(Om_mode_hb, max_x1_hb,'k--','DisplayName','HB');
 xlabel('\omega_1');
 ylabel('max(x)');
 grid on;
@@ -76,10 +77,11 @@ funcs = {@VDPDwithe1_F, @VDPD_DFDX, [], @VDPD_L};
 prob = ode_isol2QuasiP(prob, '', funcs{:}, X_MF, OM0);
 [data, uidx] = coco_get_func_data(prob, 'QuasiP', 'data', 'uidx');
 bd1_co = coco(prob, 'qp1_co', [], 1, {'k_OM1'}, [0.2 om1]);
+close(11111)
 
 max_x1_co    = coco_bd_col(bd1_co, 'Max_x');
 Om_mode_co  = coco_bd_col(bd1_co, 'Om');
-
+figure(1)
 plot(Om_mode_co, max_x1_co,'r--','DisplayName','CO');
 
 %% ===================== 任务3：FD =====================
@@ -102,10 +104,11 @@ funcs = {@VDPDwithe1_F, @VDPD_DFDX, [], @VDPD_L};
 prob = ode_isol2QuasiP(prob, '', funcs{:}, X_MF, OM0);
 [data, uidx] = coco_get_func_data(prob, 'QuasiP', 'data', 'uidx');
 bd1_fd = coco(prob, 'qp1_fd', [], 1, {'k_OM1'}, [0.2 om1]);
+close(11111)
 
 max_x1_fd    = coco_bd_col(bd1_fd, 'Max_x');
 Om_mode_fd  = coco_bd_col(bd1_fd, 'Om');
-
+figure(1)
 plot(Om_mode_fd, max_x1_fd,'b.','DisplayName','FD');
 
 legend('Location','best');

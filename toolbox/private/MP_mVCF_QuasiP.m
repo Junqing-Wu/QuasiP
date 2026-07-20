@@ -1,24 +1,31 @@
 function [data, y, J] = MP_mVCF_QuasiP(prob, data, u)
 dFddX0 = [];
-PHI    = data.PHI;          % 形函数及其相关矩阵
-d      = data.ode_opts.d;   % QP基频的数量
-e      = data.ode_opts.e;   % 激励基频的数量
-n      = PHI.n;             % QP维度-自由度
-nL     = PHI.nL;            % 与QP相关的待定系数的数量
-a      = data.pdim;         % continuation paramaters [p] 的数量
+PHI    = data.PHI;               % 形函数及其相关矩阵
+OmOd   = PHI.OmOd;
+d      = data.ode_opts.d;        % QP基频的数量
+n      = PHI.n;                  % QP维度-自由度
+nL     = PHI.nL;                 % 与QP相关的待定系数的数量
+a      = data.pdim;              % continuation paramaters [p] 的数量
 %----------------------------------------------------------
-U       = cell2mat(PHI.U);  % 各周期形函数的数量
-U_prod  = prod(U);          % 周期形函数的数量的乘积
-pS      = cell2mat(PHI.pS); % 各基本周期区间内的采样数
-pS_prod = prod(pS);         % 基本周期区间内的采样数的乘积
+U       = cell2mat(PHI.U_omod);  % 各周期形函数的数量
+U_prod  = prod(U);               % 周期形函数的数量的乘积
+pS      = cell2mat(PHI.pS_omod); % 各基本周期区间内的采样数
+pS_prod = prod(pS);              % 基本周期区间内的采样数的乘积
 %----------------------------------------------------------
-y0   = zeros(nL,1);         % 非线性代数方程组Rd的残差
-Jx0  = zeros(nL,nL);        % Rd关于Xd的导数
-Jom0 = zeros(nL,d);         % Rd关于Om的导数
-Jp0  = zeros(nL,a);         % Rd关于p 的单数 
+y0   = zeros(nL,1);              % 非线性代数方程组Rd的残差
+if PHI.isvar
+    Jx0  = zeros(nL,nL);         % Rd关于Xd的导数
+    Jom0 = zeros(nL,d);          % Rd关于Om的导数
+    Jp0  = zeros(nL,a);          % Rd关于p 的导数 
+else
+    Jx0  = [];
+    Jom0 = [];
+    Jp0  = [];
+end
 %==========================================================
 Xd   = u(1:nL);             % nL*1
 Om   = u(nL+1:nL+d);        % d*1
+Om   = Om(OmOd);
 p    = u(nL+d+1:end);       % a*1
 tau  = PHI.tau;             % d*pS_prod
 %----------------------------------------------------------
@@ -44,7 +51,9 @@ OmXI1 = Om(1)*PHI.XI1{1};
 for ii = 2:d
     OmXI1 = OmXI1 + Om(ii)*PHI.XI1{ii};
 end
-OmXI1_om = PHI.XI1;
+if PHI.isvar
+    OmXI1_om = PHI.XI1;
+end
 if data.ODE == 2
     OOmXI2    = sparse(U_prod,U_prod);
     for ii = 1:d
@@ -52,17 +61,19 @@ if data.ODE == 2
             OOmXI2 = OOmXI2 + Om(ii)*Om(jj)*PHI.XI2{ii,jj};
         end
     end
-    OOmXI2_om = cell(1,d);
-    for omii = 1:d
-        OOmXI2_om{omii} = sparse(U_prod,U_prod);
-        for ii = 1:d
-            for jj = 1:d
-                if omii == ii && omii == jj
-                   OOmXI2_om{omii} = OOmXI2_om{omii} + 2*Om(omii)*PHI.XI2{ii,jj};
-                elseif omii == ii && omii ~= jj
-                   OOmXI2_om{omii} = OOmXI2_om{omii} + Om(jj)*PHI.XI2{ii,jj};
-                elseif omii ~= ii && omii == jj
-                   OOmXI2_om{omii} = OOmXI2_om{omii} + Om(ii)*PHI.XI2{ii,jj};
+    if PHI.isvar
+        OOmXI2_om = cell(1,d);
+        for omii = 1:d
+            OOmXI2_om{omii} = sparse(U_prod,U_prod);
+            for ii = 1:d
+                for jj = 1:d
+                    if omii == ii && omii == jj
+                        OOmXI2_om{omii} = OOmXI2_om{omii} + 2*Om(omii)*PHI.XI2{ii,jj};
+                    elseif omii == ii && omii ~= jj
+                        OOmXI2_om{omii} = OOmXI2_om{omii} + Om(jj)*PHI.XI2{ii,jj};
+                    elseif omii ~= ii && omii == jj
+                        OOmXI2_om{omii} = OOmXI2_om{omii} + Om(ii)*PHI.XI2{ii,jj};
+                    end
                 end
             end
         end
@@ -74,15 +85,17 @@ if data.isL
     if data.isABC(1) == 1
         AOOmXI2 = kron(A,OOmXI2);
         y0     = y0  + AOOmXI2*Xd;
-        Jx0    = Jx0 + AOOmXI2;
-        for dd = 1:d
-            Jom0(:,dd) = Jom0(:,dd) + kron(A,OOmXI2_om{dd})*Xd;
-        end
-        if data.isABCwithp(1) == 1
-            for aa = 1:a
-                Apaa = Ap(:,:,aa);
-                if any(reshape(Apaa,[],1) ~= 0)
-                    Jp0(:,aa) = Jp0(:,aa) + kron(Apaa,OOmXI2)*Xd;
+        if PHI.isvar
+            Jx0    = Jx0 + AOOmXI2;
+            for dd = 1:d
+                Jom0(:,dd) = Jom0(:,dd) + kron(A,OOmXI2_om{dd})*Xd;
+            end
+            if data.isABCwithp(1) == 1
+                for aa = 1:a
+                    Apaa = Ap(:,:,aa);
+                    if any(reshape(Apaa,[],1) ~= 0)
+                        Jp0(:,aa) = Jp0(:,aa) + kron(Apaa,OOmXI2)*Xd;
+                    end
                 end
             end
         end
@@ -90,15 +103,17 @@ if data.isL
     if data.isABC(2) == 1
         BOmXI1 = kron(B,OmXI1);
         y0     = y0  + BOmXI1*Xd;
-        Jx0    = Jx0 + BOmXI1;
-        for dd = 1:d
-            Jom0(:,dd) = Jom0(:,dd) + kron(B,OmXI1_om{dd})*Xd;
-        end
-        if data.isABCwithp(2) == 1
-            for aa = 1:a
-                Bpaa = Bp(:,:,aa);
-                if any(reshape(Bpaa,[],1) ~= 0)
-                    Jp0(:,aa) = Jp0(:,aa) + kron(Bpaa,OmXI1)*Xd;
+        if PHI.isvar
+            Jx0    = Jx0 + BOmXI1;
+            for dd = 1:d
+                Jom0(:,dd) = Jom0(:,dd) + kron(B,OmXI1_om{dd})*Xd;
+            end
+            if data.isABCwithp(2) == 1
+                for aa = 1:a
+                    Bpaa = Bp(:,:,aa);
+                    if any(reshape(Bpaa,[],1) ~= 0)
+                        Jp0(:,aa) = Jp0(:,aa) + kron(Bpaa,OmXI1)*Xd;
+                    end
                 end
             end
         end
@@ -106,12 +121,14 @@ if data.isL
     if data.isABC(3) == 1
         CXI0 = kron(C,XI0);
         y0     = y0  + CXI0*Xd;
-        Jx0    = Jx0 + CXI0;
-        if data.isABCwithp(3) == 1
-            for aa = 1:a
-                Cpaa = Cp(:,:,aa);
-                if any(reshape(Cpaa,[],1) ~= 0)
-                    Jp0(:,aa) = Jp0(:,aa) + kron(Cpaa,XI0)*Xd;
+        if PHI.isvar
+            Jx0    = Jx0 + CXI0;
+            if data.isABCwithp(3) == 1
+                for aa = 1:a
+                    Cpaa = Cp(:,:,aa);
+                    if any(reshape(Cpaa,[],1) ~= 0)
+                        Jp0(:,aa) = Jp0(:,aa) + kron(Cpaa,XI0)*Xd;
+                    end
                 end
             end
         end
@@ -119,9 +136,11 @@ if data.isL
 else
     IOmXI1 = kron(eye(n),OmXI1);
     y0     = y0  + IOmXI1*Xd;
-    Jx0    = Jx0 + IOmXI1;
-    for dd = 1:d
-        Jom0(:,dd) = Jom0(:,dd) + kron(eye(n),OmXI1_om{dd})*Xd;
+    if PHI.isvar
+        Jx0    = Jx0 + IOmXI1;
+        for dd = 1:d
+            Jom0(:,dd) = Jom0(:,dd) + kron(eye(n),OmXI1_om{dd})*Xd;
+        end
     end
 end
 %----------------------------------------------------------
@@ -152,23 +171,24 @@ else
     y0 = y0 - Fd;
 end
 %----------------------------------------------------------
-dFdXd = zeros(nL,nL);
-if data.isfwithu && ~isempty(dFddX0) 
-    is_nonzero       = ~all(cat(3, dFdX0,dFddX0) == 0, 3);
-    [fx_ll , fx_mm ] = find(is_nonzero);
-    for idx = 1:length(fx_ll)
-        ll = fx_ll(idx);
-        mm = fx_mm(idx);
-        if any(dFddX0(ll,mm,:) ~= 0)
-            dFdXd_lm = MP_mVCF_S2U_withXDX(PHI, dFdX0(ll,mm,:), ...
-                       dFddX0(ll,mm,:), Om, pS_prod);
-        else
-            dFdXd_lm = MP_mVCF_S2U_withX(PHI, dFdX0(ll,mm,:), pS_prod);
+if PHI.isvar
+    dFdXd = zeros(nL,nL);
+    if data.isfwithu && ~isempty(dFddX0) 
+        is_nonzero       = ~all(cat(3, dFdX0,dFddX0) == 0, 3);
+        [fx_ll , fx_mm ] = find(is_nonzero);
+        for idx = 1:length(fx_ll)
+            ll = fx_ll(idx);
+            mm = fx_mm(idx);
+            if any(dFddX0(ll,mm,:) ~= 0)
+                dFdXd_lm = MP_mVCF_S2U_withXDX(PHI, dFdX0(ll,mm,:), ...
+                           dFddX0(ll,mm,:), Om, pS_prod);
+            else
+                dFdXd_lm = MP_mVCF_S2U_withX(PHI, dFdX0(ll,mm,:), pS_prod);
+            end
+            row_range = (ll-1)*U_prod + 1 : ll*U_prod;
+            col_range = (mm-1)*U_prod + 1 : mm*U_prod;
+            dFdXd(row_range, col_range) = dFdXd(row_range, col_range) + dFdXd_lm;
         end
-        row_range = (ll-1)*U_prod + 1 : ll*U_prod;
-        col_range = (mm-1)*U_prod + 1 : mm*U_prod;
-        dFdXd(row_range, col_range) = dFdXd(row_range, col_range) + dFdXd_lm;
-    end
 %     is_nonzero       = ~all(dFddX0 == 0, 3);
 %     dFdOm  = zeros(U_prod,n,d);
 %     ddX0dOm = zeros(pS_prod,n,d);
@@ -195,25 +215,26 @@ if data.isfwithu && ~isempty(dFddX0)
 %     else
 %         Jom0 = Jom0 - dFdOm;
 %     end
-else
-    is_nonzero     = ~all(dFdX0  == 0, 3);
-    [fx_ll, fx_mm] = find(is_nonzero);
-    for idx = 1:length(fx_ll)
-        ll = fx_ll(idx);
-        mm = fx_mm(idx);
-        dFdXd_lm = MP_mVCF_S2U_withX(PHI, dFdX0(ll,mm,:), pS_prod);
-        row_range = (ll-1)*U_prod + 1 : ll*U_prod;
-        col_range = (mm-1)*U_prod + 1 : mm*U_prod;
-        dFdXd(row_range, col_range) = dFdXd(row_range, col_range) + dFdXd_lm;
+    else
+        is_nonzero     = ~all(dFdX0  == 0, 3);
+        [fx_ll, fx_mm] = find(is_nonzero);
+        for idx = 1:length(fx_ll)
+            ll = fx_ll(idx);
+            mm = fx_mm(idx);
+            dFdXd_lm = MP_mVCF_S2U_withX(PHI, dFdX0(ll,mm,:), pS_prod);
+            row_range = (ll-1)*U_prod + 1 : ll*U_prod;
+            col_range = (mm-1)*U_prod + 1 : mm*U_prod;
+            dFdXd(row_range, col_range) = dFdXd(row_range, col_range) + dFdXd_lm;
+        end
+    end
+    if PHI.isCO
+        Jx0 = Jx0 - PHI.Theta*dFdXd;
+    else
+        Jx0 = Jx0 - dFdXd;
     end
 end
-if PHI.isCO
-    Jx0 = Jx0 - PHI.Theta*dFdXd;
-else
-    Jx0 = Jx0 - dFdXd;
-end
 %----------------------------------------------------------
-if data.isfwithp
+if data.isfwithp && PHI.isvar
     for aa = 1:a
         Jpaa = zeros(U_prod,n);
         fpaa = dFdP0(:,aa,:);
@@ -233,6 +254,10 @@ if data.isfwithp
 end
 %==========================================================
 y = y0;
-J = [Jx0, Jom0, Jp0];
+if PHI.isvar
+    Jom0 = Jom0(:,PHI.pos);
+    J = [Jx0, Jom0, Jp0];
+else
+    J = [];
 end
-
+end

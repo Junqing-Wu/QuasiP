@@ -94,6 +94,7 @@ prob1 = ode_isol2QuasiP(prob1, '', funcs{:}, X_MF2, OM0);
 fc_funcs = {@fc_2};
 prob1 = coco_add_func(prob1, 'KOM_zero', fc_funcs{:}, [], 'zero','uidx', uidx(data.kOM_idx) , 'F+dF');
 bd1 = coco(prob1, 'qp1', [], 1, {'k_OM1' 'k_OM2'}, [1.8 6]);
+close(11111)
 
 % bd1 = coco_bd_read('qp1');
 max_x1    = coco_bd_col(bd1, 'Max_x');
@@ -131,6 +132,7 @@ prob2 = ode_isol2QuasiP(prob2, '', funcs{:}, X_MF1, OM0);
 fc_funcs = {@fc_2};
 prob2 = coco_add_func(prob2, 'KOM_zero', fc_funcs{:}, [], 'zero','uidx', uidx(data.kOM_idx) , 'F+dF');
 bd2 = coco(prob2, 'qp2', [], 1, { 'k_OM1' 'k_OM2'}, [1.8 6]);
+close(11111)
 
 % bd2 = coco_bd_read('qp2');
 max_x2    = coco_bd_col(bd2, 'Max_x');
@@ -168,6 +170,7 @@ prob3 = ode_isol2QuasiP(prob3, '', funcs{:}, X_MF1, OM0);
 fc_funcs = {@fc_2};
 prob3 = coco_add_func(prob3, 'KOM_zero', fc_funcs{:}, [], 'zero','uidx', uidx(data.kOM_idx) , 'F+dF');
 bd3 = coco(prob3, 'qp3', [], 1, { 'k_OM1' 'k_OM2'}, [1.8 6]);
+close(11111)
 
 % bd3 = coco_bd_read('qp3');
 max_x3    = coco_bd_col(bd3, 'Max_x');

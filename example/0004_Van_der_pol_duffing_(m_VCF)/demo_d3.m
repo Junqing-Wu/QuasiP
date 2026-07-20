@@ -2,7 +2,7 @@ clearvars;
 close all;
 clc;
 
-num_cont = 100;
+num_cont = 1000;
 
 e1      = 2;
 e2      = 1;
@@ -37,16 +37,17 @@ end
 
 prob = coco_prob();
 ode_opts    = struct('n',1, 'd',3, 'e',3, 'isfwithu',true);
-amp_opts    = struct('isamp',true,'isht',false,'outdof',1,'Nperiod',1,'Nsampling',2^8);
+amp_opts    = struct('isamp',false,'isht',false,'outdof',1,'Nperiod',1,'Nsampling',2^8);
 prob = coco_set(prob,'cont','PtMX',num_cont);
 prob = coco_set(prob,'QuasiP','ode_opts',ode_opts,'amp_opts',amp_opts); 
 PHI_INITIAL = struct( 'parametrization_tori', 'MP', ...
     'type',    'mVCF'           , ...     
     'method',  { {'HB','HB','HB'} }, ...   
-    'k',       { {5,5,5} }, ...        
+    'k',       { {3,3,3} }, ...        
     'P',       { {1,1,1} }, ...    
     'S',       { {2^5,2^5,2^5} }, ...
-    'S_wave',  { {2^6,2^6,2^6} });
+    'S_wave',  { {2^6,2^6,2^6} }, ...
+    'OmOd',    [3,2,1]);
 prob = coco_set(prob, 'QuasiP', 'PHI_INITIAL', PHI_INITIAL); 
 funcs = {@VDPDwithe3_F, @VDPD_DFDX, [], @VDPD_L}; 
 prob = ode_isol2QuasiP(prob, '', funcs{:}, X_MF, OM0);
@@ -55,6 +56,7 @@ fc_funcs = {@fc_3e};
 prob = coco_add_func(prob, 'KOM_zero', fc_funcs{:}, [], 'zero','uidx', uidx(data.kOM_idx) , 'F+dF');
 
 bd3_hbhbhb = coco(prob, 'qphb+hb+hb', [], 1, {'k_OM1' 'k_OM2' 'k_OM3'}, [0.2 om1]);
+close(11111)
 
 max_x1_hbhbhb    = coco_bd_col(bd3_hbhbhb, 'Max_x');
 Om_mode_hbhbhb  = coco_bd_col(bd3_hbhbhb, 'Om');

@@ -29,12 +29,12 @@ for iii = 1:NumOmi
     %--------------------------------------------------------------------------
     varphi = data.stable_opts.TAU{iii};
     rho    = Om/Om(Om_t);
-    if d >1
+    if d > 1
         varphi(:,Om_not) = varphi(:,Om_not) + varphi(:,Om_t)*rho(Om_not)';
     end
     %--------------------------------------------------------------------------
-    M = cell(1,pS_prod);
-    for ss = 1:pS_prod
+    M = cell(pS_prod,1);
+    parfor ss = 1:pS_prod
         psii  = (ss-1)*pL1+1:ss*pL1;
         theta = varphi(psii,:)';
         GAM0  = exp(1i*theta'*Amp.MF_f(:,end-d+1:end)');
@@ -91,10 +91,7 @@ for iii = 1:NumOmi
         Psi = M{1};
     else
         HARM     = data.stable_opts.Harm{iii};
-        Mdd = zeros(pS_prod,N^2);
-        for ss = 1:pS_prod
-            Mdd(ss,:) = reshape(M{ss}(:,:,end),1,[]);
-        end
+        Mdd = cell2mat(cellfun(@(x) reshape(x(:,:,end),1,[]), M, 'UniformOutput',false));
         B = [];
         M_fun = zeros(pS_prod,N^2);
         for ii = 1:N^2

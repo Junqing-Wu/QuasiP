@@ -52,6 +52,7 @@ funcs = {@PDuffing1_F, @PDuffing1_DFDX, @PDuffing1_DFDP, @PDuffing1_L};
 prob1 = ode_isol2QuasiP(prob1, '', funcs{:}, X_MF2, OM0, pname, p0);
 [data, uidx] = coco_get_func_data(prob1, 'QuasiP', 'data', 'uidx');
 bd1 = coco(prob1, 'qp11', [], 1, {'k_OM1' 'k_OM2' 'zeta' 'gamma' 'f1'}, [1.5 4]);
+close(11111)
 
 %  coco_bd_read('qp11');
 max_x1    = coco_bd_col(bd1, 'Max_x');

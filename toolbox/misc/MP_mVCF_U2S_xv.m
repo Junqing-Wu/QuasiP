@@ -1,8 +1,8 @@
 function [X0,X0dot] = MP_mVCF_U2S_xv(Xd,Om,PHI,U_prod)
 pwSiip1Td = 1;
 U1Tii = U_prod;
-U = cell2mat(PHI.U);
-pwS = cell2mat(PHI.pwS);
+U = cell2mat(PHI.U_omod);
+pwS = cell2mat(PHI.pwS_omod);
 
 Xii = reshape(Xd,pwSiip1Td,U1Tii);
 Xiidot = zeros(size(Xii));
@@ -28,3 +28,5 @@ end
 X0 = Xii;
 X0dot = Xiidot;
 end
+
+

@@ -4,6 +4,7 @@ d      = data.ode_opts.d;   % QP基频的数量
 e      = data.ode_opts.e;   % 激励基频的数量
 nL     = PHI.nL;            % 与QP相关的待定系数的数量
 a      = data.pdim;         % continuation paramaters [p] 的数量
+pos    = PHI.pos;
 %--------------------------------------------------------------------------
 y1   = zeros(d-e,1);        % 未知基频的相位条件PC的残差
 Jx1  = zeros(d-e,nL);       % PC关于Xd的导数  
@@ -15,11 +16,11 @@ if d>e
     kk = e+1;
     for ii = 1:d-e
         if data.ODE == 1
-            Jx1(ii,:) = transpose(Xd)*transpose(PHI.Lam1{kk});
+            Jx1(ii,:) = transpose(Xd)*transpose(PHI.Lam1{pos(kk)});
         else
             Jx1(ii,:) = transpose(Xd)*...
-                        ( transpose(PHI.Lam1{kk}) + ...
-                          transpose(PHI.Lam2{kk})*PHI.Lam1{kk} );
+                        ( transpose(PHI.Lam1{pos(kk)}) + ...
+                          transpose(PHI.Lam2{pos(kk)})*PHI.Lam1{pos(kk)} );
         end
         kk = kk+1;
     end

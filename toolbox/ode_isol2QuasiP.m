@@ -169,7 +169,7 @@ switch data.PHI.parametrization_tori
             strjoin(data.kOMnames, '+'), ...
             strjoin(data.uOMnames, '+'), ...
             data.PHI.parametrization_tori, ...
-            [data.PHI.type '_' strjoin(data.PHI.method, '+')], ...
+            strcat(string(data.PHI.type), '_', strjoin(data.PHI.method,'+'), '_(', strjoin(string(data.PHI.OmOd(:)),'>-'), ')'), ...
             strjoin(string(data.PHI.P), '+'), ...
             num2str(data.PHI.L), ...
             strjoin(string(data.PHI.pS), '+')
@@ -207,11 +207,13 @@ switch data.PHI.parametrization_tori
         end
 end
 %----------------------------------------------------------
-col_widths = cellfun(@(h,v) max(length(h), length(v))+2, headers, values);
+values_char = cellfun(@(v) char(v), values, 'UniformOutput', false);
+col_widths = cellfun(@(h,v) max(strlength(h), strlength(v))+4, headers, values_char);
+col_widths(end) = col_widths(end)-4;
 total_width = sum(col_widths);
-line = repmat('=', 1, total_width+(data.ode_opts.d-1)*3);
+line = repmat('=', 1, total_width);
 term_str = [' ' terms ' '];
-fill_len = total_width + (data.ode_opts.d-1)*3 - length(term_str);
+fill_len = total_width  - length(term_str);
 left_fill = repmat('>', 1, ceil(fill_len/2));
 right_fill = repmat('<', 1, floor(fill_len/2));
 title_line = [left_fill term_str right_fill];
