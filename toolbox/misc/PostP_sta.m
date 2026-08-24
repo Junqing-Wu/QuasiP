@@ -16,6 +16,12 @@ if data.ode_opts.d == 1
     Sta.Psi = Psi;
     [~,eigvalue] = eigs(Psi(:,:,end),size(Psi,2));
     eigvalue = diag(eigvalue);
+
+%     T = 2*pi /Omii;
+%     R = 1/T*logm(Psi(:,:,end))
+%     [~,eigvalueA] = eigs(R,size(Psi,2));
+%     eigvalueA = diag(eigvalueA);
+
     Flo_mul = eigvalue;
     if max( abs(Flo_mul) )> 1
         Sta.Stab = 0;
@@ -23,6 +29,9 @@ if data.ode_opts.d == 1
         Sta.Stab = 1;
     end
     Flo_exp = log(Flo_mul)*Omii/(Perii*2*pi);
+
+%     [Flo_exp,eigvalueA]
+
     Sta.Ly = [Flo_mul,Flo_exp];
 else
     Sta.Psi = Psi(2,:);
