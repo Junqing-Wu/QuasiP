@@ -6,8 +6,8 @@ nL     = PHI.nL;            % 与QP相关的待定系数的数量
 a      = data.pdim;         % continuation paramaters [p] 的数量
 pos    = PHI.pos;
 %--------------------------------------------------------------------------
-y1   = zeros(d-e,1);        % 未知基频的相位条件PC的残差
-Jx1  = zeros(d-e,nL);       % PC关于Xd的导数  
+R1   = zeros(d-e,1);        % 未知基频的相位条件PC的残差
+JXd1 = zeros(d-e,nL);       % PC关于Xd的导数  
 Jom1 = zeros(d-e,d);        % PC关于Om的导数 
 Jp1  = zeros(d-e,a);        % PC关于p 的导数 
 %==========================================================
@@ -16,9 +16,9 @@ if d>e
     kk = e+1;
     for ii = 1:d-e
         if data.ODE == 1
-            Jx1(ii,:) = transpose(Xd)*transpose(PHI.Lam1{pos(kk)});
+            JXd1(ii,:) = transpose(Xd)*transpose(PHI.Lam1{pos(kk)});
         else
-            Jx1(ii,:) = transpose(Xd)*...
+            JXd1(ii,:) = transpose(Xd)*...
                         ( transpose(PHI.Lam1{pos(kk)}) + ...
                           transpose(PHI.Lam2{pos(kk)})*PHI.Lam1{pos(kk)} );
         end
@@ -26,6 +26,6 @@ if d>e
     end
 end
 %==========================================================
-y = y1;
-J = [Jx1, Jom1, Jp1];
+y = R1;
+J = [JXd1, Jom1, Jp1];
 end

@@ -11,10 +11,10 @@ Om1   = Om(Omt);
 Om2d  = Om(Omnot);
 Rho   = Om2d./Om1;
 %----------------------------------------------------------
-y0   = zeros(NL,1);         % 非线性代数方程组Rd的残差
-Jx0  = zeros(NL,NL);        % Rd关于Xd的导数
-Jom0 = zeros(NL,d);         % Rd关于Om的导数
-Jp0  = zeros(NL,a);         % Rd关于p 的单数
+R0   = zeros(NL,1);         % 非线性代数方程组R的残差
+Jy0  = zeros(NL,NL);        % R关于y0的导数
+Jom0 = zeros(NL,d);         % R关于Om的导数
+Jp0  = zeros(NL,a);         % R关于p 的单数
 %==========================================================
 if PHI.isvar
     ye     = PSI(:,1:N);
@@ -42,11 +42,11 @@ if PHI.isvar
         % ---------------------------------------------
         ye_jj     = reshape(ye(loca0,:),[],1);
         ys_jjp1   = reshape(ys(loca1,:),[],1);
-        y0(Loca0) = y0(Loca0) + ye_jj - ys_jjp1;
+        R0(Loca0) = R0(Loca0) + ye_jj - ys_jjp1;
         % ---------------------------------------------
         ye_ys_jj  = MT_SHT_traj_yeys(ye_ys(loca0,:),PHI.pS2d,N);
-        Jx0(Loca0,Loca0) = Jx0(Loca0,Loca0) + ye_ys_jj;
-        Jx0(Loca0,Loca1) = Jx0(Loca0,Loca1) - eye(N*PHI.pS2d);
+        Jy0(Loca0,Loca0) = Jy0(Loca0,Loca0) + ye_ys_jj;
+        Jy0(Loca0,Loca1) = Jy0(Loca0,Loca1) - eye(N*PHI.pS2d);
         % ---------------------------------------------
         ye_Om_jj        = reshape(ye_Om(loca0,:),[],d);
         for ii = 1:d
@@ -72,11 +72,11 @@ if PHI.isvar
         % ---------------------------------------------
         ye_jj     = reshape(ye(loca0,:),[],1);
         ys_jjp1   = reshape(ys(loca1,:),[],1);
-        y0(Loca0) = y0(Loca0) + EGOG*ye_jj - ys_jjp1;
+        R0(Loca0) = R0(Loca0) + EGOG*ye_jj - ys_jjp1;
         % ---------------------------------------------
         ye_ys_jj  = MT_SHT_traj_yeys(ye_ys(loca0,:),PHI.pS2d,N);
-        Jx0(Loca0,Loca0) = Jx0(Loca0,Loca0) + EGOG*ye_ys_jj;
-        Jx0(Loca0,Loca1) = Jx0(Loca0,Loca1) - eye(PHI.pS2d*N);
+        Jy0(Loca0,Loca0) = Jy0(Loca0,Loca0) + EGOG*ye_ys_jj;
+        Jy0(Loca0,Loca1) = Jy0(Loca0,Loca1) - eye(PHI.pS2d*N);
         % ---------------------------------------------
         ye_Om_jj        = reshape(ye_Om(loca0,:),[],d);
         for ii = 1:d
@@ -90,8 +90,8 @@ if PHI.isvar
         end
     end
     %==========================================================
-    y = y0;
-    J = [Jx0, Jom0, Jp0];
+    y = R0;
+    J = [Jy0, Jom0, Jp0];
 else
     ye     = PSI(:,1:N);
     %==========================================================
@@ -113,7 +113,7 @@ else
         % ---------------------------------------------
         ye_jj     = reshape(ye(loca0,:),[],1);
         ys_jjp1   = reshape(ys(loca1,:),[],1);
-        y0(Loca0) = y0(Loca0) + ye_jj - ys_jjp1;
+        R0(Loca0) = R0(Loca0) + ye_jj - ys_jjp1;
     end
     %==========================================================
     %>>>>>> (I_N \otimes G*Omic*iG)yeM(ysM) - ys1 = 0 <<<<<<<<<
@@ -128,10 +128,10 @@ else
         % ---------------------------------------------
         ye_jj     = reshape(ye(loca0,:),[],1);
         ys_jjp1   = reshape(ys(loca1,:),[],1);
-        y0(Loca0) = y0(Loca0) + EGOG*ye_jj - ys_jjp1;
+        R0(Loca0) = R0(Loca0) + EGOG*ye_jj - ys_jjp1;
     end
     %==========================================================
-    y = y0;
+    y = R0;
     J = [];
 end
 end

@@ -10,30 +10,31 @@ function data = QuasiP_get_seeting(prob,tbid,data)
 % TBID - Toolbox instance identifier.
 % DATA - Toolbox data strcture.
 %--------------------------------------------------------------------------------------------------------------------
-ode_opts.n           = [];          % Number of DOFs (must be provided by user)
-ode_opts.d           = [];          % Number of base frequencies of QP (must be provided by user)
-ode_opts.e           = [];          % Number of base frequencies of Excitation (must be provided by user)
-ode_opts.isfwithu    = false;       % Default: f(x,p,theta1,...,thetae); Conversely: f(x,dx,p,theta1,...,thetae)
-defaults.ode_opts    = ode_opts;    % Store ODE options in defaults
+ode_opts.n           = [];            % Number of DOFs (must be provided by user)
+ode_opts.d           = [];            % Number of base frequencies of QP (must be provided by user)
+ode_opts.e           = [];            % Number of base frequencies of Excitation (must be provided by user)
+ode_opts.isfwithu    = false;         % Default: f(x,p,theta1,...,thetae); Conversely: f(x,dx,p,theta1,...,thetae)
+defaults.ode_opts    = ode_opts;      % Store ODE options in defaults
 %--------------------------------------------------------------------------------------------------------------------
-par_opts.parallel    = false;       % Enable or disable parallel computing
-par_opts.ncores      = 1;           % Number of CPU cores for parallel computation
-defaults.par_opts    = par_opts;    % Store parallel settings in default configuration
+par_opts.parallel    = false;         % Enable or disable parallel computing
+cl = parcluster('local');
+par_opts.ncores      = cl.NumWorkers; % Number of CPU cores for parallel computation
+defaults.par_opts    = par_opts;      % Store parallel settings in default configuration
 %--------------------------------------------------------------------------------------------------------------------
-amp_opts.isamp       = false;       % Enable or disable amplitude calculation
+amp_opts.isamp       = false;         % Enable or disable amplitude calculation
 amp_opts.isuamp      = false;       
 amp_opts.isht        = false;
-amp_opts.outdof      = 1;           % DOFs for output (all or specific indices)
-amp_opts.Nperiod     = 1;           % Number of periods for time domain: [0,Nperiod*T1]
-amp_opts.Nsampling   = 2^8;         % Number of sampling points within [0,T1)
-defaults.amp_opts    = amp_opts;    % Store amplitude options in default configuration
+amp_opts.outdof      = 1;             % DOFs for output (all or specific indices)
+amp_opts.Nperiod     = 1;             % Number of periods for time domain: [0,Nperiod*T1]
+amp_opts.Nsampling   = 2^8;           % Number of sampling points within [0,T1)
+defaults.amp_opts    = amp_opts;      % Store amplitude options in default configuration
 %--------------------------------------------------------------------------------------------------------------------
-stable_opts.issta    = false;       % Enable or disable stability analysis
+stable_opts.issta    = false;         % Enable or disable stability analysis
 stable_opts.Omi      = 1;
-stable_opts.S        = 2^5;         % Number of trajectories along a single hyper-time direction
-stable_opts.L        = 2^8;         % Number of sampling points for integration
-stable_opts.N_Ly     = 1000;        % Iterations for Lyapunov exponents (when d > 1)
-defaults.stable_opts = stable_opts; % Store stability analysis options in default configuration
+stable_opts.S        = 2^5;           % Number of trajectories along a single hyper-time direction
+stable_opts.L        = 2^8;           % Number of sampling points for integration
+stable_opts.N_Ly     = 1000;          % Iterations for Lyapunov exponents (when d > 1)
+defaults.stable_opts = stable_opts;   % Store stability analysis options in default configuration
 %--------------------------------------------------------------------------------------------------------------------
 copts = coco_get(prob, tbid);
 copts = coco_merge(defaults, copts);
@@ -76,7 +77,10 @@ end
 data.amp_opts   =  copts.amp_opts;
 %--------------------------------------------------------------------------------------------------------------------
 if copts.stable_opts.issta
-    copts.stable_opts = fill_stable_TAU_data(copts.stable_opts, data.PHI, data.ode_opts);  
+    copts.stable_opts = fill_stable_TAU_data(copts.stable_opts, data.PHI, data.ode_opts);
+    if prod(copts.stable_opts.pS{1}) >1 && ~copts.par_opts.parallel && strcmp(PHI.parametrization_tori, 'MP')
+       copts.par_opts.parallel = true;
+    end
 end
 data.stable_opts  = copts.stable_opts;
 %--------------------------------------------------------------------------------------------------------------------

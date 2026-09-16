@@ -12,13 +12,13 @@ U_prod  = prod(U);               % 周期形函数的数量的乘积
 pS      = cell2mat(PHI.pS_omod); % 各基本周期区间内的采样数
 pS_prod = prod(pS);              % 基本周期区间内的采样数的乘积
 %----------------------------------------------------------
-y0   = zeros(nL,1);              % 非线性代数方程组Rd的残差
+R0   = zeros(nL,1);              % 非线性代数方程组Rd的残差
 if PHI.isvar
-    Jx0  = zeros(nL,nL);         % Rd关于Xd的导数
+    JXd0 = zeros(nL,nL);         % Rd关于Xd的导数
     Jom0 = zeros(nL,d);          % Rd关于Om的导数
     Jp0  = zeros(nL,a);          % Rd关于p 的导数 
 else
-    Jx0  = [];
+    JXd0 = [];
     Jom0 = [];
     Jp0  = [];
 end
@@ -84,9 +84,9 @@ if data.isL
     [~,~,A,B,C,Ap,Bp,Cp] = data.l(p);
     if data.isABC(1) == 1
         AOOmXI2 = kron(A,OOmXI2);
-        y0     = y0  + AOOmXI2*Xd;
+        R0     = R0  + AOOmXI2*Xd;
         if PHI.isvar
-            Jx0    = Jx0 + AOOmXI2;
+            JXd0   = JXd0 + AOOmXI2;
             for dd = 1:d
                 Jom0(:,dd) = Jom0(:,dd) + kron(A,OOmXI2_om{dd})*Xd;
             end
@@ -102,9 +102,9 @@ if data.isL
     end
     if data.isABC(2) == 1
         BOmXI1 = kron(B,OmXI1);
-        y0     = y0  + BOmXI1*Xd;
+        R0     = R0  + BOmXI1*Xd;
         if PHI.isvar
-            Jx0    = Jx0 + BOmXI1;
+            JXd0   = JXd0 + BOmXI1;
             for dd = 1:d
                 Jom0(:,dd) = Jom0(:,dd) + kron(B,OmXI1_om{dd})*Xd;
             end
@@ -120,9 +120,9 @@ if data.isL
     end
     if data.isABC(3) == 1
         CXI0 = kron(C,XI0);
-        y0     = y0  + CXI0*Xd;
+        R0     = R0  + CXI0*Xd;
         if PHI.isvar
-            Jx0    = Jx0 + CXI0;
+            JXd0   = JXd0 + CXI0;
             if data.isABCwithp(3) == 1
                 for aa = 1:a
                     Cpaa = Cp(:,:,aa);
@@ -135,9 +135,9 @@ if data.isL
     end
 else
     IOmXI1 = kron(eye(n),OmXI1);
-    y0     = y0  + IOmXI1*Xd;
+    R0     = R0  + IOmXI1*Xd;
     if PHI.isvar
-        Jx0    = Jx0 + IOmXI1;
+        JXd0   = JXd0 + IOmXI1;
         for dd = 1:d
             Jom0(:,dd) = Jom0(:,dd) + kron(eye(n),OmXI1_om{dd})*Xd;
         end
@@ -166,9 +166,9 @@ for nn = 1:length(non_zero_nn)
 end
 Fd = reshape(Fd,[],1);
 if PHI.isCO
-    y0 = y0 - PHI.Theta*Fd;
+    R0 = R0 - PHI.Theta*Fd;
 else
-    y0 = y0 - Fd;
+    R0 = R0 - Fd;
 end
 %----------------------------------------------------------
 if PHI.isvar
@@ -228,9 +228,9 @@ if PHI.isvar
         end
     end
     if PHI.isCO
-        Jx0 = Jx0 - PHI.Theta*dFdXd;
+        JXd0 = JXd0 - PHI.Theta*dFdXd;
     else
-        Jx0 = Jx0 - dFdXd;
+        JXd0 = JXd0 - dFdXd;
     end
 end
 %----------------------------------------------------------
@@ -253,10 +253,10 @@ if data.isfwithp && PHI.isvar
     end
 end
 %==========================================================
-y = y0;
+y = R0;
 if PHI.isvar
     Jom0 = Jom0(:,PHI.pos);
-    J = [Jx0, Jom0, Jp0];
+    J = [JXd0, Jom0, Jp0];
 else
     J = [];
 end

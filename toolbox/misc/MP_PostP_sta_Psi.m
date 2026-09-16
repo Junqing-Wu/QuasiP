@@ -34,58 +34,114 @@ for iii = 1:NumOmi
     end
     %--------------------------------------------------------------------------
     M = cell(pS_prod,1);
-    parfor ss = 1:pS_prod
-        psii  = (ss-1)*pL1+1:ss*pL1;
-        theta = varphi(psii,:)';
-        GAM0  = exp(1i*theta'*Amp.MF_f(:,end-d+1:end)');
-        X0    = transpose( real(GAM0*Amp.MF_x) );
-        if isfwithu
-            OMGAM1  = GAM0*1i*diag(Om'*Amp.MF_f(:,end-d+1:end)');
-            dX0     = transpose( real(OMGAM1*Amp.MF_x) );
-            [DFDX,DFDDX] = data.fx(X0,dX0,vp,theta);
-            if isempty(DFDDX)
+    if data.par_opts.parallel
+        parfor ss = 1:pS_prod
+            psii  = (ss-1)*pL1+1:ss*pL1;
+            theta = varphi(psii,:)';
+            GAM0  = exp(1i*theta'*Amp.MF_f(:,end-d+1:end)');
+            X0    = transpose( real(GAM0*Amp.MF_x) );
+            if isfwithu
+                OMGAM1  = GAM0*1i*diag(Om'*Amp.MF_f(:,end-d+1:end)');
+                dX0     = transpose( real(OMGAM1*Amp.MF_x) );
+                [DFDX,DFDDX] = data.fx(X0,dX0,vp,theta);
+                if isempty(DFDDX)
+                    DFDDX = zeros(n,n,pL1);
+                end
+            else
+                DFDX  = data.fx(X0,vp,theta);
                 DFDDX = zeros(n,n,pL1);
             end
-        else
-            DFDX  = data.fx(X0,vp,theta);
-            DFDDX = zeros(n,n,pL1);
-        end
-        if ~data.isL
-            J = DFDX;
-        else
-            [~,~,A,B,C] = data.l(p);
-            assert(rank(A) == size(A,1), 'Error: Matrix A is singular and cannot be inverted.');
-            if ~data.isABC(2)
-                B = zeros(n,n);
-            end
-            if ~data.isABC(3)
-                C = zeros(n,n);
-            end
-            if data.isABC(1)
-                J = zeros(2*n,2*n,pL1);
-                J(1:n,n+1:2*n,:) = eye(n).*ones(n,n,pL1);
-                K = DFDX  - C;
-                D = DFDDX - B;
-                invM = inv(full(A));
-                iMK = pagemtimes(invM,K);
-                iMD = pagemtimes(invM,D);
-                J(n+1:2*n,1:n,:) = iMK;
-                J(n+1:2*n,n+1:2*n,:) = iMD;
+            if ~data.isL
+                J = DFDX;
             else
-                assert(rank(B) == size(B,1), 'Error: Matrix B is singular and cannot be inverted.');
+                [~,~,A,B,C] = data.l(p);
+                assert(rank(A) == size(A,1), 'Error: Matrix A is singular and cannot be inverted.');
+                if ~data.isABC(2)
+                    B = zeros(n,n);
+                end
                 if ~data.isABC(3)
                     C = zeros(n,n);
                 end
-                invB = inv(full(B));
-                J    = pagemtimes(invB,DFDX-C);
+                if data.isABC(1)
+                    J = zeros(2*n,2*n,pL1);
+                    J(1:n,n+1:2*n,:) = eye(n).*ones(n,n,pL1);
+                    K = DFDX  - C;
+                    D = DFDDX - B;
+                    invM = inv(full(A));
+                    iMK = pagemtimes(invM,K);
+                    iMD = pagemtimes(invM,D);
+                    J(n+1:2*n,1:n,:) = iMK;
+                    J(n+1:2*n,n+1:2*n,:) = iMD;
+                else
+                    assert(rank(B) == size(B,1), 'Error: Matrix B is singular and cannot be inverted.');
+                    if ~data.isABC(3)
+                        C = zeros(n,n);
+                    end
+                    invB = inv(full(B));
+                    J    = pagemtimes(invB,DFDX-C);
+                end
             end
+            Mss = J;
+            Mss(:,:,1) = eye (N);
+            for ii = 1 : pL1-1
+                Mss(:,:,ii+1) = expm( (J(:,:,ii)+J(:,:,ii+1))/2*dt1 )*Mss(:,:,ii);
+            end
+            M{ss} = Mss;
         end
-        Mss = J;
-        Mss(:,:,1) = eye (N);
-        for ii = 1 : pL1-1
-            Mss(:,:,ii+1) = expm( (J(:,:,ii)+J(:,:,ii+1))/2*dt1 )*Mss(:,:,ii);
+    else
+        for ss = 1:pS_prod
+            psii  = (ss-1)*pL1+1:ss*pL1;
+            theta = varphi(psii,:)';
+            GAM0  = exp(1i*theta'*Amp.MF_f(:,end-d+1:end)');
+            X0    = transpose( real(GAM0*Amp.MF_x) );
+            if isfwithu
+                OMGAM1  = GAM0*1i*diag(Om'*Amp.MF_f(:,end-d+1:end)');
+                dX0     = transpose( real(OMGAM1*Amp.MF_x) );
+                [DFDX,DFDDX] = data.fx(X0,dX0,vp,theta);
+                if isempty(DFDDX)
+                    DFDDX = zeros(n,n,pL1);
+                end
+            else
+                DFDX  = data.fx(X0,vp,theta);
+                DFDDX = zeros(n,n,pL1);
+            end
+            if ~data.isL
+                J = DFDX;
+            else
+                [~,~,A,B,C] = data.l(p);
+                assert(rank(A) == size(A,1), 'Error: Matrix A is singular and cannot be inverted.');
+                if ~data.isABC(2)
+                    B = zeros(n,n);
+                end
+                if ~data.isABC(3)
+                    C = zeros(n,n);
+                end
+                if data.isABC(1)
+                    J = zeros(2*n,2*n,pL1);
+                    J(1:n,n+1:2*n,:) = eye(n).*ones(n,n,pL1);
+                    K = DFDX  - C;
+                    D = DFDDX - B;
+                    invM = inv(full(A));
+                    iMK = pagemtimes(invM,K);
+                    iMD = pagemtimes(invM,D);
+                    J(n+1:2*n,1:n,:) = iMK;
+                    J(n+1:2*n,n+1:2*n,:) = iMD;
+                else
+                    assert(rank(B) == size(B,1), 'Error: Matrix B is singular and cannot be inverted.');
+                    if ~data.isABC(3)
+                        C = zeros(n,n);
+                    end
+                    invB = inv(full(B));
+                    J    = pagemtimes(invB,DFDX-C);
+                end
+            end
+            Mss = J;
+            Mss(:,:,1) = eye (N);
+            for ii = 1 : pL1-1
+                Mss(:,:,ii+1) = expm( (J(:,:,ii)+J(:,:,ii+1))/2*dt1 )*Mss(:,:,ii);
+            end
+            M{ss} = Mss;
         end
-        M{ss} = Mss;
     end
     if d == 1
         Psi = M{1};
@@ -113,7 +169,7 @@ for iii = 1:NumOmi
         end
         M_H = exp(1i*varphi0_ll*HARM_B);
         Psi{1,iii} = real(M_H*M_fun);
-        Psi{2,iii} = Mdd;        
+        Psi{2,iii} = Mdd;
     end
 end
 end

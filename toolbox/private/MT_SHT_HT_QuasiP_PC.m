@@ -6,8 +6,8 @@ d     = data.ode_opts.d;
 e     = data.ode_opts.e;
 a     = data.pdim;
 %----------------------------------------------------------
-y1   = zeros(d-e,1);        % 未知基频的相位条件PC的残差
-Jx1  = zeros(d-e,NL);       % PC关于Xd的导数
+R1   = zeros(d-e,1);        % 未知基频的相位条件PC的残差
+Jy1  = zeros(d-e,NL);       % PC关于Xd的导数
 Jom1 = zeros(d-e,d);        % PC关于Om的导数
 Jp1  = zeros(d-e,a);        % PC关于p 的导数
 %----------------------------------------------------------
@@ -34,14 +34,14 @@ if d > e
                 dys1    = MT_SHT_dy(data,ys1,theta1,Om1,repmat(p,1,PHI.pS2d),N);
                 dys1(:,N/2+1:end) = dys1(:,N/2+1:end)/Om1;
             end
-            Jx1(ii,Loca0) = kron(eye(N),PHI.iGTiG)*reshape(dys1,[],1);
+            Jy1(ii,Loca0) = kron(eye(N),PHI.iGTiG)*reshape(dys1,[],1);
         else 
-            Jx1(ii,Loca0) = kron(eye(N),PHI.iGTXI1iG{kk})*reshape(ys1,[],1);
+            Jy1(ii,Loca0) = kron(eye(N),PHI.iGTXI1iG{kk})*reshape(ys1,[],1);
         end
         kk = kk+1;
     end
 end
 %==========================================================
-y = y1;
-J = [Jx1, Jom1, Jp1];
+y = R1;
+J = [Jy1, Jom1, Jp1];
 end

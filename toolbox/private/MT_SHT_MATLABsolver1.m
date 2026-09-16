@@ -61,7 +61,8 @@ if ~data.isL
     g        = data.f(x,p,theta);
     dgdy     = data.fx(x,p,theta);
     if e ~= 0
-        dgdth    = data.fth(x,p,theta);
+        dgdth    = zeros(N,d);
+        dgdth(:,1:e) = data.fth(x,p,theta);
     else
         dgdth    = zeros(N,d);
     end
@@ -74,7 +75,8 @@ else
         f        = data.f(x,p,theta);
         dfdx     = data.fx(x,p,theta);
         if e ~= 0
-            dfdth    = data.fth(x,p,theta);
+            dfdth    = zeros(N,d);
+            dfdth(:,1:e)    = data.fth(x,p,theta);
         else
             dfdth    = zeros(N,d);
         end
@@ -106,7 +108,8 @@ else
             dfdx     = data.fx(x,p,theta);
             dfddx    = zeros(N/2,N/2);
             if e ~= 0
-                dfdth    = data.fth(x,p,theta);
+                dfdth    = zeros(N/2,d);
+                dfdth(:,1:e)    = data.fth(x,p,theta);
             else
                 dfdth    = zeros(N/2,d);
             end
@@ -117,7 +120,8 @@ else
                 dfddx = zeros(N/2,N/2);
             end
             if e ~= 0
-                dfdth    = data.fth(x,dx,p,theta);
+                dfdth    = zeros(N/2,d);
+                dfdth(:,1:e)    = data.fth(x,dx,p,theta);
             else
                 dfdth    = zeros(N/2,d);
             end

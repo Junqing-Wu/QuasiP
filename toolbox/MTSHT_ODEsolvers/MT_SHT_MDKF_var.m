@@ -14,7 +14,8 @@ if data.isfwithu
         dfdv = zeros(n,n);
     end
     if e ~= 0
-        dfdth = data.fth(q,v,p,theta);
+        dfdth = zeros(n,d);
+        dfdth(:,1:e) = data.fth(q,v,p,theta);
     else
         dfdth = zeros(n,d);
     end
@@ -28,7 +29,8 @@ else
     dfdq = data.fx(q,p,theta);
     dfdv = zeros(n,n);
     if e ~= 0
-        dfdth = data.fth(q,p,theta);
+        dfdth = zeros(n,d);
+        dfdth(:,1:e) = data.fth(q,p,theta);
     else
         dfdth = zeros(n,d);
     end
