@@ -10,31 +10,14 @@ function prob = ode_construct_QuasiP(prob, tbid, data, sol)
 % PROB - Continuation problem structure.
 % TBID - Toolbox instance identifier.
 % DATA - Toolbox data structure.
-% SOL  - Initial solution guess.   
+% SOL  - Initial solution guess.
 %----------------------------------------------------------
-switch data.PHI.parametrization_tori
-    case{'MP'}
-        switch data.PHI.type
-            case{'mVCF'}
-                if data.PHI.isvar
-                    prob = coco_add_func(prob, tbid, @MP_mVCF_QuasiP, data, 'zero', 'u0', sol.u, 'F+dF');
-                else
-                    prob = coco_add_func(prob, tbid, @MP_mVCF_QuasiP, data, 'zero', 'u0', sol.u);                    
-                end
-            case{'sCCF'}
-        end
-    case{'MT'}
-        switch data.PHI.type
-            case{'DM'}
-
-            case{'SHT'}
-                if data.PHI.isvar
-                   prob = coco_add_func(prob, tbid, @MT_SHT_QuasiP, data, 'zero', 'u0', sol.u, 'F+dF');  
-                else
-                   prob = coco_add_func(prob, tbid, @MT_SHT_QuasiP, data, 'zero', 'u0', sol.u);  
-                end
-        end
+if data.PHI.isvar
+    prob = coco_add_func(prob, tbid, @QuasiP, data, 'zero', 'u0', sol.u, 'F+dF');
+else
+    prob = coco_add_func(prob, tbid, @QuasiP, data, 'zero', 'u0', sol.u);
 end
+%----------------------------------------------------------
 if data.ode_opts.d > data.ode_opts.e
     pcfid = coco_get_id(tbid, 'OPC');
     uidx   = coco_get_func_data(prob, tbid, 'uidx');
@@ -59,11 +42,12 @@ if data.ode_opts.d > data.ode_opts.e
     prob   = coco_add_pars(prob, uomfid, uidx(data.uOM_idx), data.uOMnames);
 end
 %----------------------------------------------------------
+if data.stable_opts.issta && data.ode_opts.d == 1
+    prob = QuasiP_d1_test(prob, tbid, data);
+end
+%----------------------------------------------------------
 prob     = coco_add_slot(prob, tbid, @coco_save_data, data, 'save_full');
 PostPtid = coco_get_id(tbid, 'PostP');
-prob     = coco_add_slot(prob, PostPtid, @PostP_forQP, data, 'bddat') ;
+prob     = coco_add_slot(prob, PostPtid, @PostP_Amp_Sta_bddat, data, 'bddat');
 %----------------------------------------------------------
 end
-
-
-

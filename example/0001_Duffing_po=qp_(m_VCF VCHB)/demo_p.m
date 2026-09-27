@@ -8,16 +8,16 @@ clearvars;
 close all;
 clc;
 % system parameters
-rho = [1];
+rho = 1;
 Om1 = 4;
 OM0 = rho*Om1;
 pname = {'zeta' 'gamma' 'f1'};
 p0 = [0.1;0.2;5];
 %----------------------------------------------------------
 % initial condition
-Fex1.location{1} = [1];
+Fex1.location{1} = 1;
 Fex1.amplitude{1} = -1i*p0(3);
-Fex1.location{2} = [50];
+Fex1.location{2} = 50;
 Fex1.amplitude{2} = -1i*p0(3);
 
 [~,~,A,B,C] = PDuffing1_L(p0);
@@ -73,8 +73,6 @@ plot(Om_mode1(A1), max_x1(A1), 'ko');
 xlabel('\omega_1');
 ylabel('max(x)');
 grid on;
-
-
 dd = 1;
 figure(3)
 plot(TX(:,dd),TU(:,dd))

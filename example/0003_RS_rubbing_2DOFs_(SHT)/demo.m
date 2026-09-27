@@ -82,31 +82,28 @@ par_opts = struct('parallel',true,'ncores',12);
 prob1 = coco_set(prob1,'cont','PtMX',3000);
 prob1 = coco_set(prob1,'corr','ItMX',50);
 prob1 = coco_set(prob1,'cont','NSV',1);
-prob1 = coco_set(prob1,'cont','h_min',.2,'h_max',1);
+prob1 = coco_set(prob1,'cont','h_min',.1,'h_max',1);
 
 prob1 = coco_set(prob1,'QuasiP','ode_opts',ode_opts,'amp_opts',amp_opts,'par_opts',par_opts); 
 PHI_INITIAL = struct( 'parametrization_tori', 'MT', ...
     'type',       'SHT'           , ...     
-    'method',     'MF' , ... % HT or MF
+    'method',     'HT' , ... % HT or MF
     'ODEsolver',  @ode45, ...
     'isvar'    ,  true, ...
     'Omt',        1, ...
     'M_SHT',      4, ...
     'Nsteps',     2^10,...   
-    'k',       { {9,9} }, ...        
+    'k',       { {7,7} }, ...        
     'P',       { {1,1} }, ...    
     'S',       { {2^6,2^6} }, ...
     'S_wave',  { {2^8,2^8} });
 prob1 = coco_set(prob1, 'QuasiP', 'PHI_INITIAL', PHI_INITIAL); 
 funcs = {@RS1_F, @RS1_DFDX, @RS1_DFDP, @RS1_L, @RS1_DFDTH};
-
-
 prob1 = ode_isol2QuasiP(prob1, '', funcs{:}, X_MF2, OM0, pname , p0);
 [data, uidx] = coco_get_func_data(prob1, 'QuasiP', 'data', 'uidx');
-prob1 = coco_add_glue(prob1,'OMp2',data.kOM_idx,data.p_idx(2));
+prob1 = coco_add_glue(prob1,'OMp2',uidx(data.kOM_idx),uidx(data.p_idx(2)));
 bd1 = coco(prob1, 'qp1', [], 1, { 'k_OM1' 'u_om2' 'OM' 'mu'}, [0.3 1]);
 close(11111)
-
 
 figure(1)
 OM1 = coco_bd_col(bd1,'k_OM1');
@@ -122,6 +119,8 @@ plot(OM1,max_x(:,1));
 xlabel('k_{OM1}');
 ylabel('max(x)');
 grid on;
+
+
 
 
 prob2 = coco_prob();

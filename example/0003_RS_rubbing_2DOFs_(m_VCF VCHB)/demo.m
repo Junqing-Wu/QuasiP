@@ -93,7 +93,7 @@ funcs = {@RS1_F, @RS1_DFDX, @RS1_DFDP, @RS1_L};
 prob1 = ode_isol2QuasiP(prob1, '', funcs{:}, X_MF2, OM0, pname , p0);
 [data, uidx] = coco_get_func_data(prob1, 'QuasiP', 'data', 'uidx');
 prob1 = coco_add_glue(prob1,'OMp2',data.kOM_idx,data.p_idx(2));
-bd1 = coco(prob1, 'qp1', [], 1, { 'k_OM1' 'u_om2' 'OM' 'mu'}, [0.3 1]);
+bd1 = coco(prob1, 'qp1', [], 1, { 'k_OM1' 'u_om2' 'OM' 'mu'}, [0.28 1]);
 close(11111)
 
 

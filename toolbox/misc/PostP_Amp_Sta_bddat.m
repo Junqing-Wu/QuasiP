@@ -1,4 +1,4 @@
-function [data, res] = PostP_forQP(prob, data, command, varargin)
+function [data, res] = PostP_Amp_Sta_bddat(prob, data, command, varargin)
 res = {};
 my_tbid = data.my_tbid;
 prefix_tbid = data.prefix;

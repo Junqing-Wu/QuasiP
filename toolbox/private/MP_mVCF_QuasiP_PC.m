@@ -16,9 +16,9 @@ if d>e
     kk = e+1;
     for ii = 1:d-e
         if data.ODE == 1
-            JXd1(ii,:) = transpose(Xd)*transpose(PHI.Lam1{pos(kk)});
+            JXd1(ii,:) = 1e5* transpose(Xd)*transpose(PHI.Lam1{pos(kk)});
         else
-            JXd1(ii,:) = transpose(Xd)*...
+            JXd1(ii,:) = 1e5* transpose(Xd)*...
                         ( transpose(PHI.Lam1{pos(kk)}) + ...
                           transpose(PHI.Lam2{pos(kk)})*PHI.Lam1{pos(kk)} );
         end
