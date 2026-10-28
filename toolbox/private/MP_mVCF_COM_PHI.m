@@ -57,7 +57,7 @@ for ii = 1:d
     Si   = PHI.S{OmOd(ii)};
     wSi  = PHI.S_wave{OmOd(ii)};
 
-    switch PHI.method{OmOd(ii)}
+    switch PHI.type{OmOd(ii)}
         case{'HB'}
             [xi1{ii},xi2{ii},Gam0{ii},iGam0{ii},...
                 wGam0{ii},U_omod{ii},pS_omod{ii},pwS_omod{ii}] = MP_mVCF_ShapeF_HB(ki,pii,Si,wSi);
@@ -85,7 +85,7 @@ for ii = 1:d
     end
     XI0 = sparse( kron(XI0,xi0{ii}) );
 
-    me_omod{ii} = PHI.method{OmOd(ii)};
+    me_omod{ii} = PHI.type{OmOd(ii)};
     k_omod{ii}  = ki;
     S_omod{ii}  = Si;
     P_omod{ii}  = pii;

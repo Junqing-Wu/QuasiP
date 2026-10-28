@@ -37,7 +37,7 @@ if d == 1
     PHI.U        = 1;
     PHI.pS2d     = 1;
     PHI.Varphi2d = [];
-    PHI.method   = 'HT';   % d = 1 默认为时域SHT
+    PHI.type     = 'HT';   % d = 1 默认为时域SHT
 else
     %---------------------------------------------------------------------
     PHI.kQ                     = Com_kQ(knot,Pnot,d);
@@ -102,7 +102,7 @@ Varphi(:,PHI.Omnot) = kron(ones(PHI.M_SHT,1),PHI.Varphi2d);
 PHI.Varphi          = Varphi;             % 单轨迹初始值
 PHI.L_HT            = PHI.M_SHT*PHI.pS2d; % 单个x需要的未知数个数 （超时域）
 PHI.L_MF            = PHI.M_SHT*PHI.U;    % 单个x需要的未知数个数 （多频域）
-switch PHI.method
+switch PHI.type
     case 'HT'
         PHI.L = PHI.L_HT;
     case 'MF'

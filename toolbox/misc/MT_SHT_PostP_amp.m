@@ -124,9 +124,9 @@ MF_f = [kom/Om(1),kom,k];
 [T_x, T_u, tspan] = deal([]);
 %-------------------------------------------------------------------------
 if d~=1 && data.amp_opts.Nperiod~=0
-    T1 = 2*pi/Om(Omt);
+    T1 = 2*pi/Om(data.amp_opts.Omt);
     dt = T1/data.amp_opts.Nsampling;
-    t  = 0:dt:data.amp_opts.Nperiod*T1;
+    t  = data.amp_opts.t0_per*T1:dt:(data.amp_opts.t0_per+data.amp_opts.Nperiod)*T1;
     theta = (Om*t)';
     qt_GAM = exp(1i*theta*k');
     T_x = real(qt_GAM*MF_x);

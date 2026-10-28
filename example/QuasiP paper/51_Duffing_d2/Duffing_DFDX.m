@@ -1,12 +1,9 @@
-function DFDP = Duffing1_DFDP(x,p,theta)
+function DFDX = Duffing_DFDX(x,p,theta)
 %----------------------------------------------------------
 x1 = x(1,:);
 %----------------------------------------------------------
-theta1 = theta(1,:);
-theta2 = theta(2,:);
+gama = 0.2;
 %----------------------------------------------------------
-DFDP = zeros(1,4,length(x1));
-DFDP(1,2,:) = -x1.^3;
-DFDP(1,3,:) = cos(theta1);
-DFDP(1,4,:) = cos(theta2);
+DFDX = zeros(1,1,length(x1));
+DFDX(1,1,:)   = -3*gama.*x1.^2;
 end

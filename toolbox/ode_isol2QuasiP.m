@@ -60,9 +60,9 @@ if data.stable_opts.issta
     assert(~(data.ODE == 1 && data.isfwithu), ...
         'Cannot determine the stability of dx = f(x,dx)');
 end
-switch data.PHI.parametrization_tori
+switch data.PHI.param
     case 'MT'
-        switch data.PHI.type
+        switch data.PHI.method
             case 'SHT'
                 if data.ode_opts.e > 0
                 assert(~isempty(data.fth), ...

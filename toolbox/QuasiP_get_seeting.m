@@ -25,8 +25,10 @@ amp_opts.isamp       = false;         % Enable or disable amplitude calculation
 amp_opts.isuamp      = false;       
 amp_opts.isht        = false;
 amp_opts.outdof      = 1;             % DOFs for output (all or specific indices)
-amp_opts.Nperiod     = 1;             % Number of periods for time domain: [0,Nperiod*T1]
-amp_opts.Nsampling   = 2^8;           % Number of sampling points within [0,T1)
+amp_opts.Nperiod     = 1;             % Number of periods for time domain: [0,Nperiod*Ti]
+amp_opts.Nsampling   = 2^8;           % Number of sampling points within [0,Ti)
+amp_opts.Omt         = 1;             % The i of period Ti
+amp_opts.t0_per      = 0;             % t0 = t0_per*Ti
 defaults.amp_opts    = amp_opts;      % Store amplitude options in default configuration
 %--------------------------------------------------------------------------------------------------------------------
 stable_opts.issta    = false;         % Enable or disable stability analysis
@@ -43,15 +45,15 @@ assert(~isempty(copts.ode_opts.n),'%s: The ode_opts is not defined');
 data.ode_opts = copts.ode_opts;
 %--------------------------------------------------------------------------------------------------------------------
 if ~isfield(copts, 'PHI_INITIAL') % defaults.method: VCHB
-    methods = repmat({'HB'}, 1, data.ode_opts.d);
+    types = repmat({'HB'}, 1, data.ode_opts.d);
     k = repmat({5}    , 1, data.ode_opts.d);
     P = repmat({1}    , 1, data.ode_opts.d);
     S = repmat({2^5}  , 1, data.ode_opts.d);
     S_w = repmat({2^8}, 1, data.ode_opts.d);
     OmOd = 1:data.ode_opts.d;
-    copts.PHI_INITIAL = struct( 'parametrization_tori', 'MP', ...
-        'type',    'mVCF'           , ...
-        'method',  { methods   }, ...
+    copts.PHI_INITIAL = struct( 'param', 'MP', ...
+        'method',  'mVCF'           , ...
+        'type',    { types   }, ...
         'k',       { k    }, ...
         'P',       { P    }, ...
         'S',       { S    }, ...
@@ -78,7 +80,7 @@ data.amp_opts   =  copts.amp_opts;
 %--------------------------------------------------------------------------------------------------------------------
 if copts.stable_opts.issta
     copts.stable_opts = fill_stable_TAU_data(copts.stable_opts, data.PHI, data.ode_opts);
-    if prod(copts.stable_opts.pS{1}) >1 && ~copts.par_opts.parallel && strcmp(PHI.parametrization_tori, 'MP')
+    if prod(copts.stable_opts.pS{1}) >1 && ~copts.par_opts.parallel && strcmp(PHI.param, 'MP')
        copts.par_opts.parallel = true;
     end
 end

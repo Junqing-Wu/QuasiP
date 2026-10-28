@@ -20,8 +20,8 @@ else
     Omii = u(data.OM_idx);
     pii  = u(data.p_idx);
     data_eval = data;
-    if strcmp(data.PHI.parametrization_tori, 'MT') && ...
-            strcmp(data.PHI.type, 'SHT')
+    if strcmp(data.PHI.param, 'MT') && ...
+            strcmp(data.PHI.method, 'SHT')
         [data_eval, ~, ~] = MT_SHT_QuasiP(prob, data_eval, u);
     end
     Amp = PostP_amp(data_eval, Cii, Omii, 1:data.ode_opts.n, false);
@@ -51,6 +51,9 @@ cdata.test      = y;
 cdata.nunstable = sum(abs(la) > 1);
 chart = coco_set_chart_data(chart, data.tfid, cdata);
 end
+%-----------------------------------------------------------------------------
+%-----------------------------------------------------------------------------
+%-----------------------------------------------------------------------------
 function [data, cseg, msg] = QuasiP_d1_evhan_TR(prob, data, cseg, cmd, msg) 
 % QUASIP_D1_EVHAN_TR  Keep unit-circle crossings of a multiplier pair.
 switch cmd

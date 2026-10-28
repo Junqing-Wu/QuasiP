@@ -43,25 +43,25 @@ X_final  = X(loc_final,:);
 X_MF1 = solve_HOrder(X_final,ff_final,rho,[5,5],[2,2]);
 X_MF2 = X_MF1(:,1:end-1);
 %----------------------------------------------------------
-% figure(1)
-% plot(ff/(OM0(1)),log(abs(X(:,1))))
-% xlabel('normalized f')
-% ylabel('log(abs(X))')
-% xlim([0,4])
-% k_h = X_MF1(:,1:2)';
-% Q   = X_MF1(:,1+2:end);
-% theta = (OM0*t)';
-% H_IDF = exp(1i*theta*k_h);
-% xx = real(H_IDF*Q);
-% figure(2)
-% plot(x(:,1),x(:,2),'c--')
-% hold on
-% plot(x(1:S_period:end,1),x(1:S_period:end,2),'ro')
-% % plot(x(1:2*S_period:end,1),x(1:2*S_period:end,2),'ro')
-% % plot(xx(:,1),xx(:,2),'--')
-% xlabel('x')
-% ylabel('dx')
-% % legend('TI','TI-FFT')
+figure(1)
+plot(ff/(OM0(1)),log(abs(X(:,1))))
+xlabel('normalized f')
+ylabel('log(abs(X))')
+xlim([0,4])
+k_h = X_MF1(:,1:2)';
+Q   = X_MF1(:,1+2:end);
+theta = (OM0*t)';
+H_IDF = exp(1i*theta*k_h);
+xx = real(H_IDF*Q);
+figure(2)
+plot(x(:,1),x(:,2),'c--')
+hold on
+plot(x(1:S_period:end,1),x(1:S_period:end,2),'ro')
+% plot(x(1:2*S_period:end,1),x(1:2*S_period:end,2),'ro')
+% plot(xx(:,1),xx(:,2),'--')
+xlabel('x')
+ylabel('dx')
+% legend('TI','TI-FFT')
 %----------------------------------------------------------
 
 %% ====================== 任务 1 ======================
@@ -74,9 +74,9 @@ prob1 = coco_set(prob1,'corr','ItMX',50);
 prob1 = coco_set(prob1,'cont','h_min',0.001,'h_max',0.5);
 stable_opts = struct('issta',true,'S',2^6,'L',2^8,'N_Ly',2000,'Omi',[1,2]);
 prob1 = coco_set(prob1,'QuasiP','ode_opts',ode_opts,'amp_opts',amp_opts,'stable_opts',stable_opts); 
-PHI_INITIAL = struct( 'parametrization_tori', 'MP', ...
-    'type',    'mVCF'           , ...     
-    'method',  { {'HB','HB'} }, ...   
+PHI_INITIAL = struct( 'param', 'MP', ...
+    'method',   'mVCF'           , ...     
+    'type',    { {'HB','HB'} }, ...  
     'k',       { {7,7} }, ...        
     'P',       { {2,2} }, ...    
     'S',       { {2^5,2^5} }, ...

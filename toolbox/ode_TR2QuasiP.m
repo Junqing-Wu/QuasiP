@@ -64,6 +64,39 @@ else
     y_po = x_po;
 end
 [X_MF0,OM0]  = PO_TR2QP_d2(Psi,Om1,data.PHI.P{1},eps,y_po);
+
+% %-----------------------
+% figure(1)
+% plot3([y_po(:,1);y_po(1,1)],[y_po(:,4);y_po(1,4)],[y_po(:,2);y_po(1,2)],'k--','LineWidth',1.5)
+% hold on
+% [X_MF0,OM0,y_qp]  = PO_TR2QP_d2(Psi,Om1,data.PHI.P{1},0.05,y_po);
+% y_qp = reshape(y_qp,256,256,[]);
+% y_qp = y_qp(1:8:end,1:8:end,:);
+% y_qp = reshape(y_qp,32*32,[]);
+% plot3(y_qp(:,1),y_qp(:,4),y_qp(:,2),'g.')
+% 
+% [X_MF0,OM0,y_qp]  = PO_TR2QP_d2(Psi,Om1,data.PHI.P{1},0.1,y_po);
+% y_qp = reshape(y_qp,256,256,[]);
+% y_qp = y_qp(1:8:end,1:8:end,:);
+% y_qp = reshape(y_qp,32*32,[]);
+% plot3(y_qp(:,1),y_qp(:,4),y_qp(:,2),'r.')
+% 
+% [X_MF0,OM0,y_qp]  = PO_TR2QP_d2(Psi,Om1,data.PHI.P{1},0.2,y_po);
+% y_qp = reshape(y_qp,256,256,[]);
+% y_qp = y_qp(1:8:end,1:8:end,:);
+% y_qp = reshape(y_qp,32*32,[]);
+% plot3(y_qp(:,1),y_qp(:,4),y_qp(:,2),'b.')
+% 
+% xlabel('$q_1$','Interpreter','latex');
+% ylabel('$\dot{q}_1$','Interpreter','latex');
+% zlabel('$q_2$','Interpreter','latex');
+% legend('PO-unstable','QP-$\varepsilon=0.05$','QP-$\varepsilon=0.10$','QP-$\varepsilon=0.20$','Location','best');
+% grid on;
+% plot_setting_paper()
+% set(findall(gcf,'type','line'),'linewidth',3)
+% legend boxon;
+% %---------------------------------------
+
 if data.ODE == 2
    X_MF0 = X_MF0(:,1:end-data.ode_opts.n);
 end
@@ -81,9 +114,6 @@ prob      = ode_isol2QuasiP(prob, oid, funcs{:}, X_MF0, OM0, pname, p0);
 end
 
 
-
-
-
 function TRbd = get_TRbd(args)
 bd   = coco_bd_read(args.run);
 lab  = coco_bd_col(bd, 'LAB');
@@ -97,7 +127,7 @@ assert(strcmp(type{1},'TR'), ...
   'get_TRbd: run=%s, LAB=%d, TYPE = %s, must be TR', args.run{1}, args.lab, type{1});
 end
 
-function [X_MF,OM]  = PO_TR2QP_d2(Psi,Om1,P1,eps,y_po)
+function [X_MF,OM,y_qp]  = PO_TR2QP_d2(Psi,Om1,P1,eps,y_po)
 [N,L] = size(Psi,1,3);
 S     = size(y_po,1);
 m     = S/(L-1);
@@ -137,9 +167,7 @@ else
 end
 end
 
-
 function X_MF = QP2X_MF(y_qp,Y,P1)
-
 k1 = 1:1/P1:7;
 k = {k1,1};
 N = {numel(k1),1};
@@ -174,7 +202,6 @@ A = A_ii(idx);
 
 X_MF = X_MF(A,:);
 end
-
 
 function kQ = Com_kQ(k,N)
 kQ = [0,k{1}];

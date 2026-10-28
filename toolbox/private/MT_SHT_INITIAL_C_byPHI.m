@@ -43,7 +43,7 @@ else
     Qs   = PHI.iGam*qs;
     Vs   = PHI.iGam*vs;
     Us   = PHI.iGam*us;
-    switch PHI.method
+    switch PHI.type
         case 'HT'
             if data.ODE == 1
                 C = reshape(qs,[],1);

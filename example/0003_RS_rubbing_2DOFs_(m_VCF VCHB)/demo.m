@@ -74,52 +74,52 @@ OM0 = rho*Om1;
 % legend('TI','TI-FFT')
 
 
-prob1 = coco_prob();
-ode_opts = struct('n',2, 'd',2, 'e',1, 'isfwithu',true);
-amp_opts = struct('isamp',true,'outdof',[1 2],'Nperiod',1,'Nsampling',2^8);
-prob1 = coco_set(prob1,'cont','PtMX',3000);
-prob1 = coco_set(prob1,'QuasiP','ode_opts',ode_opts,'amp_opts',amp_opts); 
-PHI_INITIAL = struct( 'parametrization_tori', 'MP', ...
-    'type',    'mVCF'           , ...     
-    'method',  { {'HB','HB'} }, ...   
-    'k',       { {7,7} }, ...        
-    'P',       { {1,1} }, ...    
-    'S',       { {2^8,2^8} }, ...
-    'S_wave',  { {2^8,2^8} }, ...
-    'OmOd',    [2,1]);
-prob1 = coco_set(prob1, 'QuasiP', 'PHI_INITIAL', PHI_INITIAL); 
-funcs = {@RS1_F, @RS1_DFDX, @RS1_DFDP, @RS1_L};
-
-prob1 = ode_isol2QuasiP(prob1, '', funcs{:}, X_MF2, OM0, pname , p0);
-[data, uidx] = coco_get_func_data(prob1, 'QuasiP', 'data', 'uidx');
-prob1 = coco_add_glue(prob1,'OMp2',data.kOM_idx,data.p_idx(2));
-bd1 = coco(prob1, 'qp1', [], 1, { 'k_OM1' 'u_om2' 'OM' 'mu'}, [0.28 1]);
-close(11111)
-
-
-figure(1)
-OM1 = coco_bd_col(bd1,'k_OM1');
-om2 = coco_bd_col(bd1,'u_om2');
-plot(OM1,om2);
-xlabel('k_{OM1}');
-ylabel('\omega_2');
-grid on;
-
-max_x = coco_bd_col(bd1, 'Max_x');
-figure(2)
-plot(OM1,max_x(:,1));
-xlabel('k_{OM1}');
-ylabel('max(x)');
-grid on;
+% prob1 = coco_prob();
+% ode_opts = struct('n',2, 'd',2, 'e',1, 'isfwithu',true);
+% amp_opts = struct('isamp',true,'outdof',[1 2],'Nperiod',1,'Nsampling',2^8);
+% prob1 = coco_set(prob1,'cont','PtMX',3000);
+% prob1 = coco_set(prob1,'QuasiP','ode_opts',ode_opts,'amp_opts',amp_opts); 
+% PHI_INITIAL = struct( 'param', 'MP', ...
+%     'method',   'mVCF'           , ...     
+%     'type',    { {'HB','HB'} }, ...   
+%     'k',       { {7,7} }, ...        
+%     'P',       { {1,1} }, ...    
+%     'S',       { {2^8,2^8} }, ...
+%     'S_wave',  { {2^8,2^8} }, ...
+%     'OmOd',    [2,1]);
+% prob1 = coco_set(prob1, 'QuasiP', 'PHI_INITIAL', PHI_INITIAL); 
+% funcs = {@RS1_F, @RS1_DFDX, @RS1_DFDP, @RS1_L};
+% 
+% prob1 = ode_isol2QuasiP(prob1, '', funcs{:}, X_MF2, OM0, pname , p0);
+% [data, uidx] = coco_get_func_data(prob1, 'QuasiP', 'data', 'uidx');
+% prob1 = coco_add_glue(prob1,'OMp2',data.kOM_idx,data.p_idx(2));
+% bd1 = coco(prob1, 'qp1', [], 1, { 'k_OM1' 'u_om2' 'OM' 'mu'}, [0.3 1]);
+% close(11111)
+% 
+% 
+% figure(1)
+% OM1 = coco_bd_col(bd1,'k_OM1');
+% om2 = coco_bd_col(bd1,'u_om2');
+% plot(OM1,om2);
+% xlabel('k_{OM1}');
+% ylabel('\omega_2');
+% grid on;
+% 
+% max_x = coco_bd_col(bd1, 'Max_x');
+% figure(2)
+% plot(OM1,max_x(:,1));
+% xlabel('k_{OM1}');
+% ylabel('max(x)');
+% grid on;
 
 
 prob2 = coco_prob();
 ode_opts = struct('n',4, 'd',2, 'e',1, 'isfwithu',false);
 prob2 = coco_set(prob2,'cont','PtMX',10000);
 prob2 = coco_set(prob2,'QuasiP','ode_opts',ode_opts); 
-PHI_INITIAL = struct( 'parametrization_tori', 'MP', ...
-    'type',    'mVCF'           , ...     
-    'method',  { {'HB','HB'} }, ...   
+PHI_INITIAL = struct( 'param', 'MP', ...
+    'method',   'mVCF'           , ...     
+    'type',    { {'HB','HB'} }, ...     
     'k',       { {7,7} }, ...        
     'P',       { {1,1} }, ...    
     'S',       { {2^8,2^8} }, ...

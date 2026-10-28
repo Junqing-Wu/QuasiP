@@ -1,13 +1,13 @@
 function [data, y, J] = QuasiP(prob, data, u)
-switch data.PHI.parametrization_tori
+switch data.PHI.param
     case{'MP'}
-        switch data.PHI.type
+        switch data.PHI.method
             case{'mVCF'}
                 [data, y, J] = MP_mVCF_QuasiP(prob, data, u);
             case{'sCCF'}
         end
     case{'MT'}
-        switch data.PHI.type
+        switch data.PHI.method
             case{'DM'}
 
             case{'SHT'}

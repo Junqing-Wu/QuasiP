@@ -11,7 +11,7 @@ M_SHT  = PHI.M_SHT;                 % 单轨迹 积分段数
 a      = data.pdim;                 % continuation paramaters [p] 的数量
 Omt    = PHI.Omt;                   % 积分的基频方向，记作phi_1 = Om(Omt)*t, 周期[0,2P(Omt)pi)
 %----------------------------------------------------------
-switch PHI.method
+switch PHI.type
     case 'HT'  % SHT_HT  超时域打靶法 
                % d==1时，只能是SHT_HT
         ys  = reshape(u(1:NL),[],N);
@@ -106,7 +106,7 @@ end
 %==========================================================
 %>>>>>>>>>>>>>>>>>>>>>>>>> BC <<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 %==========================================================
-switch PHI.method
+switch PHI.type
     case 'HT'
         [y,J] = MT_SHT_HT_QuasiP(data,PSI,ys,Om);
     case 'MF'

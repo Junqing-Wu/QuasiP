@@ -1,15 +1,15 @@
 function C = INITIAL_C_byPHI(data,X_MF,OM)
 PHI = data.PHI;
-switch PHI.parametrization_tori
+switch PHI.param
   case{'MP'} 
-      switch PHI.type
+      switch PHI.method
           case{'mVCF'}
                C = MP_mVCF_INITIAL_C_byPHI(data,X_MF);
           case{'sCCF'}
                C = MP_sCCF_INITIAL_C_byPHI(data,X_MF,OM);     
       end
   case{'MT'} 
-      switch PHI.type
+      switch PHI.method
           case{'DM'}
                C = MT_DM_INITIAL_C_byPHI(data,X_MF,OM);
           case{'SHT'}

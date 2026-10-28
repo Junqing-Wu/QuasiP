@@ -1,10 +1,10 @@
 function Sta = PostP_sta(data,Omii,pii,Amp)
 
-switch data.PHI.parametrization_tori
+switch data.PHI.param
     case{'MP'}
         Psi = MP_PostP_sta_Psi(data,Omii,pii,Amp);
     case{'MT'}
-        switch data.PHI.type
+        switch data.PHI.method
             case{'DM'}
             case{'SHT'}
                 Psi = MT_SHT_PostP_sta_Psi(data,Omii,pii,Amp);
