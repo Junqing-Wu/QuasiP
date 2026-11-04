@@ -116,7 +116,7 @@ end
 if data.amp_opts.isamp && max(abs(y))<1e-5 
         data.phi_y_dy  = phi_y_dy;
 end
-if data.stable_opts.issta && PHI.isvar && max(abs(y))<1e-5
+if data.sta_opts.issta && PHI.isvar && max(abs(y))<1e-5
     data.ye_ys = PSI(:,N+1:N+N^2);
 end
 end

@@ -70,11 +70,11 @@ legend('TI','TI-FFT')
 prob1 = coco_prob();
 ode_opts    = struct('n',1, 'd',1, 'e',1, 'isfwithu',false);
 amp_opts    = struct('isamp',true,'isuamp',true,'isht',false,'outdof',1,'Nperiod',1,'Nsampling',2^8);
-stable_opts = struct('issta',true,'S',2^5,'L',2^8,'N_Ly',1000,'Omi',1);
+sta_opts = struct('issta',true,'S',2^5,'L',2^8,'N_Ly',1000,'Omt',1);
 prob1 = coco_set(prob1,'cont','PtMX',1000);
 prob1 = coco_set(prob1,'cont','NSV',10);
 prob1 = coco_set(prob1,'cont','h_min',0.001,'h_max',0.1);
-prob1 = coco_set(prob1,'QuasiP','ode_opts',ode_opts,'amp_opts',amp_opts,'stable_opts',stable_opts); 
+prob1 = coco_set(prob1,'QuasiP','ode_opts',ode_opts,'amp_opts',amp_opts,'sta_opts',sta_opts); 
 PHI_INITIAL = struct( 'param', 'MP', ...
     'method',  'mVCF'           , ...     
     'type',    { {'HB'} }, ...   

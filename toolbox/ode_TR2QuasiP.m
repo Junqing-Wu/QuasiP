@@ -133,7 +133,7 @@ S     = size(y_po,1);
 m     = S/(L-1);
 mm    = (L-1)/S;
 assert(mod(m,1)==0 || mod(mm,1)==0, ...
-    'the ratio of S_wave in PHI and L in stable_opts is not an integer.');
+    'the ratio of S_wave in PHI and L in sta_opts is not an integer.');
 M = Psi(:,:,end);
 [vector,value] = eig(M);
 value  = diag(value);

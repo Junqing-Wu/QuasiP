@@ -42,7 +42,7 @@ if data.ode_opts.d > data.ode_opts.e
     prob   = coco_add_pars(prob, uomfid, uidx(data.uOM_idx), data.uOMnames);
 end
 %----------------------------------------------------------
-if data.stable_opts.issta && data.ode_opts.d == 1
+if data.sta_opts.issta && data.ode_opts.d == 1
     prob = QuasiP_d1_test(prob, tbid, data);
 end
 %----------------------------------------------------------

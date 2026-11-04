@@ -56,7 +56,7 @@ pnames   = args.pnames;
 data = QuasiP_pnames_update(tbid, data, pnames);
 data = QuasiP_system_identify(data,p0);
 %----------------------------------------------------------
-if data.stable_opts.issta
+if data.sta_opts.issta
     assert(~(data.ODE == 1 && data.isfwithu), ...
         'Cannot determine the stability of dx = f(x,dx)');
 end

@@ -3,7 +3,7 @@ n        = data.ode_opts.n;
 d        = data.ode_opts.d;
 ODE      = data.ODE;
 P        = cell2mat(data.PHI.P);
-Omi      = data.stable_opts.Omi;
+Omi      = data.sta_opts.Omt;
 NumOmi   = numel(Omi);
 Psi      = cell(2,NumOmi);
 if ODE == 2
@@ -16,18 +16,18 @@ isfwithu = data.isfwithu;
 for iii = 1:NumOmi
     Om_t     = Omi(iii);
     Om_not   = [Om_t+1:data.ode_opts.d,1:Om_t-1];
-    pS       = data.stable_opts.pS{iii};
+    pS       = data.sta_opts.pS{iii};
     if d == 2
         pS = [pS,1];
     end
     pS_prod  = prod(pS);
-    pL1      = data.stable_opts.pL1{iii};
-    L        = data.stable_opts.L;
+    pL1      = data.sta_opts.pL1{iii};
+    L        = data.sta_opts.L;
     vp       = repmat(p,1,pL1);
     dt1      = 2*pi/(L*Om(Om_t));
-    N_Ly     = data.stable_opts.N_Ly;
+    N_Ly     = data.sta_opts.N_Ly;
     %--------------------------------------------------------------------------
-    varphi = data.stable_opts.TAU{iii};
+    varphi = data.sta_opts.TAU{iii};
     rho    = Om/Om(Om_t);
     if d > 1
         varphi(:,Om_not) = varphi(:,Om_not) + varphi(:,Om_t)*rho(Om_not)';
@@ -146,7 +146,7 @@ for iii = 1:NumOmi
     if d == 1
         Psi = M{1};
     else
-        HARM     = data.stable_opts.Harm{iii};
+        HARM     = data.sta_opts.Harm{iii};
         Mdd = cell2mat(cellfun(@(x) reshape(x(:,:,end),1,[]), M, 'UniformOutput',false));
         B = [];
         M_fun = zeros(pS_prod,N^2);

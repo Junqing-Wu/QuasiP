@@ -73,8 +73,8 @@ prob1 = coco_set(prob1,'cont','PtMX',1000);
 % prob1 = coco_set(prob1,'cont','NSV',1);
 prob1 = coco_set(prob1,'corr','ItMX',50);
 prob1 = coco_set(prob1,'cont','h_min',0.001,'h_max',0.5);
-stable_opts = struct('issta',true,'S',2^6,'L',2^8,'N_Ly',2000,'Omi',[1,2]);
-prob1 = coco_set(prob1,'QuasiP','ode_opts',ode_opts,'amp_opts',amp_opts,'stable_opts',stable_opts); 
+sta_opts = struct('issta',true,'S',2^6,'L',2^8,'N_Ly',2000,'Omt',[1,2]);
+prob1 = coco_set(prob1,'QuasiP','ode_opts',ode_opts,'amp_opts',amp_opts,'sta_opts',sta_opts); 
 PHI_INITIAL = struct( 'param', 'MP', ...
     'method',   'mVCF'           , ...     
     'type',    { {'HB','HB'} }, ...    

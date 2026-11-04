@@ -31,12 +31,12 @@ amp_opts.Omt         = 1;             % The i of period Ti
 amp_opts.t0_per      = 0;             % t0 = t0_per*Ti
 defaults.amp_opts    = amp_opts;      % Store amplitude options in default configuration
 %--------------------------------------------------------------------------------------------------------------------
-stable_opts.issta    = false;         % Enable or disable stability analysis
-stable_opts.Omi      = 1;
-stable_opts.S        = 2^5;           % Number of trajectories along a single hyper-time direction
-stable_opts.L        = 2^8;           % Number of sampling points for integration
-stable_opts.N_Ly     = 1000;          % Iterations for Lyapunov exponents (when d > 1)
-defaults.stable_opts = stable_opts;   % Store stability analysis options in default configuration
+sta_opts.issta       = false;         % Enable or disable stability analysis
+sta_opts.Omt         = 1;
+sta_opts.S           = 2^5;           % Number of trajectories along a single hyper-time direction
+sta_opts.L           = 2^8;           % Number of sampling points for integration
+sta_opts.N_Ly        = 1000;          % Iterations for Lyapunov exponents (when d > 1)
+defaults.sta_opts    = sta_opts;      % Store stability analysis options in default configuration
 %--------------------------------------------------------------------------------------------------------------------
 copts = coco_get(prob, tbid);
 copts = coco_merge(defaults, copts);
@@ -74,17 +74,17 @@ if copts.amp_opts.isamp
         copts.amp_opts.isht = true;
     end
 else
-    copts.stable_opts.issta = false;
+    copts.sta_opts.issta = false;
 end
 data.amp_opts   =  copts.amp_opts;
 %--------------------------------------------------------------------------------------------------------------------
-if copts.stable_opts.issta
-    copts.stable_opts = fill_stable_TAU_data(copts.stable_opts, data.PHI, data.ode_opts);
-    if prod(copts.stable_opts.pS{1}) >1 && ~copts.par_opts.parallel && strcmp(PHI.param, 'MP')
+if copts.sta_opts.issta
+    copts.sta_opts = fill_stable_TAU_data(copts.sta_opts, data.PHI, data.ode_opts);
+    if prod(copts.sta_opts.pS{1}) >1 && ~copts.par_opts.parallel && strcmp(PHI.param, 'MP')
        copts.par_opts.parallel = true;
     end
 end
-data.stable_opts  = copts.stable_opts;
+data.sta_opts  = copts.sta_opts;
 %--------------------------------------------------------------------------------------------------------------------
 if copts.par_opts.parallel
     % activate parallel computing
@@ -96,11 +96,11 @@ end
 %====================================================================================================================
 %====================================================================================================================
 %====================================================================================================================
-function stable_opts = fill_stable_TAU_data(stable_opts, PHI, ode_opts)
-S        = stable_opts.S;
-L        = stable_opts.L;
+function sta_opts = fill_stable_TAU_data(sta_opts, PHI, ode_opts)
+S        = sta_opts.S;
+L        = sta_opts.L;
 period   = cell2mat(PHI.P);
-Omi      = stable_opts.Omi;
+Omi      = sta_opts.Omt;
 d        = ode_opts.d;
 assert(length(unique(Omi)) == length(Omi) && all(Omi <= d), ...
    '%s: The OmiforStab is not defined');
@@ -144,10 +144,10 @@ for ii = 1:Num_Omi
         pS{ii}   = [];
     end
 end
-stable_opts.TAU  = TAU;
-stable_opts.pL1  = pL1;
-stable_opts.Harm = Harm;
-stable_opts.pS   = pS;
+sta_opts.TAU  = TAU;
+sta_opts.pL1  = pL1;
+sta_opts.Harm = Harm;
+sta_opts.pS   = pS;
 end
 %====================================================================================================================
 %====================================================================================================================

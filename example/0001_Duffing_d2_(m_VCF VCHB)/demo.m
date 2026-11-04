@@ -79,11 +79,11 @@ X_MF2 = X_MF1(:,1:end-1);
 prob1 = coco_prob();
 ode_opts    = struct('n',1, 'd',2, 'e',2, 'isfwithu',false);
 prob1 = coco_set(prob1,'QuasiP','ode_opts',ode_opts);
-prob1 = coco_set(prob1,'cont','PtMX',2);
+prob1 = coco_set(prob1,'cont','PtMX',2000);
 
-amp_opts    = struct('isamp',true,'isuamp',true,'isht',true,'outdof',1,'Nperiod',1,'Nsampling',2^8);
-stable_opts = struct('issta',true,'S',2^5,'L',2^8,'N_Ly',500,'Omi',[1,2]);
-prob1 = coco_set(prob1,'QuasiP','amp_opts',amp_opts,'stable_opts',stable_opts); 
+amp_opts = struct('isamp',true,'isuamp',true,'isht',true,'outdof',1,'Nperiod',1,'Nsampling',2^8);
+sta_opts = struct('issta',true,'S',2^5,'L',2^8,'N_Ly',500,'Omt',[1,2]);
+prob1 = coco_set(prob1,'QuasiP','amp_opts',amp_opts,'sta_opts',sta_opts); 
 PHI_INITIAL = struct( 'param', 'MP', ...
     'method',    'mVCF'         , ...  
     'isvar'    ,true          , ...
@@ -147,10 +147,10 @@ grid on;
 %% ====================== 任务 2 ======================
 prob2 = coco_prob();
 ode_opts = struct('n',2, 'd',2, 'e',2, 'isfwithu',false);
-amp_opts    = struct('isamp',true,'isuamp',true,'isht',true,'outdof',1,'Nperiod',1,'Nsampling',2^8);
-stable_opts = struct('issta',true,'S',2^6,'L',2^8,'N_Ly',500,'Omi',[1,2]);
-prob2 = coco_set(prob2,'cont','PtMX',2);
-prob2 = coco_set(prob2,'QuasiP','ode_opts',ode_opts,'amp_opts',amp_opts,'stable_opts',stable_opts); 
+amp_opts = struct('isamp',true,'isuamp',true,'isht',true,'outdof',1,'Nperiod',1,'Nsampling',2^8);
+sta_opts = struct('issta',true,'S',2^6,'L',2^8,'N_Ly',500,'Omt',[1,2]);
+prob2 = coco_set(prob2,'cont','PtMX',2000);
+prob2 = coco_set(prob2,'QuasiP','ode_opts',ode_opts,'amp_opts',amp_opts,'sta_opts',sta_opts); 
 PHI_INITIAL = struct( 'param', 'MP', ...
     'method',  'mVCF'           , ...     
     'type',    { {'HB','HB'} }, ...   
@@ -186,10 +186,10 @@ grid on;
 %% ====================== 任务 3 ======================
 prob3 = coco_prob();
 ode_opts = struct('n',2, 'd',2, 'e',2, 'isfwithu',false);
-amp_opts    = struct('isamp',true,'isuamp',true,'isht',true,'outdof',1,'Nperiod',1,'Nsampling',2^8);
-stable_opts = struct('issta',true,'S',2^6,'L',2^8,'N_Ly',500,'Omi',[1,2]);
-prob3 = coco_set(prob3,'cont','PtMX',2);
-prob3 = coco_set(prob3,'QuasiP','ode_opts',ode_opts,'amp_opts',amp_opts,'stable_opts',stable_opts); 
+amp_opts = struct('isamp',true,'isuamp',true,'isht',true,'outdof',1,'Nperiod',1,'Nsampling',2^8);
+sta_opts = struct('issta',true,'S',2^6,'L',2^8,'N_Ly',500,'Omt',[1,2]);
+prob3 = coco_set(prob3,'cont','PtMX',2000);
+prob3 = coco_set(prob3,'QuasiP','ode_opts',ode_opts,'amp_opts',amp_opts,'sta_opts',sta_opts); 
 PHI_INITIAL = struct( 'param', 'MP', ...
     'method',   'mVCF'           , ...     
     'type',    { {'HB','HB'} }, ...   

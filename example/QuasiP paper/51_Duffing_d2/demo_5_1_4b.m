@@ -65,8 +65,8 @@ prob1 = coco_set(prob1,'cont','PtMX',3000);
 prob1 = coco_set(prob1,'corr','ItMX',50);
 prob1 = coco_set(prob1,'cont','h_min',1e-4,'h_max',0.1);
 amp_opts    = struct('isamp',true,'isuamp',true,'isht',true,'outdof',1,'Nperiod',1,'Nsampling',2^8);
-stable_opts = struct('issta',true,'S',2^5,'L',2^8,'N_Ly',1000,'Omi',[1,2]);
-prob1 = coco_set(prob1,'QuasiP','amp_opts',amp_opts,'stable_opts',stable_opts); 
+sta_opts = struct('issta',true,'S',2^5,'L',2^8,'N_Ly',1000,'Omt',[1,2]);
+prob1 = coco_set(prob1,'QuasiP','amp_opts',amp_opts,'sta_opts',sta_opts); 
 PHI_INITIAL = struct( 'param', 'MP', ...
     'method',    'mVCF'         , ...  
     'isvar'    ,true          , ...
@@ -92,8 +92,8 @@ prob1 = coco_set(prob1,'cont','PtMX',3000);
 prob1 = coco_set(prob1,'corr','ItMX',50);
 prob1 = coco_set(prob1,'cont','h_min',1e-3,'h_max',0.1);
 amp_opts    = struct('isamp',true,'isuamp',true,'isht',true,'outdof',1,'Nperiod',1,'Nsampling',2^8);
-stable_opts = struct('issta',true,'S',2^5,'L',2^8,'N_Ly',1000,'Omi',[1,2]);
-prob1 = coco_set(prob1,'QuasiP','amp_opts',amp_opts,'stable_opts',stable_opts); 
+sta_opts = struct('issta',true,'S',2^5,'L',2^8,'N_Ly',1000,'Omt',[1,2]);
+prob1 = coco_set(prob1,'QuasiP','amp_opts',amp_opts,'sta_opts',sta_opts); 
 PHI_INITIAL = struct( 'param', 'MP', ...
     'method',    'mVCF'         , ...  
     'isvar'    ,true          , ...
@@ -133,8 +133,8 @@ prob1 = coco_set(prob1,'cont','PtMX',20);
 prob1 = coco_set(prob1,'cont','NSV',1);
 prob1 = coco_set(prob1,'corr','ItMX',50);
 prob1 = coco_set(prob1,'cont','h_min',1e-4,'h_max',0.2);
-stable_opts = struct('issta',true,'S',2^5,'L',2^8,'N_Ly',2000,'Omi',[1,2]);
-prob1 = coco_set(prob1,'QuasiP','ode_opts',ode_opts,'amp_opts',amp_opts,'stable_opts',stable_opts);
+sta_opts = struct('issta',true,'S',2^5,'L',2^8,'N_Ly',2000,'Omt',[1,2]);
+prob1 = coco_set(prob1,'QuasiP','ode_opts',ode_opts,'amp_opts',amp_opts,'sta_opts',sta_opts);
 PHI_INITIAL = struct( 'param', 'MP', ...
 'method',   'mVCF'           , ...
 'type',    { {'HB','HB'} }, ...

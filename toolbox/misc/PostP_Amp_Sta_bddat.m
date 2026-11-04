@@ -4,15 +4,15 @@ my_tbid = data.my_tbid;
 prefix_tbid = data.prefix;
 switch command
     case 'init'
-        if ~data.amp_opts.isamp && ~data.stable_opts.issta
+        if ~data.amp_opts.isamp && ~data.sta_opts.issta
             temp = {'C', 'Om', 'p'};
-        elseif data.amp_opts.isamp && ~data.stable_opts.issta
+        elseif data.amp_opts.isamp && ~data.sta_opts.issta
             if data.amp_opts.isuamp
                 temp   = {'C' 'Om' 'p' 'Max_x' 'max.x' 'min.x' 'HT_x' 'HT_u' 'T_x' 'T_u' 'MF_x' 'MF_f' 't'};
             else
                 temp   = {'C' 'Om' 'p' 'Max_x' 'max.x' 'min.x' 'HT_x' 'T_x' 'MF_x' 'MF_f' 't'};
             end
-        elseif data.stable_opts.issta
+        elseif data.sta_opts.issta
             if data.amp_opts.isuamp
                 temp   = {'C' 'Om' 'p' 'Max_x' 'max.x' 'min.x' 'HT_x' 'HT_u' 'T_x' 'T_u' 'MF_x' 'MF_f' 't' 'Psi' 'Ly' 'Stab'};
             else
@@ -43,7 +43,7 @@ switch command
             iscont = false;
         end
         figure(11111)
-        if ~data.amp_opts.isamp && ~data.stable_opts.issta
+        if ~data.amp_opts.isamp && ~data.sta_opts.issta
             res = {reshape(Cii,[],n), Omii', pii'};
             if iscont
                 plot(cont_para,norm(Cii),'ko');
@@ -51,7 +51,7 @@ switch command
                 ylabel('C');
                 hold on
             end
-        elseif data.amp_opts.isamp && ~data.stable_opts.issta
+        elseif data.amp_opts.isamp && ~data.sta_opts.issta
             outdof = data.amp_opts.outdof;
             Amp    = PostP_amp(data_ii,Cii,Omii,outdof,data_ii.amp_opts.isuamp);
             if ~data_ii.amp_opts.isht
@@ -71,7 +71,7 @@ switch command
                 ylabel('||x_1||')
                 hold on
             end
-        elseif data.stable_opts.issta
+        elseif data.sta_opts.issta
             outdof = 1:n;
             Amp    = PostP_amp(data_ii,Cii,Omii,outdof,data_ii.amp_opts.isuamp);
             Sta    = PostP_sta(data_ii,Omii,pii,Amp);

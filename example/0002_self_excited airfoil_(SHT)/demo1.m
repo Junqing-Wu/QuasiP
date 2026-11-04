@@ -19,11 +19,11 @@ prob = coco_prob();
 ode_opts = struct('n',3, 'd',2, 'e',0, 'isfwithu',false);
 prob = coco_set(prob,'cont','PtMX',1000);
 amp_opts = struct('isamp',false,'isuamp',true,'outdof',2,'Nperiod',10,'Nsampling',2^8);
-stable_opts = struct('issta',false,'S',2^6,'L',2^8,'N_Ly',500,'Omi',[1,2]);
+sta_opts = struct('issta',false,'S',2^6,'L',2^8,'N_Ly',500,'Omt',[1,2]);
 par_opts    = struct('parallel',true,'ncores',6);
 prob = coco_set(prob,'cont','NSV',1);
 prob = coco_set(prob,'cont','h_min',1e-2,'h_max',1e-1);
-prob = coco_set(prob,'QuasiP','ode_opts',ode_opts,'amp_opts',amp_opts,'stable_opts',stable_opts,'par_opts',par_opts); 
+prob = coco_set(prob,'QuasiP','ode_opts',ode_opts,'amp_opts',amp_opts,'sta_opts',sta_opts,'par_opts',par_opts); 
 PHI_INITIAL = struct( 'param', 'MT', ...
     'method',     'SHT'           , ...     
     'type',       'MF' , ... % HT or MF

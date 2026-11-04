@@ -29,13 +29,18 @@ else
     dy = [];
 end
 
-% plot(Psi(:,1),Psi(:,2))
+% figure(1)
+% c_gray = [0.40, 0.40, 0.40];
+% plot(Psi(:,1),Psi(:,2),'-','Color',c_gray,'LineWidth',1.2)
 % hold on
-% plot(Psi(1,1),Psi(1,2),'rx')
-% plot(Psi(end,1),Psi(end,2),'bo')
-% xlabel('x')
-
-
+% plot(Psi(1,1),Psi(1,2),'rx','MarkerSize',6)
+% plot(Psi(end,1),Psi(end,2),'bo','MarkerSize',6)
+% xlabel('$y_1$','Interpreter','latex');
+% ylabel('$y_2$','Interpreter','latex');
+% grid on;
+% legend('NI','$\bar{\mathbf{y}}_s$','$\bar{\mathbf{y}}_e$','Interpreter','latex','Location','best')
+% plot_setting_paper()
+% set(findall(gcf,'type','line'),'linewidth',0.5)
 end
 
 function dPsi = MT_SHT_dPSI_function1(data,phi1,Psi,phis,Om1,Om2d,Omt,Omnot,Rho,p,N,a,d,e)

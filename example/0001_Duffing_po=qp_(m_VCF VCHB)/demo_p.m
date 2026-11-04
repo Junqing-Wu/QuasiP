@@ -36,9 +36,9 @@ end
 prob1 = coco_prob();
 ode_opts    = struct('n',1, 'd',1, 'e',1, 'isfwithu',false);
 amp_opts    = struct('isamp',true,'isuamp',true,'outdof',1,'Nperiod',1,'Nsampling',2^9);
-stable_opts = struct('issta',true,'S',2^6,'L',2^8,'N_Ly',500);
+sta_opts = struct('issta',true,'S',2^6,'L',2^8,'N_Ly',500);
 prob1 = coco_set(prob1,'cont','PtMX',3000);
-prob1 = coco_set(prob1,'QuasiP','ode_opts',ode_opts,'amp_opts',amp_opts,'stable_opts',stable_opts); 
+prob1 = coco_set(prob1,'QuasiP','ode_opts',ode_opts,'amp_opts',amp_opts,'sta_opts',sta_opts); 
 PHI_INITIAL = struct( 'param', 'MP', ...
     'method',    'mVCF'           , ...     
     'type',  { {'HB'} }, ...   

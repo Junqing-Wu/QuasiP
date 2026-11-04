@@ -35,14 +35,14 @@ if data.ode_opts.d == 1
     Sta.Ly = [Flo_mul,Flo_exp];
 else
     Sta.Psi = Psi(2,:);
-    Omi      = data.stable_opts.Omi;
+    Omi      = data.sta_opts.Omt;
     NumOmi   = numel(Omi);
     Sta.Ly   = [];
     Sta.Stab = [];
     for iii = 1:NumOmi
         Om_t    = Omi(iii);
         Psi_iii = Psi{1,iii};
-        N_Ly     = data.stable_opts.N_Ly;
+        N_Ly     = data.sta_opts.N_Ly;
         N        = sqrt(size(Psi_iii,2));
         E        = eye(N);
         lnR      = zeros(1,N);
