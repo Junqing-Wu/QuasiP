@@ -1,11 +1,21 @@
 function Nd_Xd = MP_mVCF_S2U_withX(PHI, N0_X0, pS_prod)
-% MP_mVCF_S2U_withX: S-domain → U-domain mapping for nonlinear force gradients (∂N/∂Xd)
-% Inputs:
-%   - PHI: MP parametrization config (HB/CO/FD methods, U/S dimensions)
-%   - N0_X0: S-domain gradient tensor (dimension: 1×pS_prod)
-%   - S_prod: Total S-domain spectral combinations
-% Output:
-%   - Nd_Xd: U-domain gradient matrix (dimension: U_prod × U_prod)
+% Jacobian transformation:
+%   dFdC = S2U(PHI,dF/dX0).
+% The tensor projection applies the chain rule from sampled state values to U-domain coefficients.
+%MP_MVCF_S2U_WITHX  Transform nonlinear force derivatives from S-domain to U-domain.
+%
+% The S-domain derivative N0_X0 is a block of derivatives with respect to
+% sampled state values. This routine applies the tensor-product sample-to-
+% coefficient transforms and returns the coefficient-space derivative used in
+% dF/dXd.
+%
+% On input:
+%   PHI      : m-VCF basis and transform data.
+%   N0_X0    : Sample-domain derivative tensor with respect to X0.
+%   pS_prod  : Product of sample counts.
+%
+% On output:
+%   Nd_Xd    : Coefficient-space derivative with respect to Xd.
 U            = cell2mat(PHI.U_omod);
 pS           = cell2mat(PHI.pS_omod);
 pS_iiTd      = pS_prod;
@@ -43,4 +53,3 @@ for kk = 1:PHI.d
 end
 Nd_Xd = transpose( reshape(N_Xiiminus1,U_1Tiiminus1,U_1Tiiminus1) );
 end
-

@@ -1,18 +1,22 @@
 function prob = ode_QuasiP2QuasiP(prob,oid,varargin)
-% ODE_QuasiP2QuasiP   Append 'QuasiP' instance constructed from saved data.
+% ODE_QUASIP2QUASIP   Restart QuasiP continuation from a saved solution.
 %
-% Support restarting continuation from a previously obtained solution,
-% stored to disk.
+% PROB = ODE_QUASIP2QUASIP(PROB, OID, RUN, [SOID], LAB)
 %
-% PROB     = ODE_QUASIP2QUASIP(PROB, OID, VARARGIN)
-% VARARGIN = { RUN [SOID] LAB }
+% Read a previously saved QuasiP solution and use it as the initial point
+% of a new continuation problem.
 %
-% PROB  - Continuation problem structure.
-% OID   - Target object instance identifier (string).
-% RUN   - Run identifier (string).
-% SOID  - Source object instance identifier (string).
-% LAB   - Solution label (integer).
-
+% On input:
+%
+% PROB : COCO continuation problem structure.
+% OID  : Target QuasiP object identifier.
+% RUN  : Source continuation run.
+% SOID : Optional source object identifier.
+% LAB  : Saved solution label.
+%
+% On output:
+%
+% PROB : COCO problem with the saved QuasiP solution restored.
 tbid = coco_get_id(oid, 'QuasiP'); % Create toolbox instance identifier
 str  = coco_stream(varargin{:});   % Convert varargin to stream of tokens for argument parsing
 run  = str.get;

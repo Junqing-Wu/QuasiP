@@ -1,24 +1,28 @@
 function prob = ode_TR2QuasiP(prob, oid, varargin)
-%ODE_TR2QuasiP   Switch to branch of QuasiP at torus (TR) bifurcation.
+% ODE_TR2QUASIP   Start a QuasiP branch from a torus bifurcation.
 %
-% PROB = ODE_TR2QUASIP(PROB, OID, VARARGIN)
-% VARARGIN = { RUN [SOID] LAB [EPS [DFDTH]] }
-
-% Start a continuation of quasiperiodic orbits emanating from a torus bifurcation
-% that was obtained and saved to dis in a previous continuation along a
-% branch of periodic orbits with name RUN. To start from a saved TR
-% bifurcation, at least the name RUN of the continuation run and the
-% solution label LAB must be given. The label LAB must be the label of a
-% TR bifurcation points.
-
-% PROB   - Continuation problem structure.
-% OID    - Target object instance identifier (string).
-% RUN    - Run identifier (string or cell-array of strings).
-% SOID   - Source object instance identifier (string, optional).
-% LAB    - Solution label (integer).
-% EPS    - Amount of peturbation, 1e-3 by default
-% @DFDTH - Optional function handle to Jacobian w.r.t. theta
-
+% PROB = ODE_TR2QUASIP(PROB, OID, RUN, [SOID], LAB, [EPS], [DFDTH])
+%
+% Read a torus bifurcation of a periodic-orbit branch, perturb its critical
+% eigenvector to create an initial two-frequency torus, and construct a new
+% QuasiP continuation problem from that initial guess.
+%
+% On input:
+%
+% PROB  : COCO continuation problem structure.
+% OID   : Target QuasiP object identifier.
+% RUN   : Source periodic-orbit continuation run.
+% SOID  : Optional source object identifier.
+% LAB   : Label of the torus bifurcation point.
+% EPS   : Initial perturbation amplitude; default is 1e-3.
+% DFDTH : Optional excitation-phase derivative callback.
+%
+% On output:
+%
+% PROB  : COCO problem containing the new QuasiP branch.
+%
+% The torus-point data are converted to Xk_MF and Om before being passed to
+% ODE_ISOL2QUASIP.
 grammar   = 'RUN [SOID] LAB [EPS] [DFDTH]';
 args_spec = {
      'RUN', 'cell', '{str}',       'run',   {},   'read',  {}
@@ -36,9 +40,7 @@ else
 end
 fth = args.dfdthhan;
 %--------------------------------------------------------------------------
-prob0  = coco_prob();
-prob0  = ode_QuasiP2QuasiP(prob0, '' , args.run, args.soid, args.lab);
-data   = coco_get_func_data(prob0, 'QuasiP', 'data'); clear prob0;
+[sol,data] = QuasiP_read_solution(args.soid,args.run,args.lab);
 %--------------------------------------------------------------------------
 ode_opts  = data.ode_opts; ode_opts.d = 2;
 prob      = coco_set(prob,'QuasiP','ode_opts',ode_opts);
@@ -49,68 +51,49 @@ else
     funcs = {data.f, data.fx, data.fp, data.l, fth};
 end
 %--------------------------------------------------------------------------
-if data.ODE == 2
-   assert(data.amp_opts.isuamp, ...
-  'run=%s data.amp_opts.isuamp must be true', args.run{1});
-end
 bd     = get_TRbd(args);
 Psi    = coco_bd_col(bd, 'Psi');
 Om1    = coco_bd_col(bd, 'Om');
+n      = data.ode_opts.n;
 x_po   = coco_bd_col(bd, 'HT_x');
+fullOutput = ~isempty(x_po) && size(x_po,2)==n && isequal(data.amp_opts.outdof(:),(1:n)');
+if data.ODE == 2 && fullOutput && data.amp_opts.isuamp
+    u_po = coco_bd_col(bd, 'HT_u');
+    fullOutput = ~isempty(u_po) && isequal(size(u_po),size(x_po));
+end
+if data.ODE==2 && ~data.amp_opts.isuamp
+    fullOutput = false;
+end
+if ~fullOutput && strcmp(data.PHI.param,'MP')
+    % Saved plots may contain only selected DOFs or no velocity history.
+    Amp = PostP_amp(data,sol.u(data.C_idx),Om1,1:n,data.ODE==2);
+    x_po = Amp.HT_x;
+    if data.ODE == 2
+        u_po = Amp.HT_u;
+    end
+elseif ~fullOutput || (data.ODE==2 && ~data.amp_opts.isuamp)
+    error('ode_TR2QuasiP:IncompleteOrbit','Save full periodic states and velocities before switching from this TR.');
+end
 if data.ODE == 2
-    u_po   = coco_bd_col(bd, 'HT_u');
     y_po = [x_po,u_po];
 else
     y_po = x_po;
 end
-[X_MF0,OM0]  = PO_TR2QP_d2(Psi,Om1,data.PHI.P{1},eps,y_po);
-
-% %-----------------------
-% figure(1)
-% plot3([y_po(:,1);y_po(1,1)],[y_po(:,4);y_po(1,4)],[y_po(:,2);y_po(1,2)],'k--','LineWidth',1.5)
-% hold on
-% [X_MF0,OM0,y_qp]  = PO_TR2QP_d2(Psi,Om1,data.PHI.P{1},0.05,y_po);
-% y_qp = reshape(y_qp,256,256,[]);
-% y_qp = y_qp(1:8:end,1:8:end,:);
-% y_qp = reshape(y_qp,32*32,[]);
-% plot3(y_qp(:,1),y_qp(:,4),y_qp(:,2),'g.')
-% 
-% [X_MF0,OM0,y_qp]  = PO_TR2QP_d2(Psi,Om1,data.PHI.P{1},0.1,y_po);
-% y_qp = reshape(y_qp,256,256,[]);
-% y_qp = y_qp(1:8:end,1:8:end,:);
-% y_qp = reshape(y_qp,32*32,[]);
-% plot3(y_qp(:,1),y_qp(:,4),y_qp(:,2),'r.')
-% 
-% [X_MF0,OM0,y_qp]  = PO_TR2QP_d2(Psi,Om1,data.PHI.P{1},0.2,y_po);
-% y_qp = reshape(y_qp,256,256,[]);
-% y_qp = y_qp(1:8:end,1:8:end,:);
-% y_qp = reshape(y_qp,32*32,[]);
-% plot3(y_qp(:,1),y_qp(:,4),y_qp(:,2),'b.')
-% 
-% xlabel('$q_1$','Interpreter','latex');
-% ylabel('$\dot{q}_1$','Interpreter','latex');
-% zlabel('$q_2$','Interpreter','latex');
-% legend('PO-unstable','QP-$\varepsilon=0.05$','QP-$\varepsilon=0.10$','QP-$\varepsilon=0.20$','Location','best');
-% grid on;
-% plot_setting_paper()
-% set(findall(gcf,'type','line'),'linewidth',3)
-% legend boxon;
-% %---------------------------------------
-
+[Xk_MF0,OM0] = PO_TR2QP_d2(Psi,Om1,data.PHI.P{1},eps,y_po,data.ode_opts.e);
 if data.ODE == 2
-   X_MF0 = X_MF0(:,1:end-data.ode_opts.n);
+   Xk_MF0.Xc = Xk_MF0.Xc(:,1:end-data.ode_opts.n);
 end
-k12 = X_MF0(:,1:2);
+k12 = Xk_MF0.k_wave(:,1:2);
 mask = ismember(k12, [1 -1; 1 1], 'rows');
-if isempty(find(mask, 1))
-    X_MF0(:,1:2) = X_MF0(:,1:2)/k12(1:2,:);
+if data.ode_opts.e == 0 && ~any(mask)
+    Xk_MF0.k_wave(:,1:2) = Xk_MF0.k_wave(:,1:2)/k12(1:2,:);
     OM0          = k12(1:2,:)*OM0;
 end
 %--------------------------------------------------------------------------
 pname     = data.pnames_np;
 p0        = coco_bd_col(bd, 'p');
 %--------------------------------------------------------------------------
-prob      = ode_isol2QuasiP(prob, oid, funcs{:}, X_MF0, OM0, pname, p0);
+prob      = ode_isol2QuasiP(prob, oid, funcs{:}, Xk_MF0, OM0, pname, p0);
 end
 
 
@@ -127,7 +110,7 @@ assert(strcmp(type{1},'TR'), ...
   'get_TRbd: run=%s, LAB=%d, TYPE = %s, must be TR', args.run{1}, args.lab, type{1});
 end
 
-function [X_MF,OM,y_qp]  = PO_TR2QP_d2(Psi,Om1,P1,eps,y_po)
+function [Xk_MF,OM,y_qp]  = PO_TR2QP_d2(Psi,Om1,P1,eps,y_po,e)
 [N,L] = size(Psi,1,3);
 S     = size(y_po,1);
 m     = S/(L-1);
@@ -163,11 +146,11 @@ else
     Tau2     = 0:2*pi/(Y):2*pi-2*pi/(Y);
     Phi2_bar = [ones(Y,1),cos(Tau2)',sin(Tau2)'];
     y_qp = reshape( transpose( kron(eye(N),Phi2_bar)*y1_bar ), [], N ) ;
-    X_MF = QP2X_MF(y_qp,Y,P1);
+    Xk_MF = QP2X_MF(y_qp,Y,P1,e);
 end
 end
 
-function X_MF = QP2X_MF(y_qp,Y,P1)
+function Xk_MF = QP2X_MF(y_qp,Y,P1,e)
 k1 = 1:1/P1:7;
 k = {k1,1};
 N = {numel(k1),1};
@@ -194,13 +177,19 @@ iGAM = iGAM/(Y^2*P1);
 X2 = iGAM*y_qp;
 X2_C = [X2(1,:) ; X2(2:2:end,:) - 1i*X2(3:2:end,:)];
 kQ = [[0;0],kQ];
-X_MF = [kQ',X2_C];
+k_wave = kQ';
 
-[XC_ii,A_ii] = sort(X2_C(:,1),'descend');
-idx  = abs(XC_ii) > max(abs(XC_ii))*1e-7;
+if e > 0
+    % A forced beam's first displacement can have no critical sidebands.
+    [XC_ii,A_ii] = sort(max(abs(X2_C),[],2),'descend');
+else
+    [XC_ii,A_ii] = sort(X2_C(:,1),'descend');
+end
+idx = abs(XC_ii) > max(abs(XC_ii))*1e-7;
 A = A_ii(idx);
 
-X_MF = X_MF(A,:);
+Xk_MF.k_wave = k_wave(A,:);
+Xk_MF.Xc     = X2_C(A,:);
 end
 
 function kQ = Com_kQ(k,N)

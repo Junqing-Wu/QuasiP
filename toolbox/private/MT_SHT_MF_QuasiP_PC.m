@@ -1,4 +1,23 @@
 function [data, y, J] = MT_SHT_MF_QuasiP_PC(prob, data, u)
+% MF-OPC relation:
+%   OPC_i = <phase-direction derivative, continuation correction> = 0.
+% The code evaluates this row using the initial multi-frequency coefficients.
+%MT_SHT_MF_QUASIP_PC  Build phase conditions for multi-frequency shooting.
+%
+% The unknown response frequencies require one phase condition per free
+% hyper-time direction. This routine evaluates the selected phase-direction
+% derivative on the initial multi-frequency coefficient blocks Ys and returns
+% the rows that are appended to the shooting continuation problem.
+%
+% On input:
+%   prob : COCO problem structure.
+%   data : QuasiP model and PHI data.
+%   u    : Shooting unknown vector.
+%
+% On output:
+%   data : Updated callback data.
+%   y    : Multi-frequency shooting phase-condition residual.
+%   J    : Its Jacobian with respect to the active unknowns.
 PHI   = data.PHI;
 NL    = PHI.nL;
 N     = PHI.N;
@@ -6,12 +25,12 @@ d     = data.ode_opts.d;
 e     = data.ode_opts.e;
 a     = data.pdim;
 %----------------------------------------------------------
-R1   = zeros(d-e,1);        % 未知基频的相位条件PC的残差
-JY1  = zeros(d-e,NL);       % PC关于Xd的导数
-Jom1 = zeros(d-e,d);        % PC关于Om的导数
-Jp1  = zeros(d-e,a);        % PC关于p 的导数
+R1   = zeros(d-e,1);        % OPC residual for unknown response frequencies
+JY1  = zeros(d-e,NL);       % dOPC/dC
+Jom1 = zeros(d-e,d);        % dOPC/dOm
+Jp1  = zeros(d-e,a);        % dOPC/dp
 %----------------------------------------------------------
-M_SHT = PHI.M_SHT;
+M_SHT = PHI.M;
 Ys  = reshape(u(1:NL),[],N*M_SHT);
 ys  = reshape(PHI.Gam*Ys,[],N);
 Ys  = reshape(u(1:NL),[],N);
@@ -31,11 +50,11 @@ else
     Theta(:,Omnot) = Theta(:,Omnot) + Rhophi1;
 end
 %============================================================
-%>>>>>>>>>>>>>>>                dYs1 垂直 Ys1r <<<<<<<<<<<<<<
-%>>>>>>>>>>>>>>> (I_N \otimes Xi)Ys1 垂直 Ys1r <<<<<<<<<<<<<<
+%>>>>>>>>>>>>>>>                dYs1 orthogonal to Ys1r <<<<<<<<<<<<<<
+%>>>>>>>>>>>>>>> (I_N \otimes Xi)Ys1 orthogonal to Ys1r <<<<<<<<<<<<<<
 %============================================================
 if d > e
-    for mm = 1:PHI.M_SHT
+    for mm = 1:PHI.M
         kk = e + 1;
         loca0   = PHI.local_HT{mm};
         loca00  = PHI.local_MF{mm};

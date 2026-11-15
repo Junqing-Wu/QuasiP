@@ -1,4 +1,17 @@
 function X0 = MP_mVCF_U2S_x(Xd,PHI,U_prod)
+%MP_MVCF_U2S_X  Reconstruct m-VCF state samples for Processor routines.
+%
+% Apply the tensor-product PHI.wGam0 transforms direction by direction to
+% evaluate the physical state on the dense S_wave grid.
+%
+% On input:
+%   Xd      : Coefficients of one state component in U-domain ordering.
+%   PHI     : m-VCF basis, transform, period, and sample-count data.
+%   U_prod  : Product of the U_i coefficient counts.
+%
+% On output:
+%   X0      : State samples on the dense hyper-time grid.
+
 pwSiip1Td = 1;
 U1Tii = U_prod;
 U = cell2mat(PHI.U_omod);

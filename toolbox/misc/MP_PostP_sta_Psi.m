@@ -1,4 +1,19 @@
 function Psi = MP_PostP_sta_Psi(data,Om,p,Amp)
+%MP_POSTP_STA_PSI  Compute m-VCF transition data for stability analysis.
+%
+% Reconstruct the state-transition matrices along the selected base-frequency
+% direction, sample them on the remaining S-domain directions, and use FFT
+% filtering to obtain the multi-frequency representation used by PostP_sta.
+%
+% On input:
+%   data    : QuasiP model, PHI, and stability settings.
+%   Om      : Base-frequency vector.
+%   p       : Model-parameter vector.
+%   Amp     : Amplitude data used to reconstruct the current torus.
+%
+% On output:
+%   Psi     : Transition-matrix data used for multipliers or Lyapunov exponents.
+
 n        = data.ode_opts.n;
 d        = data.ode_opts.d;
 ODE      = data.ODE;
@@ -22,7 +37,7 @@ for iii = 1:NumOmi
     end
     pS_prod  = prod(pS);
     pL1      = data.sta_opts.pL1{iii};
-    L        = data.sta_opts.L;
+    L        = data.sta_opts.L1;
     vp       = repmat(p,1,pL1);
     dt1      = 2*pi/(L*Om(Om_t));
     N_Ly     = data.sta_opts.N_Ly;
@@ -55,6 +70,8 @@ for iii = 1:NumOmi
                 J = DFDX;
             else
                 [~,~,A,B,C] = data.l(p);
+                % Densify only inside stability analysis for rank and propagation.
+                A = full(A);
                 assert(rank(A) == size(A,1), 'Error: Matrix A is singular and cannot be inverted.');
                 if ~data.isABC(2)
                     B = zeros(n,n);
@@ -67,17 +84,18 @@ for iii = 1:NumOmi
                     J(1:n,n+1:2*n,:) = eye(n).*ones(n,n,pL1);
                     K = DFDX  - C;
                     D = DFDDX - B;
-                    invM = inv(full(A));
+                    invM = inv(A);
                     iMK = pagemtimes(invM,K);
                     iMD = pagemtimes(invM,D);
                     J(n+1:2*n,1:n,:) = iMK;
                     J(n+1:2*n,n+1:2*n,:) = iMD;
                 else
+                    B = full(B);
                     assert(rank(B) == size(B,1), 'Error: Matrix B is singular and cannot be inverted.');
                     if ~data.isABC(3)
                         C = zeros(n,n);
                     end
-                    invB = inv(full(B));
+                    invB = inv(B);
                     J    = pagemtimes(invB,DFDX-C);
                 end
             end
@@ -109,6 +127,8 @@ for iii = 1:NumOmi
                 J = DFDX;
             else
                 [~,~,A,B,C] = data.l(p);
+                % Densify only inside stability analysis for rank and propagation.
+                A = full(A);
                 assert(rank(A) == size(A,1), 'Error: Matrix A is singular and cannot be inverted.');
                 if ~data.isABC(2)
                     B = zeros(n,n);
@@ -121,17 +141,18 @@ for iii = 1:NumOmi
                     J(1:n,n+1:2*n,:) = eye(n).*ones(n,n,pL1);
                     K = DFDX  - C;
                     D = DFDDX - B;
-                    invM = inv(full(A));
+                    invM = inv(A);
                     iMK = pagemtimes(invM,K);
                     iMD = pagemtimes(invM,D);
                     J(n+1:2*n,1:n,:) = iMK;
                     J(n+1:2*n,n+1:2*n,:) = iMD;
                 else
+                    B = full(B);
                     assert(rank(B) == size(B,1), 'Error: Matrix B is singular and cannot be inverted.');
                     if ~data.isABC(3)
                         C = zeros(n,n);
                     end
-                    invB = inv(full(B));
+                    invB = inv(B);
                     J    = pagemtimes(invB,DFDX-C);
                 end
             end

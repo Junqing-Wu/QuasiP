@@ -1,4 +1,21 @@
 function PHI = MP_mVCF_COM_PHI(PHI_INITIAL)
+%MP_MVCF_COM_PHI  Build the m-VCF basis and discrete operator matrices.
+%
+% This constructor turns PHI_INITIAL into the PHI structure used by the
+% residual. For each base-frequency direction it constructs the selected HB,
+% collocation, or finite-difference basis, its first and second derivative
+% matrices, sample-to-coefficient transforms, and period-dependent dimensions.
+% Tensor products then produce PHI.XI0, PHI.XI1, and PHI.XI2 for the full torus.
+%
+% On input:
+%   PHI_INITIAL : Structure containing d, n, method types, harmonic orders k,
+%                 period factors P, coarse counts S, fine counts S_wave, and
+%                 the frequency ordering OmOd.
+%
+% On output:
+%   PHI : Complete m-VCF discretization structure used by MP_mVCF_QuasiP.
+%         It contains basis matrices, transforms, index maps, and phase-condition
+%         matrices Lam1 and Lam2.
 PHI = PHI_INITIAL;
 d   = PHI.d;
 n   = PHI.n;
@@ -203,4 +220,3 @@ PHI.Theta = sparse( kron(eye(n),XI0) );
 PHI.L     = prod(U);
 PHI.nL    = n*PHI.L;
 end
-

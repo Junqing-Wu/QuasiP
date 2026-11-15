@@ -1,22 +1,50 @@
 function [data, y, J] = MP_mVCF_QuasiP(prob, data, u)
+%MP_MVCF_QUASIP  Evaluate the multi-step variable-coefficient torus residual.
+%
+% The routine reconstructs physical samples from the coefficient vector Xd,
+% applies the discrete hyper-time derivative matrices, evaluates the nonlinear
+% force in the sample domain, transforms it back to coefficient space, and
+% assembles the residual and Jacobian.
+%
+% For a second-order model, the linear part represented in the program is
+%   R0 = (A*OOmXI2 + B*OmXI1 + C*XI0)*Xd - Theta*Fd.
+% For a first-order model, it is
+%   R0 = kron(eye(n),OmXI1)*Xd - Fd.
+% Here OmXI1=sum_i Om(i)*PHI.XI1{i}, OOmXI2=sum_i,j Om(i)*Om(j)*PHI.XI2{i,j},
+% and Fd is the transformed nonlinear force.
+%
+% On input:
+%   prob : COCO problem structure used by callbacks and post-processing.
+%   data : Model, PHI discretization, and option data.
+%   u    : Unknown vector [Xd(:); Om(:); p(:)].
+%
+% On output:
+%   data : Updated data structure.
+%   y    : Discrete m-VCF residual R0.
+%   J    : Jacobian with respect to Xd, Om, and p when PHI.isvar is true.
 dFddX0 = [];
-PHI    = data.PHI;               % 形函数及其相关矩阵
+PHI    = data.PHI;               % PHI basis, transform, and differentiation data
 OmOd   = PHI.OmOd;
-d      = data.ode_opts.d;        % QP基频的数量
-n      = PHI.n;                  % QP维度-自由度
-nL     = PHI.nL;                 % 与QP相关的待定系数的数量
-a      = data.pdim;              % continuation paramaters [p] 的数量
+d      = data.ode_opts.d;        % Number d of response base frequencies
+n      = PHI.n;                  % State dimension n
+nL     = PHI.nL;                 % Total coefficient count nL=N*L
+a      = data.pdim;              % Number a of model parameters p
 %----------------------------------------------------------
-U       = cell2mat(PHI.U_omod);  % 各周期形函数的数量
-U_prod  = prod(U);               % 周期形函数的数量的乘积
-pS      = cell2mat(PHI.pS_omod); % 各基本周期区间内的采样数
-pS_prod = prod(pS);              % 基本周期区间内的采样数的乘积
+U       = cell2mat(PHI.U_omod);  % Number U_i of periodic shape functions
+U_prod  = prod(U);               % Product U_prod of shape-function counts
+pS      = cell2mat(PHI.pS_omod); % Sample counts pS_i=P_i*S_i
+pS_prod = prod(pS);              % Product pS_prod of sample counts
 %----------------------------------------------------------
-R0   = zeros(nL,1);              % 非线性代数方程组Rd的残差
+useSparse = isfield(PHI,'sparse_jacobian') && PHI.sparse_jacobian && ~data.isfwithu;
+R0   = zeros(nL,1);              % NAE residual R0
 if PHI.isvar
-    JXd0 = zeros(nL,nL);         % Rd关于Xd的导数
-    Jom0 = zeros(nL,d);          % Rd关于Om的导数
-    Jp0  = zeros(nL,a);          % Rd关于p 的导数 
+    if useSparse
+        JXd0 = sparse(nL,nL);
+    else
+        JXd0 = zeros(nL,nL);
+    end         % dR0/dC
+    Jom0 = zeros(nL,d);          % dR0/dOm
+    Jp0  = zeros(nL,a);          % dR0/dp 
 else
     JXd0 = [];
     Jom0 = [];
@@ -32,6 +60,8 @@ tau  = PHI.tau;             % d*pS_prod
 vp   = repmat(u(nL+d+1:end),1,pS_prod);
                             % a*pS_prod
 %----------------------------------------------------------
+% Reconstruct the torus samples from C=Xd:
+%   X0 = Phi(C), and dX0 = dX/dt when velocity dependence is enabled.
 Xd_n = reshape(Xd,U_prod,n)';
 if data.isfwithu
     X0  = zeros(n,pS_prod);
@@ -46,6 +76,9 @@ else
     end
 end
 %----------------------------------------------------------
+% Discrete hyper-time derivatives are assembled as
+%   D1(Om)=sum_i Om(i)*PHI.XI1{i},
+%   D2(Om)=sum_i,j Om(i)*Om(j)*PHI.XI2{i,j}.
 XI0 = PHI.XI0;
 OmXI1 = Om(1)*PHI.XI1{1};
 for ii = 2:d
@@ -54,6 +87,7 @@ end
 if PHI.isvar
     OmXI1_om = PHI.XI1;
 end
+% Continuous model: A(p)*ddx+B(p)*dx+C(p)*x=f(x,dx,theta_1^e,p).
 if data.ODE == 2
     OOmXI2    = sparse(U_prod,U_prod);
     for ii = 1:d
@@ -80,6 +114,8 @@ if data.ODE == 2
     end
 end
 %----------------------------------------------------------
+% Transform sampled nonlinear values F0 to coefficient values Fd=S2U(PHI,F0).
+% The assembled NAE is R0=linear_operator(Xd,Om,p)-Fd.
 if data.isL
     [~,~,A,B,C,Ap,Bp,Cp] = data.l(p);
     if data.isABC(1) == 1
@@ -146,13 +182,17 @@ end
 %----------------------------------------------------------
 if data.isfwithu
     F0 = data.f(X0,dX0,vp,tau);
-    [dFdX0,dFddX0] = data.fx(X0,dX0,vp,tau);
+    if PHI.isvar
+        [dFdX0,dFddX0] = data.fx(X0,dX0,vp,tau);
+    end
     if data.isfwithp
         dFdP0 = data.fp(X0,dX0,vp,tau);
     end
 else
     F0 = data.f(X0,vp,tau);
-    dFdX0 = data.fx(X0,vp,tau);
+    if PHI.isvar
+        dFdX0 = data.fx(X0,vp,tau);
+    end
     if data.isfwithp
         dFdP0 = data.fp(X0,vp,tau);
     end
@@ -172,7 +212,9 @@ else
 end
 %----------------------------------------------------------
 if PHI.isvar
-    dFdXd = zeros(nL,nL);
+    if ~useSparse
+        dFdXd = zeros(nL,nL);
+    end
     if data.isfwithu && ~isempty(dFddX0) 
         is_nonzero       = ~all(cat(3, dFdX0,dFddX0) == 0, 3);
         [fx_ll , fx_mm ] = find(is_nonzero);
@@ -215,6 +257,8 @@ if PHI.isvar
 %     else
 %         Jom0 = Jom0 - dFdOm;
 %     end
+    elseif useSparse
+        dFdXd = sparse_force_jacobian(PHI,dFdX0,pS_prod,U_prod,nL);
     else
         is_nonzero     = ~all(dFdX0  == 0, 3);
         [fx_ll, fx_mm] = find(is_nonzero);
@@ -261,3 +305,22 @@ else
     J = [];
 end
 end
+
+function J = sparse_force_jacobian(PHI,df,pS_prod,U_prod,nL)
+% Project only coupled DOF pairs, then assemble the global sparse matrix.
+[rowDof,colDof] = find(any(df~=0,3));
+numBlocks = numel(rowDof);
+rows = cell(numBlocks,1);
+cols = cell(numBlocks,1);
+vals = cell(numBlocks,1);
+for iblock = 1:numBlocks
+    ii = rowDof(iblock);
+    jj = colDof(iblock);
+    block = MP_mVCF_S2U_withX(PHI,df(ii,jj,:),pS_prod);
+    [i,j,vals{iblock}] = find(block);
+    rows{iblock} = i+(ii-1)*U_prod;
+    cols{iblock} = j+(jj-1)*U_prod;
+end
+J = sparse(vertcat(rows{:}),vertcat(cols{:}),vertcat(vals{:}),nL,nL);
+end
+

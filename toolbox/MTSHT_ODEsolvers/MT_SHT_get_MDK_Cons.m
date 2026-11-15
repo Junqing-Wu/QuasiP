@@ -1,4 +1,21 @@
 function Cons = MT_SHT_get_MDK_Cons(data, p, n, a, Om1)
+%MT_SHT_GET_MDK_CONS  Precompute constant data for the SHT integrator.
+%
+% Evaluate the linear callback l at p and organize A, B, C and their
+% parameter derivatives in a compact structure. MT_SHT_MDKF_var reuses this
+% data at every integration point.
+%
+% On input:
+%   data : QuasiP model callbacks and ODE flags.
+%   p    : Model-parameter vector.
+%   n    : Original ODE state dimension.
+%   a    : Number of model parameters.
+%   Om1  : Selected integration frequency.
+%
+% On output:
+%   Cons : Precomputed mass, damping, stiffness, and derivative data used by
+%          MT_SHT_MDKF_var.
+
 [~,~,A,B,C,Ap,Bp,Cp] = data.l(p);
 %-------------------------------------------------------------------------------------
 if data.isABC(2) ~= 1

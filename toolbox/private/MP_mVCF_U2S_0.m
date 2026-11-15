@@ -1,11 +1,20 @@
 function X0 = MP_mVCF_U2S_0(PHI,Xd,U_prod)
-% MP_mVCF_U2S_0: U-domain (harmonic) → S-domain (spectral) mapping for QP
-% Inputs:
-%   - PHI: MP parametrization config (HB/CO/FD methods, U/S dimensions)
-%   - Xd: U-domain coefficient vector (dimension: U_prod)
-%   - U_prod: Total U-domain harmonic combinations
-% Output:
-%   - X0: S-domain spectral vector (dimension: S_prod)
+%MP_MVCF_U2S_0  Reconstruct physical samples from m-VCF coefficients.
+%
+% Apply the tensor-product basis transforms PHI.Gam0 to convert one state
+% component from U-domain coefficients to sample-domain values. This is used
+% before evaluating the nonlinear force F at the hyper-time sample points.
+%
+% On input:
+%   PHI    : m-VCF basis and transform data.
+%   Xd     : U-domain coefficient row for one state component.
+%   U_prod : Total number of U-domain coefficients.
+%
+% On output:
+%   X0     : Reconstructed state samples.
+% Tensor-product reconstruction used by the code:
+%   X0 = U2S(PHI,Xd), with X0 sampled on the S-domain grid.
+% X0 = U2S(PHI,Xd) reconstructs the physical samples from coefficient vector Xd.
 pSiip1Td = 1;
 U1Tii = U_prod;
 U = cell2mat(PHI.U_omod);

@@ -1,4 +1,21 @@
-function dy    = MT_SHT_dy(data,y,theta,Om1,p,N)
+function dy  = MT_SHT_dy(data,y,theta,Om1,p,N)
+%MT_SHT_DY  Evaluate the shooting ODE in the scaled phi1 coordinate.
+%
+% The independent variable is phi1=Om1*t. For first-order models the code
+% evaluates dy/dphi1 = f(y,theta,p)/Om1. For second-order models it evaluates
+% the equivalent scaled equation using the mass, damping, and stiffness terms.
+%
+% On input:
+%   data : QuasiP model data and ODE flags.
+%   y : Current first-order or second-order state.
+%   theta : Excitation phase vector.
+%   Om1 : Selected integration frequency.
+%   p : Model-parameter vector.
+%   N : First-order state dimension.
+%                          selected frequency, parameters, and state dimension.
+%
+% On output:
+%   dy : Derivative with respect to phi1.
 if data.ODE == 1
     x  = y';
 else

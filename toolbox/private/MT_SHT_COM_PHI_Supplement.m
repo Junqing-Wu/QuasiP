@@ -1,20 +1,34 @@
 function PHI = MT_SHT_COM_PHI_Supplement(data)
+% Supplementary SHT relation:
+% The supplement adds the phase-shift and sensitivity data needed to evaluate
+% R_M after the last trajectory segment.
+%MT_SHT_COM_PHI_SUPPLEMENT  Complete PHI data for MT-SHT residual evaluation.
+%
+% Add model- and method-dependent quantities that cannot be constructed by
+% the generic MT-SHT mesh builder alone, including trajectory sensitivities,
+% solver callbacks, phase-direction data, and period-shift information.
+%
+% On input:
+%   data : QuasiP data containing the model callbacks and initial PHI fields.
+%
+% On output:
+%   PHI  : Updated PHI structure ready for MT_SHT_QuasiP.
 PHI      = data.PHI;
 PHI.N    = data.ODE*PHI.n;
 PHI.nL   = PHI.N*PHI.L;
 %-------------------------------------------------------------
-local_HT = cell(1,PHI.M_SHT);
-local_MF = cell(1,PHI.M_SHT);
-for jj = 1:PHI.M_SHT
+local_HT = cell(1,PHI.M);
+local_MF = cell(1,PHI.M);
+for jj = 1:PHI.M
     local_HT{jj} = (jj-1)*PHI.pS2d+1:jj*PHI.pS2d;
     local_MF{jj} = (jj-1)*PHI.U+1:jj*PHI.U;
 end
 PHI.local_HT = local_HT;
 PHI.local_MF = local_MF;
 %-------------------------------------------------------------
-Local_HT = cell(1,PHI.M_SHT);
-Local_MF = cell(1,PHI.M_SHT);
-for jj = 1:PHI.M_SHT
+Local_HT = cell(1,PHI.M);
+Local_MF = cell(1,PHI.M);
+for jj = 1:PHI.M
     Local_HT{jj} = [];
     Local_MF{jj} = [];
     for nn = 1:PHI.N

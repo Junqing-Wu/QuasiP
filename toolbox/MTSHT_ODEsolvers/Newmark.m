@@ -1,6 +1,30 @@
 function [Phi1,Psi,A]  = Newmark(data,ys,phi,phi1s,phi1e,dphi1,Om,p)
-% 0: M*a + D*u + K*q = f(q,Om1*u,p,phi1,phi2+rho2*phi1,...,phie+rhoe*phi1)
-%    M = Om1^2*A; D = Om1*B 
+%NEWMARK  Integrate one second-order FSE-SHT trajectory segment.
+%
+% Advance the displacement and velocity along the scaled coordinate phi1
+% using the Newmark method. The routine also propagates sensitivities with
+% respect to the initial state, base frequencies, and model parameters.
+% The terminal state and sensitivity blocks are consumed by MT_SHT_QuasiP.
+%
+% The physical second-order model is
+%   A(p)*ddx + B(p)*dx + C(p)*x = f(x,dx,theta,p).
+% With phi1=Om1*t, the scaled equation is
+%   Om1^2*A*q'' + Om1*B*q' + C*q = f(q,Om1*q',theta,p).
+%
+% On input:
+%   data   : QuasiP model, PHI settings, and derivative callbacks.
+%   ys     : Initial state [q;u] at the beginning of the segment.
+%   phi    : Remaining hyper-time phases.
+%   phi1s  : Segment start in phi1.
+%   phi1e  : Segment end in phi1.
+%   dphi1  : Fixed Newmark step in phi1.
+%   Om     : Complete base-frequency vector.
+%   p      : Model-parameter vector.
+%
+% On output:
+%   Phi1   : Integration grid in phi1.
+%   Psi    : State and sensitivity history.
+%   A      : Acceleration history.
 PHI     = data.PHI;
 n       = data.ode_opts.n;
 N       = PHI.N;
@@ -10,7 +34,8 @@ a       = data.pdim;
 %-------------------------------------------------------------------------------------
 Phi1    = (phi1s:dphi1:phi1e)';
 n_steps = length(Phi1);
-if PHI.isvar 
+compact = PHI.isvar && isfield(PHI,'endpoint_sensitivities') && PHI.endpoint_sensitivities;
+if PHI.isvar && ~compact
     Psi = zeros(n_steps,N+N^2+N*d+N*a);
 else
     Psi = zeros(n_steps,N);
@@ -55,7 +80,11 @@ end
 if PHI.isvar
     Psis     = [qs,Jqs;
                 us,Jus];
-    Psi(1,:) = Psis(:);
+    if compact
+        Psi(1,:) = ys';
+    else
+        Psi(1,:) = Psis(:);
+    end
 else
     Psi(1,:) = ys';
 end
@@ -81,12 +110,12 @@ for i = 1:n_steps-1
             fe  = data.f(qe,ve,p,thetae);
             [fqe,fve] = data.fx(qe,ve,p,thetae);
             if isempty(fve)
-                fve = zeros(n,n);
+                fve = sparse(n,n);
             end
         else
             fe  = data.f(qe,p,thetae);
             fqe = data.fx(qe,p,thetae);
-            fve = zeros(n,n);
+            fve = sparse(n,n);
         end
 
         fue = Om1*fve;
@@ -112,7 +141,7 @@ for i = 1:n_steps-1
        Jqstar = Jqs + dphi1*Jus + (0.5-beta)*dphi1^2*Jas;
        Justar = Jus + (1-gamma)*dphi1*Jas;
        S   = Me/(beta*dphi1^2) + gamma*De/(beta*dphi1) + Ke;
-       Jqe = S\(Fe + Me*Jqstar/(beta*dphi1^2) + De*(gamma/(beta*dphi1)*Jqstar-Justar));
+       Jqe = S\full(Fe + Me*Jqstar/(beta*dphi1^2) + De*(gamma/(beta*dphi1)*Jqstar-Justar));
        Jue = Justar+gamma/(beta*dphi1)*(Jqe-Jqstar);
        Jae = (Jqe-Jqstar)/(beta*dphi1^2);
        
@@ -126,7 +155,11 @@ for i = 1:n_steps-1
         Jas = Jae;
         Psis  = [qs,Jqs;
                  us,Jus];
-        Psi(i+1,:) = Psis(:);
+        if compact
+            Psi(i+1,:) = [qs;us]';
+        else
+            Psi(i+1,:) = Psis(:);
+        end
     else
         qs  = qe;
         us  = ue;
@@ -137,6 +170,13 @@ for i = 1:n_steps-1
     A(i+1,:) = as';
 end
 
+if compact
+    % SHT reads the states at every step and sensitivities at the endpoint.
+    terminal = reshape(Psis(:,2:end),1,[]);
+    j = 1:numel(terminal);
+    Psi = [sparse(Psi),sparse(repmat(n_steps,size(j)),j,terminal,n_steps,numel(j))];
+end
+
 % plot(Psi(:,1),Psi(:,2))
 % hold on
 % plot(Psi(1,1),Psi(1,2),'rx')
@@ -144,5 +184,3 @@ end
 % xlabel('x')
 
 end
-
-

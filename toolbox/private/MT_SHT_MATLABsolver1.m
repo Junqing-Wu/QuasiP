@@ -1,4 +1,24 @@
 function [Phi1,Psi,dy]  = MT_SHT_MATLABsolver1(data,ys,phis,phi1s,phi1e,Om,p)
+%PURPOSE  Integrate one SHT trajectory and its sensitivity equations.
+%
+% Integrate the state equation in the phi1 coordinate using a MATLAB ODE
+% solver. When PHI.isvar is true, integrate sensitivities with respect to the
+% initial state, base frequencies, and model parameters. The terminal blocks
+% are consumed by the MT-SHT boundary residual and its Jacobian.
+%
+% On input:
+%   data   : QuasiP model data, PHI settings, and callbacks.
+%   ys     : Initial trajectory state.
+%   phis   : Initial phases in the remaining hyper-time directions.
+%   phi1s  : Segment start in phi1.
+%   phi1e  : Segment end in phi1.
+%   Om     : Complete base-frequency vector.
+%   p      : Model-parameter vector.
+%
+% On output:
+%   Phi1   : Adaptive integration grid in phi1.
+%   Psi    : State and sensitivity history.
+%   dy     : Optional state-derivative history.
 PHI   = data.PHI;
 N     = PHI.N;
 a     = data.pdim;
@@ -232,6 +252,5 @@ end
 
 dPsi  = g/Om1;
 end  
-
 
 

@@ -1,18 +1,19 @@
 function plot_stab_lines4(x,y,S,ST,varargin)
-% PLOT_STAB_LINES This function is adapted from stab_plot in coco_plot_bd
-% in coco. It plots continuation results with stability info.
+%PLOT_STAB_LINES4  Plot continuation curves with stability information.
 %
-% PLOT_STAB_LINES(X,Y,S,ST,VARARGIN)
+% Plot the supplied branch coordinates and use S and ST to distinguish stable,
+% unstable, or special segments. Optional arguments control line appearance
+% and figure behavior. No numerical continuation data is modified.
 %
-% X:        Data for x axis
-% Y:        Data for y axis
-% S:        Data for stability of solution
-% ST:       A cell array for line style, for instance, we may have ST = cell(2,1);
-%             ST{1} = {'r--','LineWidth',1.0}; % unstable
-%             ST{2} = {'r-','LineWidth',1.0};  % stable
-% VARARGIN: Strings for legends of unstable/stable solution branches
+% On input:
+%   x : Branch coordinates.
+%   y : Branch coordinates.
+%   S : Stability data and plotting/state labels.
+%   ST : Stability data and plotting/state labels.
+%   varargin : Optional plotting arguments.
 %
-%consider the situation of II=NaN, II+1=NaN
+% On output:
+%   None. The current figure is updated.
 oldlegs = get(gca, 'legend');
 if ~isempty(oldlegs)
     legsold = oldlegs.String;

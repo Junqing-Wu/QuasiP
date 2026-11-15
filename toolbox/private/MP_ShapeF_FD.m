@@ -1,4 +1,24 @@
 function [xi1,xi2,wGam0,wGam1,U,pS,pwS] = MP_ShapeF_FD(w,p,S,wS)
+%PURPOSE  Construct periodic finite-difference operators and interpolation.
+%
+% Build periodic first- and second-derivative matrices from the requested
+% finite-difference stencil and construct interpolation operators on the dense
+% S_wave grid.
+%
+% On input:
+%   w  : Finite-difference stencil positions.
+%   p  : Period-multiplication number P_i.
+%   S  : Coarse sample count S_i.
+%   wS : Dense sample count S_wave(i).
+%
+% On output:
+%   xi1 : Periodic first-derivative matrix.
+%   xi2 : Periodic second-derivative matrix.
+%   wGam0: Dense-grid value interpolation matrix.
+%   wGam1: Dense-grid first-derivative interpolation matrix.
+%   U   : Number of finite-difference coefficients.
+%   pS  : Period-weighted coarse sample count P_i*S_i.
+%   pwS : Period-weighted dense sample count P_i*S_wave(i).
 tol = 1e-6;
 if abs(mod(wS, S)) > tol
     warning('S_wave is not an integer multiple of S!');

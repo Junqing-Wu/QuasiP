@@ -1,12 +1,21 @@
 function Nd = MP_mVCF_S2U(PHI,N0,pS_prod)
-% MP_mVCF_S2U: S-domain (spectral) → U-domain (harmonic) mapping for
-%              Nonlinear terms or Excitation
-% Inputs:
-%   - PHI: MP parametrization config (HB/CO/FD methods, U/S dimensions)
-%   - N0: S-domain nonlinear force vector (dimension: 1 × pS_prod )
-%   - S_prod: Total S-domain spectral combinations
-% Output:
-%   - Nd: U-domain nonlinear force matrix (dimension: U_prod × 1)
+%MP_MVCF_S2U  Transform nonlinear samples from the S-domain to U-domain.
+%
+% Nonlinear forces are evaluated at PHI.pS_omod sample points. This routine
+% applies the inverse basis transform direction by direction, so the sampled
+% values N0 are represented by the coefficient vector Nd used in the m-VCF
+% residual. The order of the tensor-product coefficients follows PHI.U_omod.
+%
+% On input:
+%   PHI    : m-VCF discretization data with U, pS, and iGam0 transforms.
+%   N0     : Sample-domain values arranged along the product sample grid.
+%   pS_prod: Product of the sample counts in all hyper-time directions.
+%
+% On output:
+%   Nd     : U-domain coefficient vector in the ordering used by Xd.
+% Tensor-product projection used by the code:
+%   Nd = S2U(PHI,N0), where N0 contains samples on the S-domain grid.
+% Nd = S2U(PHI,N0) maps nonlinear samples N0 on the S-domain grid to U-domain coefficients.
 U = cell2mat(PHI.U_omod);
 pS = cell2mat(PHI.pS_omod);
 pS_iiTd = pS_prod;

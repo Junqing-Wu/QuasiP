@@ -1,16 +1,19 @@
-function sol  = QuasiP_init_sol(data,X_MF,OM,p0)
-% QUASIP_INIT_SOL   Build initial solution guess.
+function sol  = QuasiP_init_sol(data,Xk_MF,OM,p0)
+%QUASIP_INIT_SOL  Convert Starter data to the COCO unknown vector.
 %
-% Construct initial solution guess for 'QuasiP' toolbox.
+% INITIAL_C_byPHI maps the multi-frequency Fourier representation Xk_MF to
+% the coefficient ordering C used by the selected PHI method. The solution
+% vector then follows the NAE ordering u=[C(:); Om(:); p0(:)].
 %
-% SOL = QUASIP_INIT_SOL(DATA, X_MF, OM, P0)
+% On input:
+%   data  : Initialized QuasiP data and PHI discretization.
+%   Xk_MF : Harmonic combinations k_tilde and Fourier coefficients X_c(k_tilde).
+%   OM    : Initial omega_1^d.
+%   p0    : Initial model parameters.
 %
-% DATA - Toolbox data structure.
-% X_MF - Combination of frequency components and their amplitudes for quasi-periodic solution
-% OM   - base frequencies of quasi-periodic solution
-% P0   - Initial solution guess for problem parameters.
-
-C = INITIAL_C_byPHI(data,X_MF,OM);
+% On output:
+%   sol   : Structure with sol.u ready for coco_add_func.
+C = INITIAL_C_byPHI(data,Xk_MF,OM);
 
 sol.u  = [C(:); OM(:); p0(:)];
 end

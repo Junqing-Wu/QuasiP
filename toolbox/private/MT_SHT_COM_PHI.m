@@ -1,11 +1,28 @@
 function PHI = MT_SHT_COM_PHI(PHI_INITIAL)
+% SHT discretization relation:
+%   Y_s -> y_s = [I_N kron Gam]*Y_s,
+%   y_e -> Y_e = [I_N kron iGam]*y_e.
+% PHI stores the segment maps required by the MF and HT boundary residuals.
+%MT_SHT_COM_PHI  Build the multi-trajectory shooting discretization.
+%
+% Construct the trajectory mesh, Fourier index combinations, sample/coefficient
+% transforms, segment location maps, and period-dependent phase-shift data used
+% by the MT-SHT residual. The period factors PHI.P determine the length and
+% phase relation of each hyper-time direction.
+%
+% On input:
+%   PHI_INITIAL : MT-SHT settings including d, n, method type, harmonic orders,
+%                 period factors, mesh counts, and the selected shooting direction.
+%
+% On output:
+%   PHI : Complete MT-SHT discretization structure.
 PHI = PHI_INITIAL;
 d   = PHI.d;
 %---------------------------------------------------------------------
 defaults.ODEsolver      = @ode45;
 defaults.Omt            = 1;
-defaults.M_SHT          = 1;
-defaults.Nsteps         = 2^8;
+defaults.M              = 1;
+defaults.L1             = 2^8;
 defaults.IsFixedStep    = false;
 defaults.isvar          = true;
 defaults.ODEsolver_opt  = odeset('RelTol', 1.0e-6, 'AbsTol', 1.0e-8, 'NormControl', 'on');
@@ -37,7 +54,7 @@ if d == 1
     PHI.U        = 1;
     PHI.pS2d     = 1;
     PHI.Varphi2d = [];
-    PHI.type     = 'HT';   % d = 1 默认为时域SHT
+    PHI.type     = 'HT';   % d=1 uses HT-SHT by default
 else
     %---------------------------------------------------------------------
     PHI.kQ                     = Com_kQ(knot,Pnot,d);
@@ -66,15 +83,15 @@ else
 end
 %---------------------------------------------------------------------
 if PHI.IsFixedStep
-    if PHI.S_wave{PHI.Omt} >= PHI.Nsteps
-        n_node    = PHI.P{PHI.Omt}*PHI.Nsteps + 1;
-        mm        = PHI.S_wave{PHI.Omt}/PHI.Nsteps;
+    if PHI.S_wave{PHI.Omt} >= PHI.L1
+        n_node    = PHI.P{PHI.Omt}*PHI.L1 + 1;
+        mm        = PHI.S_wave{PHI.Omt}/PHI.L1;
         n_interp  = PHI.P{PHI.Omt}*PHI.S_wave{PHI.Omt} + 1;
-        [A,B,C,D] = cubic_spline(PHI.P{PHI.Omt}*PHI.Nsteps, PHI.P{PHI.Omt});
+        [A,B,C,D] = cubic_spline(PHI.P{PHI.Omt}*PHI.L1, PHI.P{PHI.Omt});
         SPLine    = zeros(n_interp, n_node);
         SPLine(1:mm:end, :) = eye(n_node);
-        PHI.dphi1           = 2*pi/PHI.Nsteps;
-        for seg = 1:PHI.P{PHI.Omt}*PHI.Nsteps
+        PHI.dphi1           = 2*pi/PHI.L1;
+        for seg = 1:PHI.P{PHI.Omt}*PHI.L1
             for ii = 1:mm-1
                 deltexi = ii/mm * PHI.dphi1;
                 idx = (seg-1)*mm + ii + 1;
@@ -83,33 +100,33 @@ if PHI.IsFixedStep
         end
         PHI.SPLine = sparse(SPLine);
     else
-        mm = PHI.Nsteps/PHI.S_wave{PHI.Omt};
-        SPLine = eye(PHI.P{PHI.Omt}*PHI.Nsteps+1);
+        mm = PHI.L1/PHI.S_wave{PHI.Omt};
+        SPLine = eye(PHI.P{PHI.Omt}*PHI.L1+1);
         PHI.SPLine = sparse(SPLine(1:mm:end,:));
     end
 end
-PHI.Varphi1      = 0:2*pi/PHI.Nsteps:2*PHI.P{PHI.Omt}*pi;
+PHI.Varphi1      = 0:2*pi/PHI.L1:2*PHI.P{PHI.Omt}*pi;
 PHI.wVarphi1      = 0:2*pi/PHI.S_wave{PHI.Omt}:2*PHI.P{PHI.Omt}*pi;
 %---------------------------------------------------------------------
-Dphi1             = 2*PHI.P{PHI.Omt}*pi/PHI.M_SHT;
+Dphi1             = 2*PHI.P{PHI.Omt}*pi/PHI.M;
 Varphi1_se        = 0:Dphi1:2*PHI.P{PHI.Omt}*pi;
 PHI.Varphi1_sta   = Varphi1_se(1:end-1);
 PHI.Varphi1_end   = Varphi1_se(2:end);
 %---------------------------------------------------------------------
-Varphi              = zeros(PHI.M_SHT*PHI.pS2d,d);
+Varphi              = zeros(PHI.M*PHI.pS2d,d);
 Varphi(:,PHI.Omt)   = kron(transpose(PHI.Varphi1_sta),ones(PHI.pS2d,1));
-Varphi(:,PHI.Omnot) = kron(ones(PHI.M_SHT,1),PHI.Varphi2d);
-PHI.Varphi          = Varphi;             % 单轨迹初始值
-PHI.L_HT            = PHI.M_SHT*PHI.pS2d; % 单个x需要的未知数个数 （超时域）
-PHI.L_MF            = PHI.M_SHT*PHI.U;    % 单个x需要的未知数个数 （多频域）
+Varphi(:,PHI.Omnot) = kron(ones(PHI.M,1),PHI.Varphi2d);
+PHI.Varphi          = Varphi;             % Initial trajectory phases
+PHI.L_HT            = PHI.M*PHI.pS2d; % Unknown count for one state in HT-SHT
+PHI.L_MF            = PHI.M*PHI.U;    % Unknown count for one state in MF-SHT
 switch PHI.type
     case 'HT'
         PHI.L = PHI.L_HT;
     case 'MF'
         PHI.L = PHI.L_MF;
 end
-PHI.dphi1  = 2*pi/PHI.Nsteps;
-PHI.num_phi1_taj = PHI.P{PHI.Omt}*PHI.Nsteps/PHI.M_SHT + 1;
+PHI.dphi1  = 2*pi/PHI.L1;
+PHI.num_phi1_taj = PHI.P{PHI.Omt}*PHI.L1/PHI.M + 1;
 %---------------------------------------------------------------------
 OmOd     = [PHI.Omt,PHI.Omnot];
 [~, pos] = sort(OmOd);

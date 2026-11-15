@@ -1,4 +1,21 @@
 function [data, res] = PostP_Amp_Sta_bddat(prob, data, command, varargin)
+%POSTP_AMP_STA_BDDAT  Export Processor results to COCO branch data.
+%
+% This callback is registered as a COCO bddat slot. During initialization it
+% declares amplitude and stability column names. During chart evaluation it
+% extracts the current QuasiP variables, calls PostP_amp and PostP_sta, and
+% returns the values stored on the continuation branch.
+%
+% On input:
+%   prob      : COCO continuation problem structure.
+%   data      : QuasiP slot data.
+%   command   : COCO slot command such as ''init'' or ''data''.
+%   varargin  : Command-specific chart or slot arguments.
+%
+% On output:
+%   data      : Updated slot data.
+%   res       : Cell array of branch-data values.
+
 res = {};
 my_tbid = data.my_tbid;
 prefix_tbid = data.prefix;
@@ -75,6 +92,13 @@ switch command
             outdof = 1:n;
             Amp    = PostP_amp(data_ii,Cii,Omii,outdof,data_ii.amp_opts.isuamp);
             Sta    = PostP_sta(data_ii,Omii,pii,Amp);
+            % Keep the transition history at TR for ode_TR2QuasiP restarts.
+            % Floquet multipliers and stability are stored at every point.
+            if data_ii.ode_opts.d==1 && isfield(data_ii.sta_opts,'store_all_psi') ...
+                    && ~data_ii.sta_opts.store_all_psi ...
+                    && ~contains(chart.pt_type,'TR')
+                Sta.Psi = [];
+            end
             if ~data_ii.amp_opts.isht
                Amp.HT_x = [];Amp.HT_u = [];
             else

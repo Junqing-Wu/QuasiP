@@ -1,4 +1,18 @@
-function C = MT_SHT_INITIAL_C_byPHI(data,X_MF,Om)
+function C = MT_SHT_INITIAL_C_byPHI(data,Xk_MF,Om)
+%MT_SHT_INITIAL_C_BYPHI  Build initial shooting coefficients from Xk_MF.
+%
+% Convert the user multi-frequency representation to the initial trajectory
+% or Fourier coefficient ordering required by the selected MT-SHT type. OM is
+% used to construct the phase-aligned initial sections when required.
+%
+% On input:
+%   data : QuasiP data, initial multi-frequency representation, and
+%   Xk_MF : QuasiP data, initial multi-frequency representation, and
+%   Om : QuasiP data, initial multi-frequency representation, and
+%                   base frequencies.
+%
+% On output:
+%   C : Initial MT-SHT coefficient vector.
 PHI     = data.PHI;
 d       = data.ode_opts.d;
 %--------------------------------------------------------------------------------------------------------------------
@@ -15,8 +29,8 @@ else
     Theta(:,Omnot) = Theta(:,Omnot) + Rhophi1;
 end
 %--------------------------------------------------------------------------------------------------------------------
-k_h = X_MF(:,1:d)';
-Q   = X_MF(:,1+d:end);
+k_h = Xk_MF.k_wave';
+Q   = Xk_MF.Xc;
 %--------------------------------------------------------------------------------------------------------------------
 H_IDF = exp(1i*Theta*k_h);
 kOm   = 1i*diag(Om'*k_h);

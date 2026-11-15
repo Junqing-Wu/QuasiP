@@ -1,4 +1,27 @@
 function [xi0,xi1,xi2,wxi1,wxi2,wGam0,wGam1,U,pS,pwS] = MP_ShapeF_CO(m,p,S,wS)
+%PURPOSE  Construct periodic collocation basis and derivative matrices.
+%
+% Build periodic Lagrange interpolation on each collocation subinterval and
+% assemble value, first-derivative, second-derivative, and dense-grid
+% interpolation operators for the m-VCF formulation.
+%
+% On input:
+%   m  : Lagrange polynomial degree and collocation points per subinterval.
+%   p  : Period-multiplication number P_i.
+%   S  : Coarse sample count S_i.
+%   wS : Dense sample count S_wave(i).
+%
+% On output:
+%   xi0  : Periodic value/interpolation operator.
+%   xi1  : Periodic first-derivative operator.
+%   xi2  : Periodic second-derivative operator.
+%   wxi1 : Dense-grid first-derivative operator.
+%   wxi2 : Dense-grid second-derivative operator.
+%   wGam0: Dense-grid value interpolation matrix.
+%   wGam1: Dense-grid first-derivative interpolation matrix.
+%   U    : Number of collocation basis functions.
+%   pS   : Period-weighted coarse sample count P_i*S_i.
+%   pwS  : Period-weighted dense sample count P_i*S_wave(i).
 tol = 1e-6;
 if abs(mod(wS, S)) > tol
     warning('S_wave is not an integer multiple of S!');

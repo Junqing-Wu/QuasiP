@@ -1,4 +1,19 @@
 function [X0,X0dot] = MP_mVCF_U2S_xv(Xd,Om,PHI,U_prod)
+%MP_MVCF_U2S_XV  Reconstruct m-VCF state and velocity samples.
+%
+% First reconstruct X0 with the U-to-S transform, then apply the
+% frequency-weighted derivative transforms to obtain the physical velocity.
+%
+% On input:
+%   Xd      : m-VCF coefficient row.
+%   Om      : Base-frequency vector omega_1^d.
+%   PHI     : m-VCF basis and transform data.
+%   U_prod  : Product of the U_i coefficient counts.
+%
+% On output:
+%   X0      : Dense state samples.
+%   X0dot   : Dense velocity samples.
+
 pwSiip1Td = 1;
 U1Tii = U_prod;
 U = cell2mat(PHI.U_omod);
@@ -28,5 +43,4 @@ end
 X0 = Xii;
 X0dot = Xiidot;
 end
-
 

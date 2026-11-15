@@ -1,5 +1,18 @@
 function prob = QuasiP_d1_test(prob, tbid, data)
-% QUASIP_D1_TEST  Add Floquet test functions for d=1 solutions.
+%QUASIP_D1_TEST  Register d=1 bifurcation test functions.
+%
+% For a one-frequency solution, construct COCO test functions for fold,
+% period-doubling, and torus bifurcations. The nested monitor evaluates the
+% characteristic multipliers returned by PostP_sta and the event handler
+% identifies torus points used by ODE_TR2QuasiP.
+%
+% On input:
+%   prob : COCO problem structure containing the QuasiP zero problem.
+%   tbid : QuasiP toolbox identifier.
+%   data : QuasiP data and stability settings.
+%
+% On output:
+%   prob : COCO problem with test functions and events registered.
 tfid = coco_get_id(tbid, 'test');
 tfps = coco_get_id(tfid, {'FP' 'PD' 'TR'});
 uidx = coco_get_func_data(prob, tbid, 'uidx');

@@ -1,9 +1,19 @@
 function [A,B,C,D] = cubic_spline(pS, p)
-% Non-periodic cubic spline matrices
-% pS: total intervals = p*S
-% p: period scaling factor
-% A,B,C,D: (pS+1)x(pS+1) matrices
-
+%CUBIC_SPLINE  Construct cubic-spline coefficient matrices on a periodic mesh.
+%
+% Build the interval-wise cubic interpolation coefficients used by the finite
+% difference and post-processing routines. The period multiplier p determines
+% the repeated interval layout and the cyclic boundary equations.
+%
+% On input:
+%   pS : Number of mesh intervals in the periodic grid.
+%   p  : Period multiplier; the interval spans 2*p*pi.
+%
+% On output:
+%   A : Cubic-spline value coefficients for each interval.
+%   B : Cubic-spline first-order coefficients.
+%   C : Cubic-spline second-order coefficients.
+%   D : Cubic-spline third-order coefficients.
 n = pS + 1;
 h = 2*p*pi / pS;
 

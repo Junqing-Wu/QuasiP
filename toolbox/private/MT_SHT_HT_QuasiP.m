@@ -1,20 +1,43 @@
 function [y,J] = MT_SHT_HT_QuasiP(data,PSI,ys,Om)
+%MT_SHT_HT_QUASIP  Assemble hyper-time FSE-SHT boundary equations.
+%
+% This routine is the hyper-time counterpart of MT_SHT_MF_QuasiP. It matches
+% the terminal state of each shooting segment to the initial state of the next
+% segment and closes the trajectory family after one period of the selected
+% base-frequency direction.
+%
+% For adjacent segments the residual is
+%   ye_jj(ys_jj) - ys_jjp1 = 0.
+% For d>1, the closing condition is
+%   kron(eye(N),Gam*Omic*iGam)*ye_M - ys_1 = 0.
+% Gam and iGam convert between trajectory samples and Fourier coefficients;
+% Omic applies the phase shift caused by the remaining base frequencies.
+%
+% On input:
+%   data : QuasiP data, including the hyper-time mesh and conversion matrices.
+%   PSI  : Terminal states and optional sensitivities from the shooting solver.
+%   ys   : Initial hyper-time trajectory samples for all segments.
+%   Om   : Base-frequency vector; Omt selects the integration direction.
+%
+% On output:
+%   y    : Hyper-time continuity and closure residual.
+%   J    : Jacobian with respect to ys, Om, and p when PHI.isvar is true.
 PHI   = data.PHI;
 NL    = PHI.nL;
 N     = PHI.N;
 d     = data.ode_opts.d;
 a     = data.pdim;
-M_SHT = PHI.M_SHT;
+M_SHT = PHI.M;
 Omt   = PHI.Omt;
 Omnot = PHI.Omnot;
 Om1   = Om(Omt);
 Om2d  = Om(Omnot);
 Rho   = Om2d./Om1;
 %----------------------------------------------------------
-R0   = zeros(NL,1);         % 非线性代数方程组R的残差
-Jy0  = zeros(NL,NL);        % R关于y0的导数
-Jom0 = zeros(NL,d);         % R关于Om的导数
-Jp0  = zeros(NL,a);         % R关于p 的单数
+R0   = zeros(NL,1);         % NAE boundary residual R0
+Jy0  = zeros(NL,NL);        % dR0/dys
+Jom0 = zeros(NL,d);         % dR0/dOm
+Jp0  = zeros(NL,a);         % dR0/dp
 %==========================================================
 if PHI.isvar
     ye     = PSI(:,1:N);
@@ -135,3 +158,30 @@ else
     J = [];
 end
 end
+
+% data1 = ye_jj(1:16);
+% data2 = ys_jjp1(1:16);
+% data3 = EGOG*ye_jj;
+% data3 = data3(1:16);
+% x = 1:16;
+% width = 0.22;
+% figure('Color','w');
+% b1 = bar(x-width, data1, width);
+% b1.FaceColor = [0 0 1];
+% b1.FaceAlpha = 0.5;
+% hold on
+% b2 = bar(x, data2, width);
+% b2.FaceColor = [1 0 0];
+% b2.FaceAlpha = 0.5;
+% b3 = bar(x+width, data3, width);
+% b3.FaceColor = [0.6 0 0.8];
+% b3.FaceAlpha = 0.5;
+%  xlabel('$\bar{\varphi}_2$','Interpreter','latex');
+% ylabel('$y_1$','Interpreter','latex');
+% leg = legend('$\bar{\mathbf{y}}_{e:3}$','$\bar{\mathbf{y}}_{s:1}$','$\hat{\mathbf{y}}_{e:3}$');
+% leg.Interpreter = 'latex';
+% grid on
+% plot_setting_paper()
+% xlim([0.5 16.5])
+% xticks(1:16)
+% hold off

@@ -1,4 +1,20 @@
 function Amp = MT_SHT_PostP_amp(data,Om,outdof,isuamp)
+%MT_SHT_POSTP_AMP  Compute amplitudes from stored FSE-SHT trajectories.
+%
+% MT_SHT_QuasiP stores trajectory states and optional velocities when amplitude
+% processing is enabled. This routine interpolates the trajectory samples,
+% transforms the remaining hyper-time directions, and evaluates amplitudes over
+% the time interval selected by amp_opts.
+%
+% On input:
+%   data    : QuasiP data containing PHI, stored trajectory samples, and amp_opts.
+%   Om      : Base-frequency vector.
+%   outdof  : State-component indices to report.
+%   isuamp  : Flag selecting displacement-only or displacement/velocity output.
+%
+% On output:
+%   Amp     : Amplitude data for the requested state components.
+
 Noutdof   = length(outdof);
 PHI       = data.PHI;
 N         = PHI.N;
@@ -11,7 +27,7 @@ Om2d      = Om(Omnot);
 Rho       = Om2d./Om1;
 pydy_temp = data.phi_y_dy;
 pS2d      = PHI.pS2d;
-Nsteps    = PHI.Nsteps;
+Nsteps    = PHI.L1;
 wS1       = PHI.S_wave{Omt}*PHI.P{Omt};
 if d>1
     pwS2d     = prod(cell2mat(PHI.pwSnot));
@@ -37,7 +53,7 @@ MF_x      = zeros( wS1*pwS2d   ,Noutdof);
 %-------------------------------------------------------------------------
 if PHI.IsFixedStep
     ydy = pydy_temp(1,2:end,1:pS2d);
-    for jj = 1:PHI.M_SHT
+    for jj = 1:PHI.M
         st = (jj-1)*pS2d + 1;
         ed = jj*pS2d;
         ydy = [ydy;pydy_temp(2:end,2:end,st:ed)];
@@ -47,7 +63,7 @@ if PHI.IsFixedStep
     ydy(:,n+1:2*n,:) = ydy(:,n+1:2*n,:)*Om1;
 else
     ydy = cellfun(@(x) x(1,:), pydy_temp(1:pS2d), 'UniformOutput',false);
-    for jj = 1:PHI.M_SHT
+    for jj = 1:PHI.M
         st = (jj-1)*pS2d + 1;
         ed = jj*pS2d;
         ydy = cellfun(@(a,b)[a;b(2:end,:)], ydy, pydy_temp(st:ed), 'UniformOutput',false);

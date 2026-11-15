@@ -1,12 +1,24 @@
 function [xSample,ySample,stabSample,idxSample] = ...
     sample_curve_points(x,y,stability,numSamplePoints,densityWeight)
-%SAMPLE_CURVE_POINTS Adaptive sampling along a curve.
+%SAMPLE_CURVE_POINTS  Select representative points from continuation data.
 %
-% densityWeight:
-%   0 - Uniform sampling according to curve arc length
-%   1 - Uniform sampling according to original point indices
+% Normalize the branch coordinates, combine arc-length and original-index
+% density according to densityWeight, and return representative points with
+% their stability labels. This utility is used to make long COCO branches
+% easier to inspect without changing the underlying branch data.
 %
-% A value between 0.5 and 0.8 is generally recommended.
+% On input:
+%   x               : Branch coordinates.
+%   y               : Branch coordinates.
+%   stability       : Stability label associated with each point.
+%   numSamplePoints : Requested number of representative points.
+%   densityWeight   : Weight between arc-length and original-index density.
+%
+% On output:
+%   xSample         : Sampled branch coordinates.
+%   ySample         : Sampled branch coordinates.
+%   stabSample      : Stability labels at the sampled points.
+%   idxSample       : Indices of the selected original points.
 
 x = x(:).';
 y = y(:).';

@@ -1,11 +1,23 @@
 function ddX0dOm = MP_mVCF_U2S_ddX0dOm(PHI,Xd,U_prod,dd)
-% MP_mVCF_U2S_0: U-domain (harmonic) → S-domain (spectral) mapping for QP
-% Inputs:
-%   - PHI: MP parametrization config (HB/CO/FD methods, U/S dimensions)
-%   - Xd: U-domain coefficient vector (dimension: U_prod)
-%   - U_prod: Total U-domain harmonic combinations
-% Output:
-%   - X0: S-domain spectral vector (dimension: S_prod)
+% Frequency sensitivity:
+%   dX0/dOm(dd) = d[U2S(PHI,Xd)]/dOm(dd).
+% Only the derivative operator associated with direction dd contributes.
+%MP_MVCF_U2S_DDX0DOM  Compute the derivative of reconstructed samples with respect to Om.
+%
+% Differentiate the U-to-S reconstruction in the requested frequency
+% direction dd. HB uses PHI.Gam1; CO and FD use their corresponding first-
+% derivative interpolation operator. The result is used when differentiating
+% the m-VCF residual with respect to base frequencies.
+%
+% On input:
+%   PHI : m-VCF basis and derivative data.
+%   Xd : m-VCF coefficient vector.
+%   U_prod : Product of coefficient counts.
+%   dd : Frequency-direction index.
+%                      frequency-direction index.
+%
+% On output:
+%   ddX0dOm : Derivative of reconstructed state samples with respect to Om(dd).
 pSiip1Td = 1;
 U1Tii = U_prod;
 U = cell2mat(PHI.U);

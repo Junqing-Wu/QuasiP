@@ -1,11 +1,19 @@
 function [X0,dX0] = MP_mVCF_U2S_01(PHI,Xd,Om,U_prod)
-% MP_mVCF_U2S_0: U-domain (harmonic) → S-domain (spectral) mapping for QP
-% Inputs:
-%   - PHI: MP parametrization config (HB/CO/FD methods, U/S dimensions)
-%   - Xd: U-domain coefficient vector (dimension: U_prod)
-%   - U_prod: Total U-domain harmonic combinations
-% Output:
-%   - X0: S-domain spectral vector (dimension: S_prod)
+%MP_MVCF_U2S_01  Reconstruct state and first hyper-time derivative samples.
+%
+% The routine evaluates the state represented by Xd and its derivative with
+% respect to each hyper-time direction. The derivative matrices stored in PHI
+% are combined with the current base frequencies Om.
+%
+% On input:
+%   PHI    : m-VCF basis and derivative matrices.
+%   Xd     : U-domain coefficient row for one state component.
+%   Om     : Current base-frequency vector.
+%   U_prod : Total coefficient count.
+%
+% On output:
+%   X0     : State samples.
+%   dX0    : Frequency-scaled derivative samples used by F.
 pSiip1Td = 1;
 U1Tii = U_prod;
 U = cell2mat(PHI.U_omod);

@@ -1,4 +1,18 @@
 function Sta = PostP_sta(data,Omii,pii,Amp)
+%POSTP_STA  Dispatch stability processing and classify the current solution.
+%
+% Select the MP or MT transition-data constructor, then compute characteristic
+% multipliers for d=1 or Lyapunov quantities for d>1. The result is used by
+% QuasiP_d1_test and by the COCO branch-data slot.
+%
+% On input:
+%   data    : QuasiP model, PHI, and stability settings.
+%   Omii    : Current base-frequency vector.
+%   pii     : Current model-parameter vector.
+%   Amp     : Amplitude/reconstruction data.
+%
+% On output:
+%   Sta     : Stability data, transition matrices, multipliers/exponents, and labels.
 
 switch data.PHI.param
     case{'MP'}
@@ -57,7 +71,7 @@ else
 
             lnR = lnR + log(abs(diag(R)'));
             if any(isnan(R), 'all') || any(isinf(R), 'all')
-                error('QR分解结果包含NaN或无穷值！');
+                error('QR factorization returned NaN or Inf.');
             end
             Lyapunov(ii,:) = lnR / ii / dTi;
         end
@@ -74,42 +88,40 @@ end
 
 
 function [Q, R] = householder_qr(A)
-% 输入:
-% A: 需要进行 QR 分解的矩阵
-%
-% 输出:
-% Q: 正交矩阵
-% R: 上三角矩阵
+% Input:
+% A: Matrix to factorize.
+% Output:
+% Q: Orthogonal factor.
+% R: Upper-triangular factor.
 
-[m, n] = size(A);   % 获取矩阵 A 的大小
-Q = eye(m);         % 初始化 Q 为单位矩阵
-R = A;              % 初始化 R 为矩阵 A
+[m, n] = size(A);   % Get the matrix dimensions.
+Q = eye(m);         % Initialize Q as the identity.
+R = A;              % Initialize R with A.
 
-% 逐列进行 Householder 变换
+% Apply Householder reflections column by column.
 for k = 1:min(m, n)
-    % 提取 A 的第 k 列向量的下部分
-    x = R(k:m, k);  % 提取当前列中从第 k 行开始的部分
+    % Extract the active part of column k.
+    x = R(k:m, k);  % Extract the active part of column k.
 
-    % 构造 Householder 反射向量 v
+    % Construct the Householder reflection vector v.
     e1 = zeros(length(x), 1);
-    e1(1) = 1;  % 构造标准基向量 e1
-    v = sign(x(1)) * norm(x) * e1 + x;  % 构造反射向量
-    v = v / norm(v);  % 归一化
+    e1(1) = 1;  % Construct the first basis vector e1.
+    v = sign(x(1)) * norm(x) * e1 + x;  % Construct the reflection vector.
+    v = v / norm(v);  % Normalize the reflection vector.
 
-    % 构造 Householder 矩阵 H_k
-    H_k = eye(m - k + 1) - 2 * (v * v');  % 计算 Householder 变换矩阵
+    % Construct the Householder matrix H_k.
+    H_k = eye(m - k + 1) - 2 * (v * v');  % Form the Householder matrix.
 
-    % 将 H_k 应用于矩阵 R
-    R(k:m, :) = H_k * R(k:m, :);  % 更新 R 中从 k 行开始的部分
+    % Apply H_k to R.
+    R(k:m, :) = H_k * R(k:m, :);  % Update the active rows of R.
 
-    % 构造完整的 Householder 变换矩阵 H_full
+    % Construct the full Householder matrix H_full.
     H_full = eye(m);
     H_full(k:m, k:m) = H_k;
 
-    % 更新 Q 矩阵
+    % Update Q.
     Q = Q * H_full;
 end
 
 end
-
 

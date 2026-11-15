@@ -1,17 +1,20 @@
 function [A,B,C,D] = periodic_spline(U,p) % cubic spline interpolation for periodic solution
-% PERIODIC_SPLINE - Construct periodic cubic spline interpolation matrices
+%PERIODIC_SPLINE  Construct periodic cubic-spline interpolation coefficients.
 %
-% INPUT:
-%   U    - Number of discrete points in one period [0, 2pπ)
+% Solve the cyclic cubic-spline equations for a periodic grid. The returned
+% matrices A, B, C, and D provide the value contribution on each interval:
+%   x(delta) = A + B*delta + C*delta^2 + D*delta^3.
+% The cyclic endpoint equations make the first and last intervals consistent.
 %
-% OUTPUTS:
-%   A/B/C/D - Coefficient matrices for cubic spline polynomial:
-%             S(x) = A·y + B·y' + C·y'' + D·y''' (y = discrete values)
+% On input:
+%   U : Number of periodic grid nodes.
+%   p : Period multiplier defining the interval length.
 %
-% DESCRIPTION:
-%   This subfunction builds periodic cubic spline matrices with cyclic boundary
-%   conditions (continuous at τ=0 and τ=2pπ for all derivatives).
-
+% On output:
+%   A : Cubic-spline coefficient matrices.
+%   B : Cubic-spline coefficient matrices.
+%   C : Cubic-spline coefficient matrices.
+%   D : Cubic-spline coefficient matrices.
 A = eye(U); % Identity matrix (zero-order term, y)
 h = 2*p*pi/U; % Uniform grid spacing in [0, 2pπ)
 

@@ -1,15 +1,24 @@
 function data = QuasiP_get_seeting(prob,tbid,data)
-
-% QUASIP_GET_SETTINGS   Read 'QuasiP' toolbox instance settings.
+%QUASIP_GET_SEETING  Build the Generator settings and PHI discretization.
 %
-% Merge user-supplied toolbox settings with default values.
+% Merge the user options stored under the QuasiP toolbox identifier with the
+% defaults, then construct PHI_INITIAL for the selected numerical method.
+% The fields d and e define the response and excitation frequency counts;
+% P(i) defines the torus period-multiplication number; S(i) and S_wave(i)
+% define the original and denser S-domain sample counts; k(i) defines the
+% method-specific shape-function parameter. For MP/m-VCF, type(i) selects HB,
+% FD, or CO. For MT/FSE-SHT, type selects MF or HT and Omt selects the
+% integration direction.
 %
-% DATA = QUASIP_GET_SETTINGS(PROB, TBID, DATA)
+% On input:
+%   prob : COCO problem structure containing ode_opts, amp_opts, sta_opts,
+%          par_opts, and PHI_INITIAL.
+%   tbid : QuasiP object identifier used to read the options.
+%   data : Initial data structure, normally empty.
 %
-% PROB - Continuation problem structure.
-% TBID - Toolbox instance identifier.
-% DATA - Toolbox data strcture.
-%--------------------------------------------------------------------------------------------------------------------
+% On output:
+%   data : Complete settings structure containing ode_opts, PHI, amp_opts,
+%          sta_opts, and par_opts.
 ode_opts.n           = [];            % Number of DOFs (must be provided by user)
 ode_opts.d           = [];            % Number of base frequencies of QP (must be provided by user)
 ode_opts.e           = [];            % Number of base frequencies of Excitation (must be provided by user)
@@ -34,7 +43,7 @@ defaults.amp_opts    = amp_opts;      % Store amplitude options in default confi
 sta_opts.issta       = false;         % Enable or disable stability analysis
 sta_opts.Omt         = 1;
 sta_opts.S           = 2^5;           % Number of trajectories along a single hyper-time direction
-sta_opts.L           = 2^8;           % Number of sampling points for integration
+sta_opts.L1          = 2^8;           % Number of sampling points for integration
 sta_opts.N_Ly        = 1000;          % Iterations for Lyapunov exponents (when d > 1)
 defaults.sta_opts    = sta_opts;      % Store stability analysis options in default configuration
 %--------------------------------------------------------------------------------------------------------------------
@@ -98,7 +107,7 @@ end
 %====================================================================================================================
 function sta_opts = fill_stable_TAU_data(sta_opts, PHI, ode_opts)
 S        = sta_opts.S;
-L        = sta_opts.L;
+L        = sta_opts.L1;
 period   = cell2mat(PHI.P);
 Omi      = sta_opts.Omt;
 d        = ode_opts.d;

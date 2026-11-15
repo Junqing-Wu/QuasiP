@@ -1,4 +1,23 @@
 function [data, y, J] = MT_SHT_HT_QuasiP_PC(prob, data, u)
+% HT-OPC relation:
+%   OPC_i = <phase-direction derivative, continuation correction> = 0.
+% The code evaluates this row using the initial hyper-time trajectory.
+%MT_SHT_HT_QUASIP_PC  Build phase conditions for hyper-time shooting.
+%
+% Compute the orthogonality rows associated with the unknown hyper-time
+% frequencies using the initial trajectory samples ys and the trajectory
+% derivative MT_SHT_dy. These conditions remove the phase-shift nullspace
+% before COCO continues the SHT solution.
+%
+% On input:
+%   prob : COCO problem structure.
+%   data : QuasiP model and PHI data.
+%   u    : Shooting unknown vector.
+%
+% On output:
+%   data : Updated callback data.
+%   y    : Hyper-time shooting phase-condition residual.
+%   J    : Its Jacobian with respect to the active unknowns.
 PHI   = data.PHI;
 NL    = PHI.nL;
 N     = PHI.N;
@@ -6,10 +25,10 @@ d     = data.ode_opts.d;
 e     = data.ode_opts.e;
 a     = data.pdim;
 %----------------------------------------------------------
-R1   = zeros(d-e,1);        % 未知基频的相位条件PC的残差
-Jy1  = zeros(d-e,NL);       % PC关于Xd的导数
-Jom1 = zeros(d-e,d);        % PC关于Om的导数
-Jp1  = zeros(d-e,a);        % PC关于p 的导数
+R1   = zeros(d-e,1);        % OPC residual for unknown response frequencies
+Jy1  = zeros(d-e,NL);       % dOPC/dC
+Jom1 = zeros(d-e,d);        % dOPC/dOm
+Jp1  = zeros(d-e,a);        % dOPC/dp
 %----------------------------------------------------------
 ys  = reshape(u(1:NL),[],N);
 Om  = u(1+NL:d+NL);
@@ -28,11 +47,11 @@ else
     Theta(:,Omnot) = Theta(:,Omnot) + Rhophi1;
 end
 %============================================================
-%>>>>>>>> (I_N \otimes iG^\top*iG)dys1   垂直 ys1r <<<<<<<<<<
-%>>>>>>>> (I_N \otimes iG^\top*Xi*iG)ys1 垂直 ys1r <<<<<<<<<<
+%>>>>>>>> (I_N \otimes iG^\top*iG)dys1   orthogonal to ys1r <<<<<<<<<<
+%>>>>>>>> (I_N \otimes iG^\top*Xi*iG)ys1 orthogonal to ys1r <<<<<<<<<<
 %============================================================
 if d > e
-    for mm = 1:PHI.M_SHT
+    for mm = 1:PHI.M
         kk = e + 1;
         loca0   = PHI.local_HT{mm};
         ys1     = ys(loca0,:);

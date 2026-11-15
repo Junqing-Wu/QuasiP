@@ -1,4 +1,22 @@
 function f = my_dxdt(t,x,p,OM,F,L,isfwithu)
+%MY_DXDT  Evaluate the QuasiP model in physical time.
+%
+% Form the excitation phase vector theta=OM*t and evaluate either the
+% first-order vector field or the first-order state representation of the
+% second-order equation l(ddx,dx,x,p)=f(x,dx,theta,p).
+%
+% On input:
+%   t        : Physical time.
+%   x        : Current state vector.
+%   p        : Model-parameter vector.
+%   OM       : Base-frequency vector.
+%   F        : Nonlinear force or first-order vector-field callback.
+%   L        : Optional linear-part callback.
+%   isfwithu : True when F receives both x and dx.
+%
+% On output:
+%   f        : Physical-time state derivative.
+
 f = zeros(size(x));
 if isempty(OM)
     theta = [];

@@ -1,41 +1,64 @@
 function prob = ode_construct_QuasiP(prob, tbid, data, sol)
-% ODE_CONSTRUCT_QUASIP  Append an instance of 'QuasiP' to problem.
+%ODE_CONSTRUCT_QUASIP  Register the QuasiP Generator and Processor in COCO.
 %
-% Add R(C,OM,P)=0 and PHASE conditions, monitor functions that
-% evaluate to the problem parameters, and corresponding inactive
-% continuation parameters.
+% Add the NAE residual R(C,Om,p)=0, add d-e OPC equations when response
+% frequencies are unknown, expose p, known frequencies kOMs, and unknown
+% frequencies uOMs as COCO parameters, and install the save/post-processing
+% slots. This is the QuasiP counterpart of the COCO po construction routine.
 %
-% PROB = ODE_CONSTRUCT_QUASIP(PROB, TBID, DATA, SOL)
+% On input:
+%   prob : COCO problem structure.
+%   tbid : QuasiP instance identifier.
+%   data : Initialized Generator/Processor data.
+%   sol  : Starter solution with sol.u=[C(:); Om(:); p(:)] and optional sol.t0.
 %
-% PROB - Continuation problem structure.
-% TBID - Toolbox instance identifier.
-% DATA - Toolbox data structure.
-% SOL  - Initial solution guess.
-%----------------------------------------------------------
+% On output:
+%   prob : COCO problem containing the registered QuasiP equations.
+%
+% A nonempty sol.t0 is passed to COCO as the branch-switching tangent.
+has_t0 = isfield(sol, 't0') && ~isempty(sol.t0);
 if data.PHI.isvar
-    prob = coco_add_func(prob, tbid, @QuasiP, data, 'zero', 'u0', sol.u, 'F+dF');
+    if ~has_t0
+        prob = coco_add_func(prob, tbid, @QuasiP, data, 'zero', ...
+          'u0', sol.u, 'F+dF');
+    else
+        prob = coco_add_func(prob, tbid, @QuasiP, data, 'zero', ...
+          'u0', sol.u, 't0', sol.t0, 'F+dF');
+    end
 else
-    prob = coco_add_func(prob, tbid, @QuasiP, data, 'zero', 'u0', sol.u);
+    if ~has_t0
+        prob = coco_add_func(prob, tbid, @QuasiP, data, 'zero', ...
+          'u0', sol.u);
+    else
+        prob = coco_add_func(prob, tbid, @QuasiP, data, 'zero', ...
+          'u0', sol.u, 't0', sol.t0);
+    end
 end
 %----------------------------------------------------------
+% Add one orthogonality phase condition for every unknown response frequency.
+% Expose the unknown response frequencies.
 if data.ode_opts.d > data.ode_opts.e
     pcfid = coco_get_id(tbid, 'OPC');
     uidx   = coco_get_func_data(prob, tbid, 'uidx');
     prob  = coco_add_func(prob, pcfid, @QuasiP_PC, data, 'zero', 'uidx', uidx, 'F+dF');
 end
 %----------------------------------------------------------
+% Expose model parameters as COCO continuation parameters.
 if ~isempty(data.pnames)
     pfid = coco_get_id(tbid, 'pars');
     uidx = coco_get_func_data(prob, tbid, 'uidx');
     prob = coco_add_pars(prob, pfid, uidx(data.p_idx), data.pnames);
 end
 %----------------------------------------------------------
+% Expose the prescribed excitation frequencies.
 if data.ode_opts.e > 0
     komfid = coco_get_id(tbid, 'kOMs');
     uidx   = coco_get_func_data(prob, tbid, 'uidx');
     prob   = coco_add_pars(prob, komfid, uidx(data.kOM_idx), data.kOMnames);
 end
 %----------------------------------------------------------
+% Add one orthogonality phase condition for every unknown response frequency.
+% Expose the unknown response frequencies.
 if data.ode_opts.d > data.ode_opts.e
     uomfid = coco_get_id(tbid, 'uOMs');
     uidx   = coco_get_func_data(prob, tbid, 'uidx');

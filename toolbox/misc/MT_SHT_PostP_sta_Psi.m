@@ -1,4 +1,20 @@
 function Psi = MT_SHT_PostP_sta_Psi(data,Om,p,Amp)
+%MT_SHT_POSTP_STA_PSI  Compute FSE-SHT transition data for stability analysis.
+%
+% Use the variational trajectory data generated during shooting to construct
+% transition matrices over the selected integration direction and the remaining
+% hyper-time sample directions. These matrices are Fourier filtered or
+% interpolated before PostP_sta evaluates stability.
+%
+% On input:
+%   data    : QuasiP model, PHI, stored sensitivities, and stability settings.
+%   Om      : Base-frequency vector.
+%   p       : Model-parameter vector.
+%   Amp     : Current amplitude/reconstruction data.
+%
+% On output:
+%   Psi     : Transition-matrix data for multiplier or Lyapunov analysis.
+
 PHI      = data.PHI;
 n        = data.ode_opts.n;
 d        = data.ode_opts.d;
@@ -22,7 +38,7 @@ for iii = 1:NumOmi
         pS_prod = prod(pS);
         ye_ys   = data.ye_ys;
         M = cellfun(@(v) reshape(v, N, N), num2cell(ye_ys(1:pS_prod,:), 2), 'UniformOutput', false);
-        for jj = 2:PHI.M_SHT
+        for jj = 2:PHI.M
             st = (jj-1)*pS_prod + 1;
             ed = jj*pS_prod;
             M_temp = cellfun(@(v) reshape(v, N, N), num2cell(ye_ys(st:ed,:), 2), 'UniformOutput', false);
@@ -46,7 +62,7 @@ for iii = 1:NumOmi
         end
         pS_prod  = prod(pS);
         pL1      = data.sta_opts.pL1{iii};
-        L        = data.sta_opts.L;
+        L        = data.sta_opts.L1;
         vp       = repmat(p,1,pL1);
         dt1      = 2*pi/(L*Om(Om_t));
         N_Ly     = data.sta_opts.N_Ly;

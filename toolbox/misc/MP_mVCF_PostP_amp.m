@@ -1,5 +1,21 @@
 function Amp = MP_mVCF_PostP_amp(data,Xd,Om,outdof,isuamp)
-%-------------------------------------------------------------------------
+%MP_MVCF_POSTP_AMP  Reconstruct an m-VCF torus and compute response amplitudes.
+%
+% This Processor routine converts the coefficient vector Xd to dense
+% hyper-time samples, converts those samples to the multi-frequency domain,
+% and evaluates the requested amplitude measures over the selected time
+% interval. The resulting data are used by PostP_Amp_Sta_bddat.
+%
+% On input:
+%   data    : QuasiP data structure containing PHI and amp_opts.
+%   Xd      : m-VCF coefficient vector C for the current solution.
+%   Om      : Base-frequency vector omega_1^d.
+%   outdof  : Indices of state components whose amplitudes are requested.
+%   isuamp  : Flag selecting displacement-only or displacement/velocity output.
+%
+% On output:
+%   Amp     : Amplitude data for the requested state components.
+
 Noutdof  = length(outdof);
 PHI      = data.PHI;
 n        = PHI.n;

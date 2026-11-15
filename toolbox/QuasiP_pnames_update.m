@@ -1,4 +1,21 @@
 function data = QuasiP_pnames_update(tbid, data, pnames)
+% QUASIP_PNAMES_UPDATE   Build COCO names for parameters and frequencies.
+%
+% DATA = QUASIP_PNAMES_UPDATE(TBID, DATA, PNAMES)
+%
+% Add the object prefix required for composite COCO problems and generate names
+% for model parameters, prescribed excitation frequencies, and unknown response
+% frequencies.
+%
+% On input:
+%
+% TBID   : QuasiP toolbox instance identifier.
+% DATA   : QuasiP data structure.
+% PNAMES : String or cell array of model-parameter names.
+%
+% On output:
+%
+% DATA   : Updated parameter-name and frequency-name fields.
 if strcmp(tbid, 'QuasiP')
     prefix = '';
 else
@@ -17,6 +34,7 @@ else
     data.pnames = pnames;
 end
 %----------------------------------------------------------
+% Generate names for prescribed and unknown frequency blocks.
 data.kOMnames = cell(1, data.ode_opts.e);
 for ii = 1 : data.ode_opts.e
     data.kOMnames{ii} = sprintf([prefix 'k_OM%d'], ii);

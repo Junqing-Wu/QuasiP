@@ -1,11 +1,23 @@
 function Nd_Xd = MP_mVCF_S2U_withXDX(PHI, N0_X0, N0_dX0, Om, pS_prod)
-% MP_mVCF_S2U_withXDX: S-domain → U-domain mapping for nonlinear force gradients (∂N/∂Xd)
-% Inputs:
-%   - PHI: MP parametrization config (HB/CO/FD methods, U/S dimensions)
-%   - N0_X0: S-domain gradient tensor (dimension: 1×pS_prod)
-%   - S_prod: Total S-domain spectral combinations
-% Output:
-%   - Nd_Xd: U-domain gradient matrix (dimension: U_prod × U_prod)
+% Velocity-dependent chain rule:
+%   dF/dC = dF/dX0*dX0/dC + dF/d(dX0)*d(dX0)/dC.
+% Om weights the derivative contribution in the m-VCF residual.
+%MP_MVCF_S2U_WITHXDX  Transform derivatives involving X and dX to U-domain.
+%
+% For velocity-dependent nonlinear forces, combine the sampled derivatives
+% with respect to X0 and dX0, apply the Om-weighted derivative contribution,
+% and project the result through the tensor-product basis transforms.
+%
+% On input:
+%   PHI : m-VCF basis and transform data.
+%   N0_X0 : Sample-domain derivative with respect to X0.
+%   N0_dX0 : Sample-domain derivative with respect to dX0.
+%   Om : Base-frequency vector.
+%   pS_prod : Product of sample counts.
+%          frequencies, and product sample count.
+%
+% On output:
+%   Nd_Xd : Coefficient-space derivative used by the m-VCF Jacobian.
 U            = cell2mat(PHI.U_omod);
 pS           = cell2mat(PHI.pS_omod);
 pS_iiTd      = pS_prod;
@@ -70,4 +82,3 @@ for kk = 1:PHI.d
 end
 Nd_Xd = transpose( reshape(N_Xiiminus1,U_1Tiiminus1,U_1Tiiminus1) );
 end
-
