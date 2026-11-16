@@ -57,3 +57,7 @@ The toolbox manuscript, *QuasiP: A COCO-Based Toolbox for Continuation of Quasi-
 - Mingwu Li. *Tor: a toolbox for the continuation of two-dimensional tori in autonomous systems and non-autonomous systems with periodic forcing*. arXiv:2012.13256 (2020). [Preprint](https://arxiv.org/abs/2012.13256) · [Tor source code](https://github.com/mingwu-li/torus_collocation)
 - Robert Fiedler, Hartmut Hetzler, and Simon Bäuerle. *Efficient numerical calculation of Lyapunov-exponents and stability assessment for quasi-periodic motions in nonlinear systems*. **Nonlinear Dynamics**, 112, 8299–8327 (2024).
 - Harry Dankowicz and Frank Schilder. *Recipes for Continuation*. SIAM (2013).
+
+## Acknowledgments
+
+We would like to thank Hongming Liang and Feng Wang (Southern University of Science and Technology) for valuable discussions during the development of QuasiP. 
