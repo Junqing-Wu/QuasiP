@@ -42,7 +42,7 @@ Run each example from its own directory. COCO normally stores results under `dat
 |---|---|
 | [Duffing oscillator](example/0001_Duffing/README.md) | Quasi-periodic forcing, comparison of discretizations, Lyapunov stability, torus doubling, and continuation with multiple base frequencies. |
 | [Self-excited airfoil with a store](example/0002_Airfoil/README.md) | Autonomous periodic and two-frequency responses, initialization at a torus bifurcation, and comparison of m-VCF and FSE-SHT. |
-| [Rotor–stator rubbing](example/0003_RSrubbing/README.md) | Periodic and quasi-periodic response curves, stability, and orbit comparisons at prescribed rotor speeds. |
+| [Rotor–stator rubbing](example/0003_RSrubbing/README.md) | Periodic and quasi-periodic response curves, stability, and orbit comparisons at prescribed rotor speeds for *non-smooth* dynamical systems. |
 | [Clamped–pinned von Kármán beam](example/0004_CC_vonKarman_beam/README.md) | Full-order finite-element assembly, periodic Floquet analysis, and an FSE-SHT/m-VCF comparison for the two-frequency response after a Neimark–Sacker bifurcation. |
 
 ## Documentation and references
@@ -60,4 +60,4 @@ The toolbox manuscript, *QuasiP: A COCO-Based Toolbox for Continuation of Quasi-
 
 ## Acknowledgments
 
-We would like to thank Hongming Liang and Feng Wang (Southern University of Science and Technology) for valuable discussions during the development of QuasiP. 
+We would like to thank Hongming Liang and Feng Wang for valuable discussions during the development of QuasiP. 
