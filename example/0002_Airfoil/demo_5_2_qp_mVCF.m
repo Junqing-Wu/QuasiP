@@ -25,6 +25,7 @@ amp_opts    = struct('isamp',true,'isuamp',true,'isht',true,'outdof',[1,2,3],'Np
 sta_opts = struct('issta',true,'S',2^5,'L1',2^8,'N_Ly',500,'Omt',[1,2]);
 prob2 = coco_set(prob2,'cont','PtMX',3);
 prob2 = coco_set(prob2,'cont','NSV',1);
+prob2 = coco_set(prob2,'corr','ItMX',50);
 prob2 = coco_set(prob2,'cont','h_min',1e-4,'h_max',0.01);
 prob2 = coco_set(prob2,'QuasiP','amp_opts',amp_opts,'sta_opts',sta_opts); 
 % Choose torus parameterization, numerical method, basis orders, and sampling grids.
@@ -53,6 +54,7 @@ amp_opts    = struct('isamp',true,'isuamp',true,'isht',true,'outdof',[1,2,3],'Np
 sta_opts = struct('issta',true,'S',2^5,'L1',2^8,'N_Ly',500,'Omt',[1,2]);
 prob2 = coco_set(prob2,'cont','PtMX',59);
 prob2 = coco_set(prob2,'cont','NSV',1);
+prob2 = coco_set(prob2,'corr','ItMX',50);
 prob2 = coco_set(prob2,'cont','h_min',1e-3,'h_max',0.1);
 prob2 = coco_set(prob2,'QuasiP','amp_opts',amp_opts,'sta_opts',sta_opts); 
 PHI_INITIAL = struct( 'param', 'MP', ...

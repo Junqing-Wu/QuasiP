@@ -29,6 +29,8 @@ prob2 = coco_set(prob2,'cont','NSV',1);
 prob2 = coco_set(prob2,'corr','ItMX',50);
 prob2 = coco_set(prob2,'cont','h_min',1e-4,'h_max',0.2);
 prob2 = coco_set(prob2,'QuasiP','amp_opts',amp_opts,'sta_opts',sta_opts); 
+par_opts = struct('parallel',true,'ncores',16);
+prob2 = coco_set(prob2,'QuasiP','par_opts',par_opts); 
 % Choose torus parameterization, numerical method, basis orders, and sampling grids.
 % MP/mVCF uses HB/FD/CO; MT/SHT uses HT/MF and the chosen ODE integrator.
 % P stores period factors; S_wave controls denser output reconstruction.

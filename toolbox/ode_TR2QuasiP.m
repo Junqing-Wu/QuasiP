@@ -85,7 +85,7 @@ if data.ODE == 2
 end
 k12 = Xk_MF0.k_wave(:,1:2);
 mask = ismember(k12, [1 -1; 1 1], 'rows');
-if data.ode_opts.e == 0 && ~any(mask)
+if ~any(mask)
     Xk_MF0.k_wave(:,1:2) = Xk_MF0.k_wave(:,1:2)/k12(1:2,:);
     OM0          = k12(1:2,:)*OM0;
 end
@@ -123,7 +123,8 @@ value  = diag(value);
 idx    = abs(real(value)-1) < 1e-4; value  = value(~idx); vector = vector(:,~idx);
 idx    = abs(real(value)+1) < 1e-4; value  = value(~idx); vector = vector(:,~idx);
 idx    = abs(abs(value)-1)  < 1e-4; psi = value(idx); vec = vector(:,idx);
-alpha  = atan(imag(psi)./real(psi));
+
+alpha = atan(imag(psi)./real(psi));
 idx    = alpha > 0; psi = psi(idx); v0 = vec(:,idx); alpha = alpha(idx);
 if m == 1 
     Psi  = Psi(:,:,1:end-1);  Y = S/P1;
@@ -151,13 +152,13 @@ end
 end
 
 function Xk_MF = QP2X_MF(y_qp,Y,P1,e)
-k1 = 1:1/P1:7;
+k1 = 1/P1:1/P1:7;
 k = {k1,1};
 N = {numel(k1),1};
 kQ = Com_kQ(k,N);
 U = size(kQ,2)*2+1;
 
-tau_1im1 = (0:2*pi/Y/P1:2*pi-2*pi/Y/P1)';
+tau_1im1 = (0: 2*pi/Y : 2*P1*pi-2*pi/Y)';
 S_1im1 = Y*P1;
 for ii = 2:2
     tau_i = (0:2*pi/Y:2*pi-2*pi/Y)';
@@ -179,17 +180,26 @@ X2_C = [X2(1,:) ; X2(2:2:end,:) - 1i*X2(3:2:end,:)];
 kQ = [[0;0],kQ];
 k_wave = kQ';
 
-if e > 0
-    % A forced beam's first displacement can have no critical sidebands.
-    [XC_ii,A_ii] = sort(max(abs(X2_C),[],2),'descend');
-else
-    [XC_ii,A_ii] = sort(X2_C(:,1),'descend');
-end
-idx = abs(XC_ii) > max(abs(XC_ii))*1e-7;
+[XC_ii,A_ii] = sort(max(abs(X2_C),[],2),'descend');
+idx = XC_ii > max(XC_ii)*1e-7;
+
 A = A_ii(idx);
+
+% Keep the periodic fundamental and the strongest retained sideband first.
+retained = k_wave(A,:);
+iFund = find(abs(retained(:,1)-1) <= 4*eps(1) & retained(:,2) == 0, 1);
+iSide = find(abs(retained(:,2)) == 1, 1);
+if isempty(iFund) || isempty(iSide)
+    error('ode_TR2QuasiP:MissingBasisModes', ...
+        'The retained TR modes must include (1,0) and a mode with k_2 = +/-1.');
+end
+basis = A([iFund,iSide]);
+A([iFund,iSide]) = [];
+A = [basis(:);A(:)];
 
 Xk_MF.k_wave = k_wave(A,:);
 Xk_MF.Xc     = X2_C(A,:);
+
 end
 
 function kQ = Com_kQ(k,N)

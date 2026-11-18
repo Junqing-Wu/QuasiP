@@ -190,7 +190,8 @@ prob1 = coco_set(prob1,'cont','PtMX',3000);
 prob1 = coco_set(prob1,'corr','ItMX',50);
 amp_opts    = struct('isamp',true,'isuamp',true,'isht',true,'outdof',1,'Nperiod',2,'Nsampling',2^8,'t0_per',1000);
 sta_opts = struct('issta',false,'S',2^5,'L1',2^8,'N_Ly',500,'Omt',[1,2]);
-prob1 = coco_set(prob1,'QuasiP','amp_opts',amp_opts,'sta_opts',sta_opts); 
+par_opts = struct('parallel',true,'ncores',16);
+prob1 = coco_set(prob1,'QuasiP','amp_opts',amp_opts,'sta_opts',sta_opts,'par_opts',par_opts);
 PHI_INITIAL = struct( 'param', 'MT', ...
     'method',     'SHT'           , ...     
     'type',       'HT' , ... % HT or MF
@@ -223,7 +224,8 @@ prob1 = coco_set(prob1,'cont','PtMX',3000);
 prob1 = coco_set(prob1,'corr','ItMX',50);
 amp_opts    = struct('isamp',true,'isuamp',true,'isht',true,'outdof',1,'Nperiod',2,'Nsampling',2^8,'t0_per',1000);
 sta_opts = struct('issta',false,'S',2^5,'L1',2^8,'N_Ly',500,'Omt',[1,2]);
-prob1 = coco_set(prob1,'QuasiP','amp_opts',amp_opts,'sta_opts',sta_opts); 
+par_opts = struct('parallel',true,'ncores',16);
+prob1 = coco_set(prob1,'QuasiP','amp_opts',amp_opts,'sta_opts',sta_opts,'par_opts',par_opts);
 PHI_INITIAL = struct( 'param', 'MT', ...
     'method',     'SHT'           , ...     
     'type',       'MF' , ... % HT or MF

@@ -93,26 +93,22 @@ The periodic solver uses the element force handle and its tangent.
 After the periodic run, execute:
 
 ```matlab
-demo_BeamIRs_QP_SHT_seed;
 demo_BeamIRs_QP_SHT;
 demo_BeamIRs_QP_mVCF;
 figure_BeamIRs_QP;
 ```
 
-The seed demo calls `ode_TR2QuasiP` at the lower periodic TR and
-corrects the seed with a fixed projection of the first sideband.
-It then releases that seed constraint and locates three frequency
-events along the continued torus branch. The SHT
-discretization uses 1024 Newmark steps per excitation period, 32
-transverse phases, and harmonic order 7 in the second angle. It
-stores the full-state spectra for the mVCF starting guesses.
-Both demos disable quasi-periodic stability analysis.
+The SHT demo first calls `ode_TR2QuasiP` at the lower periodic TR and
+corrects the seed with a fixed projection of the first sideband. It
+saves the corrected seed in `data/beamIRs_qp_sht_seed`, releases the
+projection constraint, and continues the torus branch to locate three
+frequency events. The branch is saved in `data/beamIRs_qp_sht`.
 
-If SHT is interrupted after a converged point has been saved, run
-`demo_BeamIRs_QP_SHT_resume` to continue from that checkpoint.
-Run the SHT continuation and mVCF corrections sequentially to limit RAM
-use. The comparison routines can read the original run and its restart
-without counting the shared checkpoint twice.
+The SHT discretization uses 1024 Newmark steps per excitation period,
+32 transverse phases, and harmonic order 7 in the second angle. It
+stores the full-state spectra for the mVCF starting guesses. The SHT
+and mVCF demos run sequentially to limit RAM use. Quasi-periodic
+stability analysis is disabled.
 
 The mVCF demo corrects the SHT results at 33.859, 33.931, and
 34.034 rad/s at fixed excitation frequencies. The mVCF harmonic orders
