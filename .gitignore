@@ -6,7 +6,7 @@
 # Figures
 *.fig
 *.eps
-*.png
+# *.png
 *.lsf
 # text files
 coco_scr.txt
